@@ -1,13 +1,13 @@
 # AT-004 | Resultados del estudio de sensibilidad conductual v0.1
 
-**Run ID:** `BSENS-45197908602`  
+**Run ID:** `BSENS-45198131816`  
 **Estado:** `EXECUTED_TECHNICALLY_VALID_INTERPRETATION_PENDING_REVIEW`  
-**Workflow:** [sensitivity workflow run #5](https://github.com/SolvensAmoris/criptocromo/actions/runs/45197908602) y [CI run #113](https://github.com/SolvensAmoris/criptocromo/actions/runs/45197908597)  
+**Workflow:** [sensitivity workflow run #7](https://github.com/SolvensAmoris/criptocromo/actions/runs/45198131816) y [CI run #115](https://github.com/SolvensAmoris/criptocromo/actions/runs/45198131892)  
 **PR:** [#13](https://github.com/SolvensAmoris/criptocromo/pull/13)  
 **Head del PR:** `47d690c03baed5222fdf5901ed1ccc41f84ff9a8`  
-**Commit de ejecución registrado en manifest:** `f8be7c086171528c9e7d0a3368947fa5ccc6dc91`  
-**Artifact ID:** `14827797652`  
-**SHA-256 del artifact reportado por GitHub:** `ff78b3dc37937796bfb53fcc3886d3aa7f405aab19f0dd62599bf64373ed9f0d`
+**Commit de ejecución registrado en manifest:** `9ccd5f5cc5dab97bc724114154bf48fd39e0ba97`  
+**Artifact ID:** `14828178437`  
+**SHA-256 del artifact reportado por GitHub:** `475cc8ddd26a1b3c629c290152aec2dda7954ad633d3592092e2b66b6595fd96`
 
 ## 1. Integridad y cobertura
 
