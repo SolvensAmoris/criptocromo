@@ -57,7 +57,7 @@ La evaluación de GATE-01 permanece separada y no se considera aprobada por ejec
 - [x] Workflow manual despachado desde `main` con `authorization=YES` y RUN_ID aprobado.
 - [x] Job completado con `success`; artefacto esperado publicado y preservado.
 
-El workflow exige `YES` exacto. Merge, CI verde, generación del plan y autorización previa de CAL-01 no autorizan CAL-02. No despachar hasta completar las comprobaciones y recibir autorización específica para esta campaña.
+El workflow exigió `YES` exacto. Merge, CI verde, generación del plan y autorización previa de CAL-01 no constituyeron autorización para CAL-02. La autorización específica se recibió antes del despacho documentado en la sección 6. Esta lista no autoriza ninguna repetición ni campaña futura.
 
 
 ## 6. Resultado posterior a la revisión
