@@ -135,9 +135,34 @@ export function createMonotonicRunClock(readMonotonicNs = () => process.hrtime.b
   };
 }
 
+function validateInstrumentMetadata(metadata, label) {
+  if (!isRecord(metadata) || typeof metadata.clockSource !== 'string' || metadata.clockSource.length === 0 ||
+      metadata.clockResolutionNs !== 1n ||
+      !['QUANTIFIED', 'NOT_QUANTIFIED'].includes(metadata.uncertaintyStatus)) {
+    return { valid: false, reason: label + '.instrumentMetadata is missing or incompatible with the 1 ns clock contract' };
+  }
+  if (metadata.clockAccuracyNs !== null && metadata.clockAccuracyNs !== undefined &&
+      !isNonNegativeInt64(metadata.clockAccuracyNs)) {
+    return { valid: false, reason: label + '.instrumentMetadata.clockAccuracyNs is invalid' };
+  }
+  if (metadata.uncertaintyStatus === 'QUANTIFIED') {
+    if (!isNonNegativeInt64(metadata.measurementUncertaintyNs)) {
+      return { valid: false, reason: label + '.instrumentMetadata.measurementUncertaintyNs is invalid' };
+    }
+  } else if (metadata.measurementUncertaintyNs !== null) {
+    return { valid: false, reason: label + '.instrumentMetadata must explicitly use null when uncertainty is not quantified' };
+  }
+  if (metadata.notes !== undefined && typeof metadata.notes !== 'string') {
+    return { valid: false, reason: label + '.instrumentMetadata.notes must be a string' };
+  }
+  return { valid: true, metadata };
+}
+
 function validateTrace(trace, label, horizonNs) {
   if (!isRecord(trace)) return { valid: false, reason: label + ' trace must be an object' };
   if (!Array.isArray(trace.events)) return { valid: false, reason: label + '.events must be an array' };
+  const instrument = validateInstrumentMetadata(trace.instrumentMetadata, label);
+  if (!instrument.valid) return instrument;
   if (!Array.isArray(trace.processActiveIntervals)) {
     return { valid: false, reason: label + '.processActiveIntervals must be an array' };
   }
@@ -174,6 +199,7 @@ function validateTrace(trace, label, horizonNs) {
   return {
     valid: true,
     events,
+    instrumentMetadata: instrument.metadata,
     processIntervals: process.intervals,
     recorderIntervals: recorder.intervals,
     acquisitionErrors
@@ -293,13 +319,27 @@ export function evaluateEventEquivalence(reference, perturbed, options) {
       process: refProcessCoverage,
       recorder: refRecorderCoverage,
       fullCoverage: refCoverage,
-      acquisitionErrors: ref.acquisitionErrors
+      acquisitionErrors: ref.acquisitionErrors,
+      instrumentMetadata: {
+        clockSource: ref.instrumentMetadata.clockSource,
+        clockResolutionNs: ref.instrumentMetadata.clockResolutionNs.toString(),
+        clockAccuracyNs: ref.instrumentMetadata.clockAccuracyNs == null ? null : ref.instrumentMetadata.clockAccuracyNs.toString(),
+        measurementUncertaintyNs: ref.instrumentMetadata.measurementUncertaintyNs == null ? null : ref.instrumentMetadata.measurementUncertaintyNs.toString(),
+        uncertaintyStatus: ref.instrumentMetadata.uncertaintyStatus
+      }
     },
     perturbed: {
       process: pertProcessCoverage,
       recorder: pertRecorderCoverage,
       fullCoverage: pertCoverage,
-      acquisitionErrors: pert.acquisitionErrors
+      acquisitionErrors: pert.acquisitionErrors,
+      instrumentMetadata: {
+        clockSource: pert.instrumentMetadata.clockSource,
+        clockResolutionNs: pert.instrumentMetadata.clockResolutionNs.toString(),
+        clockAccuracyNs: pert.instrumentMetadata.clockAccuracyNs == null ? null : pert.instrumentMetadata.clockAccuracyNs.toString(),
+        measurementUncertaintyNs: pert.instrumentMetadata.measurementUncertaintyNs == null ? null : pert.instrumentMetadata.measurementUncertaintyNs.toString(),
+        uncertaintyStatus: pert.instrumentMetadata.uncertaintyStatus
+      }
     }
   });
 
