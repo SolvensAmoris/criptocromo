@@ -223,7 +223,7 @@ export function runCal01(
     const published: Record<Variant, string> = { O: '', D: '' };
     outputs.forEach((output, index) => {
       published[output.variant] = writeVariantOutput(
-        output, config, runId, configSha256, outputRoot, temporaryDirectories[index]
+        output, config, runId, configSha256, temporaryDirectories[index]
       );
     });
     return { runId, configSha256, outputs: published, recordCountPerVariant: outputs[0].records.length };
