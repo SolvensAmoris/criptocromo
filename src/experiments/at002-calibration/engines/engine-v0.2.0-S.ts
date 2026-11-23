@@ -1,4 +1,4 @@
-import type { NetworkState, SimulationConfig, Stimulus } from '../../../../core/types';
+import type { NetworkState, SimulationConfig, Stimulus } from '../../../core/types';
 import { createVariantNetwork, meanVariantActivation, stepVariantNetwork } from './variant-engine';
 export const ENGINE_ID = 'S' as const;
 export const ENGINE_VERSION = '0.2.0-S' as const;
