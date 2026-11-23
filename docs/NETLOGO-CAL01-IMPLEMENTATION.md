@@ -36,7 +36,7 @@ The GitHub Actions workflow performs these steps and uploads the full evidence p
 
 ## Input and execution identity
 
-The exporter verifies the Git blob SHA-1 identities pinned in `experiments/AT-002-CALIBRATION/configuration.json` before creating any inputs. It exports one canonical NetLogo-readable state for each of the ten CAL-01 seed labels. The initial-state file is the actual model input; NetLogo does not call its RNG.
+The exporter verifies the Git blob SHA-1 identities pinned in `experiments/AT-002-CALIBRATION/configuration.json` before creating any inputs. Numeric initial-state values are serialized with 17 significant digits and checked for IEEE-754 decimal round-trip before NetLogo reads them. It exports one canonical NetLogo-readable state for each of the ten CAL-01 seed labels. The initial-state file is the actual model input; NetLogo does not call its RNG.
 
 The TypeScript reference trace and NetLogo trace each record node-level raw/observed activation and memory, plus the complete directed weight matrix after every completed tick. A D guard event records raw activations and no fabricated post-abort state or weights.
 
