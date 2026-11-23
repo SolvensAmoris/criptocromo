@@ -4,9 +4,10 @@ import { execFileSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { auditSeedTopologies } from './topology-audit.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const CONTRACT_PATH = path.join(ROOT, 'docs/DEFINITION-COMPARATOR-CONTRACT-v0.1.json');
+const CONTRACT_PATH = path.join(ROOT, 'docs/DEFINITION-COMPARATOR-CONTRACT-v0.2.json');
 const contract = JSON.parse(readFileSync(CONTRACT_PATH, 'utf8'));
 const sha256 = (bytes) => createHash('sha256').update(bytes).digest('hex');
 const git = (args) => execFileSync('git', args, { cwd: ROOT, encoding: 'buffer', stdio: ['ignore', 'pipe', 'pipe'] });
@@ -74,16 +75,51 @@ function sourceSemantics() {
     explanation: 'The implementations agree on the configured finite overflow threshold but do not express identical behavior over all non-finite values.'
   });
 
-  const graph = core.includes('nodes.map((_, i) =>') &&
-    core.includes('nodes.map((__, j) => (i === j ? 0 : random() * 0.12))') &&
-    core.includes('state.weights[i][j] * neighbor.activation') &&
-    core.includes('nextNodes[i].activation * nextNodes[j].activation');
-  add('topology:not_a_DAG', graph ? 'MATCH' : 'MISMATCH', {
-    nodeCount: contract.topology.nodeCount,
-    directedOffDiagonalPotentialEdges: contract.topology.nodeCount * (contract.topology.nodeCount - 1),
-    reciprocalDirectedConnectionsPermitTwoCycles: graph,
-    classification: graph ? 'RECURRENT_DIRECTED_NETWORK_NOT_DAG' : 'UNVERIFIED',
-    explanation: 'Neighbor input uses prior-tick activations across directed off-diagonal weights; the update repeats this operation each tick.'
+  const graphSourcePinned = variant.includes('state = (state * 1664525 + 1013904223) >>> 0') &&
+    variant.includes('nodes.map((_, i) => nodes.map((__, j) => i === j ? 0 : random() * 0.12))') &&
+    variant.includes('state.weights[i][j] * neighbor.activation') &&
+    variant.includes('nextNodes[i].activation * nextNodes[j].activation');
+  const topologyRows = auditSeedTopologies(
+    contract.topology.seeds,
+    contract.topology.nodeCount,
+    contract.topology.perturbationLevels
+  );
+  const topologyOk = graphSourcePinned && topologyRows.length === contract.topology.seeds.length &&
+    topologyRows.every((row) =>
+      row.baseline.edgeCount === contract.topology.expectedEdgeCount &&
+      row.baseline.isDag === false &&
+      row.baseline.cycleWitness?.length === 2 &&
+      row.baseline.topologicalDepth === null &&
+      row.perturbed.length === contract.topology.perturbationLevels.length &&
+      row.perturbed.every((item) => item.graph.edgeCount === contract.topology.expectedEdgeCount && !item.graph.isDag)
+    );
+  add('topology:deterministic_cycle_audit', topologyOk ? 'MATCH' : 'MISMATCH', {
+    evidenceBasis: 'SOURCE_RECONSTRUCTION_FROM_PINNED_LCG_AND_ARTIFACT_SEED_SET',
+    artifactAdjacencyEmbedded: contract.topology.artifactAdjacencyEmbedded,
+    generatorSourcePinned: graphSourcePinned,
+    edgeSemantics: contract.topology.edgeSemantics,
+    seeds: topologyRows,
+    expectedEdgesPerSeed: contract.topology.expectedEdgeCount,
+    perturbationLevels: contract.topology.perturbationLevels,
+    conclusion: 'A 2-cycle witness is verified for each reconstructed seed; topological depth is not applicable to cyclic graphs.'
+  });
+
+  const synchronousTick = variant.includes('const nextNodes = state.nodes.map') &&
+    variant.includes('state.weights[i][j] * neighbor.activation') &&
+    variant.includes('const nextWeights = state.weights.map') &&
+    variant.includes('return { nodes: nextNodes, weights: nextWeights, tick: state.tick + 1 }') &&
+    sensitivity.includes('for (const stimulus of stimuli())') &&
+    sensitivity.includes('abortTick = tick;');
+  const noSixteenTickCap = !/max[_A-Z]?ticks?\\s*[:=]\\s*16/i.test(sensitivity + variant);
+  add('engine:tick_semantics', synchronousTick && noSixteenTickCap ? 'MATCH' : 'MISMATCH', {
+    oneTick: 'one synchronous full-state transition across all nodes',
+    readsPreviousState: variant.includes('state.weights[i][j] * neighbor.activation'),
+    commitsNextStateOnce: variant.includes('return { nodes: nextNodes, weights: nextWeights, tick: state.tick + 1 }'),
+    plannedStimuli: contract.tickSemantics.plannedStimuli,
+    pulseTicks: contract.tickSemantics.pulseTicks,
+    recoveryTicks: contract.tickSemantics.recoveryTicks,
+    noHardcodedSixteenTickCap: noSixteenTickCap,
+    guardIsTerminationMechanism: dEngine.includes('Math.abs(raw) > OVERFLOW_GUARD_ABS') && sensitivity.includes('abortTick = tick;')
   });
 }
 
@@ -119,22 +155,34 @@ function artifactAudit() {
     summaries.length === contract.artifact.expectedTrajectoryCount &&
     manifest.configSha256 === pinnedConfigSha256 &&
     manifest.pulseTicks === 18 && manifest.recoveryTicks === 24 &&
-    JSON.stringify(manifest.levels) === JSON.stringify([1e-6, 1e-8, 1e-10]);
+    JSON.stringify(manifest.levels) === JSON.stringify(contract.topology.perturbationLevels) &&
+    JSON.stringify(manifest.seedSet) === JSON.stringify(contract.artifact.expectedSeeds);
   add('artifact:manifest_scope', manifestOk ? 'MATCH' : 'MISMATCH', {
     runId: manifest.runId, sourceCommit: manifest.sourceCommit, trajectoryCount: manifest.trajectoryCount,
     pulseTicks: manifest.pulseTicks, recoveryTicks: manifest.recoveryTicks, levels: manifest.levels,
     artifactConfigSha256: manifest.configSha256, pinnedConfigSha256,
     summariesCount: summaries.length, tickComparisonsBytes: ticksBytes.length
   });
-  const seeds = [101, 202, 303, 404, 505, 606, 707, 808, 909, 1010];
+  const seeds = contract.artifact.expectedSeeds;
   const guardRows = seeds.map((seed) => {
     const rows = summaries.filter((row) => row.variant === 'D' && row.seed === seed);
     const baseline = rows.find((row) => row.variable === 'BASELINE');
     const perturbed = rows.filter((row) => row.variable !== 'BASELINE');
-    const sameGuard = Boolean(baseline) && perturbed.length === 9 && perturbed.every((row) => row.abortTick === baseline.abortTick);
-    return { seed, baselineAbortTick: baseline?.abortTick ?? null, completedTicks: baseline?.lastCompletedTick ?? null, perturbationCount: perturbed.length, allPerturbationsSameGuardTick: sameGuard };
+    const expectedAbortTick = contract.guardAudit.expectedAbortTicks[String(seed)];
+    const cause = baseline?.abortReason?.includes('D overflow guard triggered:') ? 'D_OVERFLOW_GUARD' : 'UNCLASSIFIED';
+    const baselineMatches = Boolean(baseline) && baseline.abortTick === expectedAbortTick &&
+      baseline.lastCompletedTick === expectedAbortTick - 1 &&
+      baseline.status === 'ABORTED_GUARD' && cause === contract.guardAudit.cause;
+    const sameGuard = baselineMatches && perturbed.length === 9 &&
+      perturbed.every((row) => row.abortTick === baseline.abortTick && row.lastCompletedTick === baseline.lastCompletedTick);
+    return {
+      seed, cause, expectedAbortTick, baselineAbortTick: baseline?.abortTick ?? null,
+      lastCompletedTick: baseline?.lastCompletedTick ?? null,
+      perturbationCount: perturbed.length, baselineMatchesExpectedGuard: baselineMatches,
+      allPerturbationsSameGuardTick: sameGuard
+    };
   });
-  add('artifact:D_guard_censoring_by_seed', guardRows.every((row) => row.allPerturbationsSameGuardTick) ? 'MATCH' : 'MISMATCH', guardRows);
+  add('artifact:D_guard_censoring_by_seed', guardRows.every((row) => row.allPerturbationsSameGuardTick && row.baselineMatchesExpectedGuard) ? 'MATCH' : 'MISMATCH', guardRows);
 }
 
 try {
@@ -150,9 +198,9 @@ const hasMismatch = statuses.includes('MISMATCH');
 const hasPartial = statuses.includes('PARTIAL_MATCH');
 const overall = hasMismatch ? 'DEFINITION_MISMATCH' : hasPartial ? 'DEFINITION_PARTIAL_MATCH' : 'DEFINITION_MATCH';
 const report = {
-  comparatorVersion: '0.1.0',
+  comparatorVersion: '0.2.0',
   overall,
-  interpretation: 'This comparator checks historical source identity, selected static semantic anchors, artifact provenance and topology claims. It does not prove full cross-language semantic equivalence or behavioral equivalence.',
+  interpretation: 'This comparator checks historical source identity, selected semantic anchors, deterministic topology reconstruction, synchronous tick semantics, guard censoring and artifact provenance. It does not prove full cross-language semantic equivalence or behavioral equivalence.',
   repository: contract.repository,
   historicalReferences: contract.historicalReferences,
   artifact: { ...contract.artifact, suppliedPath: artifactPath, verifiedSha256: sha256(readFileSync(artifactPath)) },
