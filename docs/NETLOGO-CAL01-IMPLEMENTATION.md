@@ -3,6 +3,7 @@
 **Status:** IMPLEMENTATION IN PR · EXPERIMENTAL RUN PENDING CI  
 **PR:** #12  
 **Model:** NetLogo 7.0.4 + BehaviorSpace  
+**Official Linux archive:** `https://downloads.netlogo.org/7.0.4/NetLogo-7.0.4-64.tgz`  
 **Scope:** shared-state implementation equivalence only
 
 ## Commands
