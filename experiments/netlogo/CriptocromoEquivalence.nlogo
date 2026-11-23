@@ -58,10 +58,10 @@ to run-one-state [state-record variant]
             (item j (item i weights)) * (item j activations)
           set j j + 1
         ]
-        let raw (0.72 * item i activations) +
+        let raw (0.72 * (item i activations)) +
           (0.42 * resonance * intensity) +
           (0.18 * neighbor-signal) +
-          (0.24 * item i memories)
+          (0.24 * (item i memories))
         set raw-list lput raw raw-list
         set i i + 1
       ]
@@ -90,7 +90,7 @@ to run-one-state [state-record variant]
           let raw item k raw-list
           let observed ifelse-value (variant = "O") [min (list 1 (max (list 0 raw)))] [raw]
           set next-activations lput observed next-activations
-          let next-memory min (list 1 (max (list 0 ((0.86 * item k memories) + (0.14 * item k activations)))))
+          let next-memory min (list 1 (max (list 0 ((0.86 * (item k memories)) + (0.14 * (item k activations))))))
           set next-memories lput next-memory next-memories
           set k k + 1
         ]
@@ -105,7 +105,7 @@ to run-one-state [state-record variant]
             let new-weight old-weight
             if i != j [
               set new-weight min (list 1 (max (list 0
-                (old-weight + (0.035 * item i next-activations * item j next-activations) - (0.008 * old-weight)))))
+                (old-weight + (0.035 * (item i next-activations) * (item j next-activations)) - (0.008 * old-weight)))))
             ]
             set next-row lput new-weight next-row
             set j j + 1
