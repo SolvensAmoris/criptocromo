@@ -12,7 +12,11 @@
     "artifactId": 14828178437,
     "sha256": "475cc8ddd26a1b3c629c290152aec2dda7954ad633d3592092e2b66b6595fd96",
     "expectedTrajectoryCount": 200,
-    "internalFiles": ["manifest.json", "summaries.json", "tick-comparisons.jsonl"]
+    "internalFiles": [
+      "manifest.json",
+      "summaries.json",
+      "tick-comparisons.jsonl"
+    ]
   },
   "sourceFiles": {
     "src/core/engine.ts": "93528403aedb708eed33729d9764918cb200bd2a",
@@ -22,7 +26,8 @@
     "src/experiments/at002-calibration/diagnostics.ts": "190570b67fb257456c82af37811f0bc6d6a0ffbd",
     "src/experiments/netlogo-interop.ts": "e0447f26f2bd877a5eaaa9f57fd31f68436ef447",
     "experiments/netlogo/CriptocromoEquivalence.nlogo": "f006db6d08a1b6ef642ba18289ea753c3eae5918",
-    "experiments/AT-002-CALIBRATION/configuration.json": "f3cd7694171681d3226ac139beadf8d71cd91849"
+    "experiments/AT-002-CALIBRATION/configuration.json": "f3cd7694171681d3226ac139beadf8d71cd91849",
+    "src/experiments/at001/config.ts": "3412c04d860aa6dacecb33fc0f0c4d101747dd8c"
   },
   "PR13OnlySourceFiles": {
     "src/experiments/behavioral-sensitivity.ts": "04969cc243a07b371139308ae0602bee4290f024"
@@ -41,7 +46,26 @@
       "ACT": "positive delta on initial activation at even-index nodes",
       "MEM": "positive delta on initial memory at even-index nodes",
       "WGT": "alternating +delta/-delta on off-diagonal initial weights; diagonal unchanged",
-      "LEVELS": [1e-6, 1e-8, 1e-10]
+      "LEVELS": [
+        0.000001,
+        1e-8,
+        1e-10
+      ]
+    },
+    "PARAMETERS": {
+      "nodeCount": 24,
+      "lambda": 0.86,
+      "alpha": 0.72,
+      "beta": 0.42,
+      "gamma": 0.18,
+      "eta": 0.24,
+      "plasticityRate": 0.035,
+      "decayRate": 0.008,
+      "resonanceWidth": 18,
+      "targetFrequency": 0.5,
+      "pulseIntensity": 1,
+      "pulseTicks": 18,
+      "recoveryTicks": 24
     }
   },
   "knownDomainDifference": {
