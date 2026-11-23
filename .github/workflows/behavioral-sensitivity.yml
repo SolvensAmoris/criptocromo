@@ -1,12 +1,6 @@
 name: Behavioral sensitivity study
 
 on:
-  pull_request:
-    branches: [main]
-    paths:
-      - "src/experiments/behavioral-sensitivity.ts"
-      - "docs/BEHAVIORAL-EQUIVALENCE-SENSITIVITY-v0.1.md"
-      - ".github/workflows/behavioral-sensitivity.yml"
   workflow_dispatch:
 
 permissions:
