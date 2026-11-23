@@ -1,0 +1,19 @@
+{
+  "exp_id": "ATANOR-AT004-001",
+  "title": "Anticítera como red de osciladores acoplados x6.5",
+  "hypothesis": "La topología de engranajes del mecanismo de Anticítera, escalada x6.5, induce transición de sincronización en K=0.2,0.5,0.85 observable en 24 osciladores Kuramoto con manivela t 0-500",
+  "scaling": 6.5,
+  "manivela_range": [0, 500],
+  "K_values": [0.2, 0.5, 0.85],
+  "N": 24,
+  "success_criteria": {
+    "K=0.2": "r_mean_last_100 < 0.4",
+    "K=0.5": "0.4 <= r <= 0.8",
+    "K=0.85": "r > 0.7"
+  },
+  "seeds": [0,1,2,3,4,7,13,21,42,99],
+  "model_not_evidence": "MODEL != EVIDENCE. Este experimento prueba coherencia interna del modelo Kuramoto-Anticítera, no que el mecanismo histórico funcionara como osciladores acoplados. Requiere validación externa con réplica física.",
+  "audit_levels": ["L1 Implementación", "L2 Matemáticas", "L3 Reproducibilidad", "L4 Validación externa", "L5 Robustez"],
+  "registered_at": "2024-12-01",
+  "author": "STARKCORE-EXP-001"
+}
