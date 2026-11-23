@@ -25,13 +25,15 @@ El objetivo no es asumir que una combinación produce emergencia. Es diseñar ex
 - **Criterio conductual v0.2:** [PR #14](https://github.com/SolvensAmoris/criptocromo/pull/14) dejó un borrador metodológico no congelado. 1e-8 y 1e-10 permanecen sin aceptación; el margen general está sin resolver.
 - **Topología y comparador:** [PR #15](https://github.com/SolvensAmoris/criptocromo/pull/15) y [PR #16](https://github.com/SolvensAmoris/criptocromo/pull/16) integraron la auditoría de red recurrente y el comparador de definición v0.2. La salida esperada es DEFINITION_PARTIAL_MATCH: el comparador detecta una diferencia conocida en el dominio de guardas TypeScript/NetLogo. No es una prueba formal de equivalencia semántica ni conductual.
 - **Análisis de semilla 303:** la evidencia original muestra que 303 es la única semilla D con 16 ticks completos, pero no la de mayor amplificación en el prefijo común 1–14. El informe específico está en [Análisis de sensibilidad D: semilla 303](docs/BEHAVIORAL-EQUIVALENCE-SEED-303-ANALYSIS-v0.1.md).
+- **BEHAVIORAL-SENSITIVITY-002:** protocolo v0.1 en borrador para intervenir por separado la activación bruta y la contribución vecinal. La primitiva tiene pruebas unitarias; no existe ejecutor de campaña y no se ha ejecutado ni autorizado el estudio. Ver [Protocolo de sensibilidad por términos](docs/BEHAVIORAL-SENSITIVITY-002-PROTOCOL-v0.1.md).
 
 ### Siguiente secuencia
 
-1. Revisar el análisis por semilla y completar los pendientes del criterio conductual.
-2. Resolver el contrato de equivalencia conductual por variable y variante, o declarar explícitamente que no existe un margen justificable con la evidencia actual.
-3. Solo después, definir la tarea y el contrato de comparación entre costo de predicción y costo de ejecución para la línea independiente de límites predictivos.
-4. Mantener AT-003 separado: su protocolo no se modifica por estas líneas de análisis.
+1. Revisar el análisis por semilla 303 y el borrador BEHAVIORAL-SENSITIVITY-002, especialmente la semántica de las intervenciones por término.
+2. Si el protocolo se aprueba, implementar un ejecutor aislado con trazas, manifiesto, checksums y controles de censura; la ejecución requerirá autorización explícita posterior.
+3. Resolver el contrato de equivalencia conductual por variable y variante, o declarar que no existe un margen justificable con la evidencia actual.
+4. Definir después la tarea y el contrato de comparación entre costo de predicción y costo de ejecución para la línea independiente de límites predictivos.
+5. Mantener AT-003 separado: su protocolo no se modifica por estas líneas de análisis.
 
 ## Principios metodológicos
 
