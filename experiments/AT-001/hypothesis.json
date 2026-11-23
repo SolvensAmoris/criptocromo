@@ -1,0 +1,19 @@
+{
+  "id": "AT-001",
+  "title": "Memoria resonante autoorganizada",
+  "status": "HYPOTHESIS",
+  "question": "¿La composición de persistencia, resonancia selectiva y plasticidad local produce una dinámica medible que no aparece de igual manera en las ablaciones individuales?",
+  "hypothesis": "La combinación de los tres mecanismos puede aumentar la persistencia de actividad selectiva después de retirar el estímulo, frente a configuraciones de control comparables.",
+  "null_hypothesis": "La combinación no produce una diferencia reproducible respecto de los controles y ablaciones bajo el protocolo fijado.",
+  "mechanisms": [
+    { "name": "memory", "role": "Persistencia temporal de una fracción del estado previo" },
+    { "name": "resonance", "role": "Ganancia selectiva dependiente de la distancia entre frecuencia de entrada y frecuencia preferida" },
+    { "name": "plasticity", "role": "Actualización local de pesos mediante coactivación y decaimiento" }
+  ],
+  "primary_metrics": ["persistenceRatio", "residualActivation"],
+  "limitations": [
+    "Modelo abstracto diseñado para simulación, no modelo físico validado",
+    "La selección de métricas puede favorecer el comportamiento buscado",
+    "Un resultado positivo no demuestra novedad científica general"
+  ]
+}
