@@ -64,6 +64,10 @@ jobs:
           test -n "$console"
           chmod +x "$console"
           echo "NETLOGO_CONSOLE=$console" >> "$GITHUB_ENV"
+          archive_sha="$(sha256sum "$RUNNER_TEMP/netlogo-7.0.4.tgz" | awk '{print $1}')"
+          printf "netlogo_version=7.0.4\\narchive_sha256=%s\\nconsole_path=%s\\n" "$archive_sha" "$console" > "$GITHUB_WORKSPACE/experiments/netlogo/interop-data/netlogo-runtime.txt"
+          echo "netlogo_version=7.0.4" >> "$GITHUB_STEP_SUMMARY"
+          echo "netlogo_archive_sha256=$archive_sha" >> "$GITHUB_STEP_SUMMARY"
           echo "netlogo_console=$console" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Execute NetLogo BehaviorSpace experiment
