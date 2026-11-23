@@ -8,10 +8,10 @@ import * as O from '../at002-calibration/engines/engine-v0.1.0-O';
 import * as D from '../at002-calibration/engines/engine-v0.2.0-D';
 import { calculateRawActivations } from '../at002-calibration/diagnostics';
 import type { NetworkState, SimulationConfig, Stimulus } from '../../core/types';
-import configJson from '../../../experiments/AT-002-CALIBRATION/configuration.json';
+import configJson from '../../experiments/AT-002-CALIBRATION/configuration.json';
 
 type Variant = 'O' | 'D';
-type Engine = typeof O;
+type Engine = { createNetwork(config: SimulationConfig): NetworkState; stepNetwork(state: NetworkState, stimulus: Stimulus, config: SimulationConfig): NetworkState };
 const engines: Record<Variant, Engine> = { O, D };
 const config = configJson as {
   seeds: number[];
@@ -36,7 +36,7 @@ const stimuli = (): Stimulus[] => Array.from(
   })
 );
 
-function appendStateRows(lines: string[], seed: number, variant: Variant, trace: string[]): void {
+function appendStateRows(lines: string[], seed: number, variant: Variant): void {
   let state: NetworkState;
   const simConfig: SimulationConfig = {
     ...defaultConfig,
@@ -83,17 +83,17 @@ function exportInputs(): void {
       state.nodes.map(node => node.memory),
       state.weights
     ]));
-    appendStateRows(expectedLines, seed, 'O', expectedLines);
-    appendStateRows(expectedLines, seed, 'D', expectedLines);
+    appendStateRows(expectedLines, seed, 'O');
+    appendStateRows(expectedLines, seed, 'D');
   }
   const initialText = initialLines.join('\n') + '\n';
   const expectedText = expectedLines.join('\n') + '\n';
   writeFileSync(path.join(outDir, 'initial_states.nls'), initialText, { flag: 'w' });
   writeFileSync(path.join(outDir, 'typescript_expected.csv'), expectedText, { flag: 'w' });
-  const configRaw = readFileSync(fileURLToPath(new URL('../../../experiments/AT-002-CALIBRATION/configuration.json', import.meta.url)), 'utf8');
-  const protocolRaw = readFileSync(fileURLToPath(new URL('../../../docs/NETLOGO-CROSS-PLATFORM-EQUIVALENCE-v0.1.md', import.meta.url)), 'utf8');
-  const modelRaw = readFileSync(fileURLToPath(new URL('../../../experiments/netlogo/CriptocromoEquivalence.nlogo', import.meta.url)), 'utf8');
-  const experimentRaw = readFileSync(fileURLToPath(new URL('../../../experiments/netlogo/behaviorspace.xml', import.meta.url)), 'utf8');
+  const configRaw = readFileSync(fileURLToPath(new URL('../../experiments/AT-002-CALIBRATION/configuration.json', import.meta.url)), 'utf8');
+  const protocolRaw = readFileSync(fileURLToPath(new URL('../../docs/NETLOGO-CROSS-PLATFORM-EQUIVALENCE-v0.1.md', import.meta.url)), 'utf8');
+  const modelRaw = readFileSync(fileURLToPath(new URL('../../experiments/netlogo/CriptocromoEquivalence.nlogo', import.meta.url)), 'utf8');
+  const experimentRaw = readFileSync(fileURLToPath(new URL('../../experiments/netlogo/behaviorspace.xml', import.meta.url)), 'utf8');
   const manifest = {
     experimentId: 'AT-003-NETLOGO-CAL01-EQUIVALENCE',
     runId: `NETLOGO-CAL01-${new Date().toISOString().replace(/[-:.TZ]/g, '').slice(0, 14)}`,
