@@ -180,6 +180,17 @@ function validateTrace(trace, label, horizonNs) {
   };
 }
 
+function isJsonValue(value, seen = new Set()) {
+  if (value === null || typeof value === 'string' || typeof value === 'boolean') return true;
+  if (typeof value === 'number') return Number.isFinite(value);
+  if (typeof value !== 'object' || seen.has(value)) return false;
+  if (!Array.isArray(value) && Object.getPrototypeOf(value) !== Object.prototype && Object.getPrototypeOf(value) !== null) return false;
+  seen.add(value);
+  const valid = (Array.isArray(value) ? value : Object.values(value)).every((item) => isJsonValue(item, seen));
+  seen.delete(value);
+  return valid;
+}
+
 function payloadsEqual(left, right) {
   if (Object.is(left, right)) return true;
   if (left === undefined || right === undefined) return false;
