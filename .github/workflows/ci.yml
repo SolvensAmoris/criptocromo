@@ -60,6 +60,17 @@ jobs:
           set -o pipefail
           npm test 2>&1 | tee ci-evidence/npm-test.log
 
+      - name: Execute preregistered behavioral sensitivity study
+        env:
+          SENSITIVITY_AUTHORIZED: YES
+          SENSITIVITY_RUN_ID: BSENS-20261123-01
+        run: npx tsx src/experiments/behavioral-sensitivity.ts
+
+      - name: Verify sensitivity artifact checksums
+        run: |
+          set -euo pipefail
+          cd artifacts/BEHAVIORAL-SENSITIVITY/BSENS-20261123-01
+          sha256sum --check checksums.sha256
       - name: Build application
         run: |
           set -o pipefail
@@ -78,6 +89,8 @@ jobs:
         uses: actions/upload-artifact@v7.0.2
         with:
           name: at002-ci-evidence-${{ github.run_id }}-${{ github.run_attempt }}
-          path: ci-evidence/
+          path: |
+            ci-evidence/
+            artifacts/BEHAVIORAL-SENSITIVITY/BSENS-20261123-01/
           if-no-files-found: warn
           retention-days: 30
