@@ -15,7 +15,8 @@
     "at002:cal02": "tsx src/experiments/at002-calibration/cal02.ts",
     "netlogo:export": "tsx src/experiments/netlogo-interop.ts export",
     "netlogo:compare": "tsx src/experiments/netlogo-interop.ts compare",
-    "verify:definitions": "node scripts/definition-comparator.mjs"
+    "verify:definitions": "node scripts/definition-comparator.mjs",
+    "test:definitions": "node --test scripts/topology-audit.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
