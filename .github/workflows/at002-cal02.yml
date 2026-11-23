@@ -1,0 +1,109 @@
+name: AT-002 CAL-02 authorized intensity sweep
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorization:
+        description: "Explicitly authorize the official CAL-02 campaign"
+        type: choice
+        required: true
+        default: "NO"
+        options:
+          - "NO"
+          - "YES"
+      run_id:
+        description: "Immutable CAL-02 campaign identifier"
+        type: string
+        required: true
+        default: "CAL02-20261123-01"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: at002-cal02-${{ inputs.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  cal02:
+    if: ${{ inputs.authorization == 'YES' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Node.js 24.22.3
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24.22.3
+          package-manager-cache: false
+
+      - name: Validate authorization and run identity
+        env:
+          AUTHORIZATION: ${{ inputs.authorization }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          test "$AUTHORIZATION" = "YES"
+          [[ "$RUN_ID" =~ ^[a-zA-Z0-9._-]+$ ]]
+          mkdir -p ci-evidence
+          {
+            echo "github_sha=${GITHUB_SHA}"
+            echo "checked_out_sha=$(git rev-parse HEAD)"
+            echo "run_id=$RUN_ID"
+            echo "authorization=$AUTHORIZATION"
+            echo "node=$(node --version)"
+            echo "npm=$(npm --version)"
+          } | tee ci-evidence/campaign-environment.txt
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run repository tests
+        run: npm test
+
+      - name: Build application
+        run: npm run build
+
+      - name: Validate AT-002 plan
+        run: npm run at002:plan
+
+      - name: Execute official CAL-02 intensity sweep
+        env:
+          AT002_CAL02_AUTHORIZED: ${{ inputs.authorization }}
+          AT002_RUN_ID: ${{ inputs.run_id }}
+        run: npm run at002:cal02
+
+      - name: Summarize campaign outputs
+        if: always()
+        env:
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { existsSync, readFileSync, appendFileSync } from 'node:fs';
+          import path from 'node:path';
+          const dir = path.join('artifacts/AT-002-CALIBRATION', 'O', 'CAL-02', process.env.RUN_ID);
+          const lines = ['## AT-002 CAL-02 intensity sweep', '', `Run ID: ${process.env.RUN_ID}`, ''];
+          const manifestPath = path.join(dir, 'manifest.json');
+          if (!existsSync(manifestPath)) {
+            lines.push('- O: no manifest published');
+          } else {
+            const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+            lines.push(`- O: **${manifest.status}**; completed ${manifest.completedStepCount}/${manifest.plannedStepCount} steps`);
+            lines.push(`- Intensities: ${manifest.intensityLevels.join(', ')}`);
+            lines.push(`- Seeds: ${manifest.seedSet.join(', ')}`);
+          }
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');
+          NODE
+
+      - name: Upload CAL-02 campaign evidence
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: at002-cal02-${{ inputs.run_id }}
+          path: |
+            artifacts/AT-002-CALIBRATION/
+            ci-evidence/
+          if-no-files-found: warn
+          retention-days: 90
