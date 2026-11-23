@@ -48,8 +48,8 @@ jobs:
           npm run verify:definitions -- --artifact artifacts/comparator-input/BSENS-45198131816-artifact.zip --out artifacts/comparator-report.json
           status=$?
           set -e
-          node -e "const r=require('./artifacts/comparator-report.json'); if(r.overall!=='DEFINITION_PARTIAL_MATCH' || r.checks.some(x=>x.status==='MISMATCH')) process.exit(1)"
-          if [ "$status" -ne 1 ]; then
-            echo "Comparator must fail closed with exit code 1 while the known guard-domain difference remains PARTIAL_MATCH; got $status"
+          if [ "$status" -ne 1 ] || [ ! -f artifacts/comparator-report.json ]; then
+            echo "Comparator did not produce the expected fail-closed partial report (exit=$status)"
             exit 1
           fi
+          node -e "const r=require('./artifacts/comparator-report.json'); if(r.overall!=='DEFINITION_PARTIAL_MATCH' || r.checks.some(x=>x.status==='MISMATCH')) process.exit(1)"
