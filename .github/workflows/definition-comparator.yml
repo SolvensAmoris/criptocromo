@@ -53,3 +53,11 @@ jobs:
             exit 1
           fi
           node -e "const r=require('./artifacts/comparator-report.json'); if(r.overall!=='DEFINITION_PARTIAL_MATCH' || r.checks.some(x=>x.status==='MISMATCH')) process.exit(1)"
+
+      - name: Preserve comparator report
+        uses: actions/upload-artifact@v4
+        with:
+          name: definition-comparator-report-v0.2
+          path: artifacts/comparator-report.json
+          if-no-files-found: error
+          retention-days: 90
