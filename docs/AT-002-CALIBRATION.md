@@ -52,7 +52,8 @@ La ejecución escribe conjuntos separados:
 Cada conjunto contiene:
 - `manifest.json`: identidad de motor, hashes de fuente/dependencias e instrumentación, SHA-256 de configuración, commit de origen, semillas, estímulo, switches y runtime;
 - `traces.jsonl`: valores brutos y observados por tick y nodo;
-- `metrics.json`: métricas por semilla, incluidos pasos completados y abortos del guard.\n- `checksums.sha256`: SHA-256 de manifest, trazas y métricas.
+- `metrics.json`: métricas por semilla, incluidos pasos completados y abortos del guard.
+- `checksums.sha256`: SHA-256 de manifest, trazas y métricas.
 
 El RUN_ID debe ser explícito y seguro para rutas. Si cualquiera de los directorios finales ya existe, el ejecutor rechaza la ejecución. No sobrescribe resultados anteriores. Los conjuntos O y D no se mezclan.
 
