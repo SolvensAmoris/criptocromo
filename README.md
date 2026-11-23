@@ -2,28 +2,48 @@
 
 **Laboratorio computacional de principios y comportamientos emergentes.**
 
-Criptocromo es el entorno experimental de ATANOR Ω para estudiar qué ocurre cuando principios de distintos dominios se formalizan como operadores ejecutables y se componen en mecanismos computacionales.
+Criptocromo es el entorno experimental de ATANOR Ω. Investiga qué ocurre cuando principios de distintos dominios se formalizan como operadores ejecutables y se componen en mecanismos computacionales.
 
 > Principio → Operador → Mecanismo → Comportamiento
 
+El objetivo no es asumir que una combinación produce emergencia. Es diseñar experimentos reproducibles capaces de distinguir efectos individuales, interacciones, límites del instrumento y explicaciones alternativas.
+
 ## Estado del proyecto
 
-**Fase:** fundación experimental  
-**Primer experimento:** AT-001, Memoria resonante autoorganizada  
-**Plataforma inicial:** aplicación web adaptable, ejecutable en navegadores de escritorio y móviles.
+**Fase:** fundación experimental y calibración del instrumento.  
+**Experimento histórico:** AT-001, Memoria resonante autoorganizada.  
+**Experimento activo:** AT-002, calibración del motor y diagnóstico de clipping.  
+**Plataforma:** aplicación web adaptable, ejecutable en navegadores de escritorio y móviles.
 
-Esta primera versión es un prototipo de investigación. Sus ecuaciones son hipótesis de diseño computacional, no leyes físicas ni afirmaciones de equivalencia biológica.
+AT-001-PILOT-01 se conserva como registro histórico. AT-002 mantiene motores versionados O, D y S para separar el comportamiento original con clipping, una variante diagnóstica sin clipping y una alternativa logística.
+
+**CAL-01:** revisión pre-ejecución documentada y cerrada. El ejecutor y el despacho manual están implementados. La campaña oficial todavía no se ha ejecutado; no hay resultados oficiales de CAL-01 publicados.
+
+## Principios metodológicos
+
+- `MODEL ≠ EVIDENCE`
+- `OBSERVATION ≠ ONTOLOGY`
+- `EXPERIMENT ≠ RESULT ≠ CONCLUSION`
+- Una prueba unitaria no sustituye una campaña experimental.
+- Divergencia observada no equivale a atribución causal.
+- `ABORTED_GUARD` es una observación diagnóstica parcial cuando el guard se activa; no representa una trayectoria completa ni autoriza extrapolar estados posteriores.
+- Los resultados negativos, los abortos controlados y las limitaciones también forman parte del registro.
+- Cada campaña debe conservar identidad del motor, configuración, semillas, entorno y checksums de sus artefactos.
+
+La hipótesis H-D1 sobre la posible contribución de la plasticidad a una retroalimentación positiva permanece como hipótesis. CAL-01 mide divergencia O/D; la atribución causal requiere una ablación independiente y pre-registrada.
 
 ## Inicio rápido
 
-Requisitos: Node.js 20 o posterior y npm.
+Requisitos: Node.js 24.x y npm. La integración continua fija Node.js 24.22.3.
+
+Instalar dependencias bloqueadas y ejecutar la aplicación:
 
 ```bash
-npm install
+npm ci
 npm run dev
 ```
 
-Para ejecutar pruebas y compilar:
+Pruebas y compilación:
 
 ```bash
 npm test
@@ -31,40 +51,46 @@ npm run build
 npm run preview
 ```
 
-## Arquitectura inicial
+Generar el plan AT-002 en modo de solo planificación:
 
-- `src/core/`: tipos y motor determinista de simulación.
-- `src/experiments/at001/`: modelo, configuración y métricas del experimento.
-- `tests/`: pruebas automatizadas del comportamiento esperado.
-- `experiments/AT-001/`: hipótesis y protocolo reproducible.
-- `docs/`: criterios metodológicos y límites de interpretación.
+```bash
+npm run at002:plan
+```
 
-## AT-001: Memoria resonante autoorganizada
+El comando anterior no ejecuta una campaña. La campaña oficial CAL-01 tiene un workflow manual separado y exige autorización explícita `YES` más un identificador de ejecución. No se despacha al hacer merge ni al ejecutar el plan.
 
-Explora la interacción de tres mecanismos: persistencia de estado, respuesta selectiva a una frecuencia y adaptación local de conexiones. Se comparará el sistema completo con ablaciones que desactivan cada mecanismo.
+## Arquitectura
 
-Las métricas iniciales son persistencia, selectividad, actividad residual y estabilidad. Un resultado interesante no demuestra por sí mismo novedad, inteligencia, conciencia ni equivalencia con un sistema natural.
+- `src/core/`: tipos y motor histórico.
+- `src/experiments/at001/`: modelo, configuración y métricas AT-001.
+- `src/experiments/at002-calibration/`: variantes O/D/S, instrumentación, diagnósticos y ejecutor CAL-01.
+- `experiments/AT-002-CALIBRATION/`: configuración versionada del protocolo.
+- `tests/`: pruebas automatizadas.
+- `docs/`: protocolos, límites metodológicos y procedimientos de análisis.
 
-## Principios metodológicos
+## Documentación principal
 
-- `EXPERIMENT ≠ RESULT ≠ CONCLUSION`
-- `MODEL ≠ EVIDENCE`
-- `OBSERVATION ≠ ONTOLOGY`
-- Las propuestas de IA son hipótesis revisables, nunca veredictos.
-- Las ejecuciones deben registrar configuración, semilla y versión del motor.
-- Los resultados negativos y las limitaciones también forman parte del registro.
+- [Protocolo AT-002](docs/AT-002-CALIBRATION.md)
+- [Checklist de análisis de trazas CAL-01](docs/AT-002-CAL-01-TRACE-ANALYSIS-CHECKLIST.md)
+- [Workflow manual CAL-01](.github/workflows/at002-cal01.yml)
 
 ## Colaboración con modelos de IA
 
-Las integraciones externas se añadirán mediante adaptadores desacoplados. Ningún proveedor será obligatorio para ejecutar el núcleo. Los modelos podrán proponer, estructurar y criticar experimentos; la ejecución y validación permanecerán en herramientas deterministas y pruebas reproducibles.
+Los modelos de IA pueden proponer, estructurar y criticar experimentos. No constituyen por sí mismos evidencia, autoridad de ejecución ni validación de resultados. El núcleo debe seguir siendo ejecutable sin depender de un proveedor externo.
 
 ## Alcance y límites
 
-La aplicación inicial corre en el navegador. El rendimiento dependerá del dispositivo y del tamaño de la simulación. No se promete capacidad uniforme en todos los teléfonos o computadoras. Las integraciones remotas, sincronización y ejecución distribuida quedan fuera de esta primera base.
+El sistema es software experimental. Sus ecuaciones son hipótesis de diseño computacional, no leyes físicas ni afirmaciones de equivalencia biológica. Una dinámica observada en la simulación describe el modelo ejecutado bajo sus condiciones; no demuestra por sí sola emergencia ontológica, inteligencia, conciencia ni comportamiento de un sistema natural.
 
-## Licencia
+## Licencias
 
-Aún no se ha seleccionado una licencia. No reutilices ni redistribuyas el código como si tuviera una licencia explícita hasta que se añada una.
+El repositorio usa licencias separadas según el tipo de material:
+
+- **Código fuente, pruebas, scripts y workflows:** Apache License 2.0, ver [LICENSE](LICENSE).
+- **README, documentación, protocolos experimentales y materiales editoriales originales:** Creative Commons Attribution 4.0 International (CC BY 4.0), ver [LICENSE-DOCS.md](LICENSE-DOCS.md).
+
+Los datos experimentales generados, archivos de terceros, dependencias, marcas y materiales expresamente identificados con otra licencia no quedan automáticamente cubiertos por estas declaraciones generales. Cada artefacto o componente de terceros conserva los avisos y términos que le correspondan. Las licencias no conceden derechos sobre las marcas ATANOR Ω ni Criptocromo.
 
 ---
+
 ATANOR Ω · Criptocromo
