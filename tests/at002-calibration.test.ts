@@ -127,7 +127,7 @@ describe('AT-002 CAL-01 execution and evidence writer', () => {
       expect(oTrace).toHaveLength(result.recordCountByVariant.O);
       expect(dTrace).toHaveLength(result.recordCountByVariant.D);
       expect(dTrace.some(record => record.stepStatus === 'guard_aborted' && record.observedActivations === null)).toBe(true);
-      expect(dTrace.some(record => record.rawActivations.some(value => Math.abs(value) > 1000000))).toBe(true);
+      expect(dTrace.some(record => record.rawActivations.some((value: number) => Math.abs(value) > 1000000))).toBe(true);
       expect(oTrace.every(record => record.engineVariant === 'O')).toBe(true);
       expect(dTrace.every(record => record.engineVariant === 'D')).toBe(true);
       expect(readFileSync(path.join(result.outputs.O, 'manifest.json'), 'utf8')).toContain('engineDependencyBlobSha1');
