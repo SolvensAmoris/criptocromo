@@ -214,8 +214,17 @@ function compare(): void {
   };
   const out = path.join(outDir, 'comparison.json');
   writeFileSync(out, JSON.stringify(result, null, 2) + '\n', { flag: 'w' });
-  const checksum = `${sha256(readFileSync(out))}  comparison.json\n`;
-  writeFileSync(path.join(outDir, 'comparison.sha256'), checksum, { flag: 'w' });
+  const manifestPath = path.join(outDir, 'manifest.json');
+  const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as Record<string, unknown>;
+  manifest.status = result.status;
+  manifest.completedAt = new Date().toISOString();
+  manifest.netlogoTraceSha256 = sha256(readFileSync(path.join(outDir, 'netlogo_trace.csv')));
+  manifest.netlogoRuntimeSha256 = sha256(readFileSync(path.join(outDir, 'netlogo-runtime.txt')));
+  manifest.comparisonSha256 = sha256(readFileSync(out));
+  writeFileSync(manifestPath, JSON.stringify(manifest, null, 2) + '\n', { flag: 'w' });
+  const checksumNames = ['initial_states.nls', 'typescript_expected.csv', 'netlogo_trace.csv', 'netlogo-runtime.txt', 'comparison.json', 'manifest.json'];
+  writeFileSync(path.join(outDir, 'checksums.sha256'), checksumNames
+    .map(name => `${sha256(readFileSync(path.join(outDir, name)))}  ${name}`).join('\n') + '\n', { flag: 'w' });
   process.stdout.write(JSON.stringify(result, null, 2) + '\n');
   if (result.status !== 'EQUIVALENCE_OBSERVED_WITHIN_TOLERANCE') process.exitCode = 1;
 }
