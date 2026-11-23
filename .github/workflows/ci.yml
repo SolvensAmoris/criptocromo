@@ -10,7 +10,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   verify:
@@ -38,7 +38,7 @@ jobs:
             echo "runner_arch=${RUNNER_ARCH}"
           } | tee ci-evidence/environment.txt
 
-      # Temporary bootstrap: this branch has no committed package-lock.json yet.
+      # Temporary bootstrap: the lockfile is committed by the push run below.
       - name: Bootstrap package lock
         run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
 
@@ -64,6 +64,21 @@ jobs:
         run: |
           set -o pipefail
           npm run at002:plan 2>&1 | tee ci-evidence/at002-plan.log
+
+      - name: Commit generated lockfile
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if git ls-files --error-unmatch package-lock.json >/dev/null 2>&1; then
+            echo "package-lock.json is already tracked"
+            exit 0
+          fi
+          lock_content="$(base64 -w 0 package-lock.json)"
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/package-lock.json" \
+            -f message="chore: add reproducible npm lockfile" \
+            -f content="$lock_content" \
+            -f branch="${GITHUB_REF_NAME}"
 
       - name: Upload CI evidence and bootstrapped lockfile
         if: always()
