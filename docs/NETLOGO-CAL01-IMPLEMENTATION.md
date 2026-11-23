@@ -45,7 +45,7 @@ The run uses the CAL-01 pulse/recovery sequence: 18 ticks at target frequency 0.
 
 ## Implementation notes
 
-The NetLogo model avoids shadowing the built-in `distance` reporter; the local frequency difference is named `frequency-delta`.
+The NetLogo model avoids shadowing the built-in `distance` reporter; the local frequency difference is named `frequency-delta`. It reuses the outer node index within the tick scope rather than redeclaring it in a nested block.
 
 ## Comparison
 
