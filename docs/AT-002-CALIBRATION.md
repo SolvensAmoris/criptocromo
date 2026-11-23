@@ -1,6 +1,6 @@
 # AT-002 | Protocolo de calibración
 
-**Estado:** revisión pre-ejecución CAL-01 cerrada y documentada; campaña oficial no ejecutada; autorización de campaña pendiente.  
+**Estado:** CAL-01 ejecutado y analizado; CAL-02 implementado en rama de trabajo, pendiente de revisión, integración y autorización de campaña.  
 **Predecesor conservado:** AT-001-PILOT-01, motor 0.1.0.  
 **Versión del protocolo:** 0.3.0.
 
@@ -71,7 +71,7 @@ Barrido predefinido de intensidad de entrada: **0.10, 0.20, 0.35, 0.50, 0.75**. 
 
 Usar las diez semillas pareadas: 101, 202, 303, 404, 505, 606, 707, 808, 909, 1010. Registrar todos los resultados, incluidos los que saturen o no produzcan respuesta. La intensidad es el único factor manipulado en esta fase.
 
-El motor 0.1.0 limita la intensidad de entrada a [0,1]; por tanto, el barrido propuesto usa valores dentro de ese intervalo. El plan está definido; el ejecutor de CAL-02 todavía no está implementado.
+El motor 0.1.0 limita la intensidad de entrada a [0,1]; por tanto, el barrido propuesto usa valores dentro de ese intervalo. El ejecutor de CAL-02 está implementado en `src/experiments/at002-calibration/cal02.ts`. Ejecuta exclusivamente O, con las cinco intensidades pre-registradas, las diez semillas pareadas y los 18 pasos de pulso más 24 de recuperación por combinación. El total planificado es 5 × 10 × 42 = 2,100 pasos. Registra trazas por tick/nodo, activación bruta y observada, clipping, fracción activa, pico y residual por semilla. Produce manifiesto, trazas, métricas y checksums SHA-256 en `artifacts/AT-002-CALIBRATION/O/CAL-02/<RUN_ID>/`. Verifica la identidad Git blob SHA-1 del motor O y sus dependencias; verifica la paridad de la instrumentación frente al motor; rechaza IDs inseguros y sobrescrituras. El comando `npm run at002:cal02` exige `AT002_CAL02_AUTHORIZED=YES` y `AT002_RUN_ID` explícito. El workflow manual `.github/workflows/at002-cal02.yml` requiere seleccionar YES. El workflow no se ejecuta automáticamente al fusionar código. La implementación está pendiente de revisión de CI y no constituye autorización para la campaña.
 
 ## 5. CAL-03 | Disociación de memoria y plasticidad
 
@@ -128,7 +128,7 @@ La aprobación de código, la aprobación del plan y la autorización de una cam
 
 Las pruebas verifican equivalencia O/D antes del clipping, divergencia después del límite, guard de overflow, identidades de dependencias, captura de activación bruta, integridad de las trazas, separación de artefactos y política no-overwrite. La prueba de integración del ejecutor usa un directorio temporal y no crea una campaña oficial.
 
-El runner `npm run at002:plan` sigue siendo plan-only. El comando `npm run at002:cal01` exige `AT002_CAL01_AUTHORIZED=YES` y un `AT002_RUN_ID` explícito. El workflow manual `.github/workflows/at002-cal01.yml` encapsula esa ejecución: requiere seleccionar `YES`, valida el identificador, repite tests/build/plan, ejecuta O y D, resume los estados y publica los artefactos durante 90 días. El identificador predeterminado propuesto es `CAL01-20261123-01`; no se ejecuta automáticamente al fusionar el workflow. Un envío con autorización `NO` no inicia el job.
+El runner `npm run at002:plan` sigue siendo plan-only. El comando `npm run at002:cal01` exige `AT002_CAL01_AUTHORIZED=YES` y un `AT002_RUN_ID` explícito. CAL-02 usa `npm run at002:cal02`, `AT002_CAL02_AUTHORIZED=YES` y un identificador explícito distinto, mediante el workflow manual `.github/workflows/at002-cal02.yml`. El workflow manual `.github/workflows/at002-cal01.yml` encapsula esa ejecución: requiere seleccionar `YES`, valida el identificador, repite tests/build/plan, ejecuta O y D, resume los estados y publica los artefactos durante 90 días. El identificador predeterminado propuesto es `CAL01-20261123-01`; no se ejecuta automáticamente al fusionar el workflow. Un envío con autorización `NO` no inicia el job.
 
 
 ## 11. Enmienda de revisión pre-ejecución CAL-01
