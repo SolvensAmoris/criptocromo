@@ -1,6 +1,6 @@
 # AT-002 | Protocolo de calibración
 
-**Estado:** CAL-01 instrumentado y probado en directorio temporal; campaña oficial no ejecutada.  
+**Estado:** revisión pre-ejecución CAL-01 cerrada y documentada; campaña oficial no ejecutada; autorización de campaña pendiente.  
 **Predecesor conservado:** AT-001-PILOT-01, motor 0.1.0.  
 **Versión del protocolo:** 0.3.0.
 
@@ -104,14 +104,14 @@ Estos umbrales son reglas operativas iniciales para decidir si AT-001-R2 puede e
 
 | Etapa | Estado |
 |---|---|
-| CAL-01 | Ejecutor y workflow manual implementados; prueba temporal detecta aborto del guard D; campaña oficial pendiente de autorización y despacho |
+| CAL-01 | Revisión pre-ejecución cerrada; ejecutor y workflow manual implementados; campaña oficial pendiente de autorización y despacho |
 | CAL-02 | Plan definido; ejecutor pendiente |
 | CAL-03 | Plan definido; ejecutor pendiente |
 | CAL-04 | Plan definido; ejecutor pendiente |
 | GATE-01 | No evaluado |
 | AT-001-R2 | Bloqueado hasta que GATE-01 pase |
 
-La aprobación de código, la aprobación del plan y la autorización de una campaña son decisiones distintas. Si D termina en `ABORTED_GUARD`, CAL-01 debe leerse como diagnóstico parcial y no como comparación O/D completa; esa condición debe resolverse o aceptarse explícitamente en una revisión del protocolo antes de interpretar la etapa. Un CI verde no autoriza una campaña. Una prueba unitaria no sustituye una ejecución experimental.
+La aprobación de código, la aprobación del plan y la autorización de una campaña son decisiones distintas. Si D termina en `ABORTED_GUARD`, CAL-01 se lee como diagnóstico parcial y no como comparación O/D completa, conforme a la enmienda de revisión pre-ejecución de la sección 11. Un CI verde no autoriza una campaña. Una prueba unitaria no sustituye una ejecución experimental.
 
 ## 9. Limitaciones explícitas
 
@@ -129,3 +129,73 @@ La aprobación de código, la aprobación del plan y la autorización de una cam
 Las pruebas verifican equivalencia O/D antes del clipping, divergencia después del límite, guard de overflow, identidades de dependencias, captura de activación bruta, integridad de las trazas, separación de artefactos y política no-overwrite. La prueba de integración del ejecutor usa un directorio temporal y no crea una campaña oficial.
 
 El runner `npm run at002:plan` sigue siendo plan-only. El comando `npm run at002:cal01` exige `AT002_CAL01_AUTHORIZED=YES` y un `AT002_RUN_ID` explícito. El workflow manual `.github/workflows/at002-cal01.yml` encapsula esa ejecución: requiere seleccionar `YES`, valida el identificador, repite tests/build/plan, ejecuta O y D, resume los estados y publica los artefactos durante 90 días. El identificador predeterminado propuesto es `CAL01-20261123-01`; no se ejecuta automáticamente al fusionar el workflow. Un envío con autorización `NO` no inicia el job.
+
+
+## 11. Enmienda de revisión pre-ejecución CAL-01
+
+**Estado de revisión:** CERRADA Y DOCUMENTADA.  
+**Estado de campaña:** PENDIENTE; esta enmienda no constituye autorización para ejecutar.  
+**Base de código revisada:** PR #3 integrado en `ecc4a48fac1147201f182bff64d84576b9496397`.  
+**Identificador propuesto:** `CAL01-20261123-01`.
+
+### 11.1 Qué mide CAL-01 y qué no mide
+
+CAL-01 compara O y D con las mismas diez semillas, 18 ticks de pulso y 24 ticks de recuperación: 840 pasos planeados entre ambos motores.
+
+CAL-01 sí mide:
+- Cuánto se aparta D del comportamiento limitado de O.
+- El primer tick observado de divergencia O/D, según la definición operacional del checklist de análisis.
+- Cuántos valores brutos quedan fuera de [0,1].
+- Cómo crece el exceso absoluto de activación.
+- Cuántas semillas de D terminan por guard.
+- Qué comportamiento conserva O durante la recuperación.
+
+CAL-01 no demuestra por sí solo:
+- Que la plasticidad sea la causa de la divergencia.
+- Que la retroalimentación hebbiana sea el mecanismo causal.
+- Que la interacción activación-plasticidad sea necesaria o suficiente.
+
+La atribución causal requiere una ablación específica, pre-registrada por separado. CAL-01 es medición diagnóstica, no atribución causal.
+
+### 11.2 Interpretación de ABORTED_GUARD
+
+D puede terminar en estado `ABORTED_GUARD`.
+
+Cuando ocurre:
+- El ejecutor conserva el tick que dispara el guard, los valores brutos y las métricas parciales.
+- No crea ni infiere un estado posterior al tick abortado.
+- No extrapola la trayectoria después del guard.
+- No sustituye el valor abortado por un valor recortado, interpolado o imputado.
+- `observedActivations` es `null` para el tick abortado porque no existe un estado posterior válido de D para ese paso.
+
+Por tanto, `ABORTED_GUARD` es una observación diagnóstica parcial, no una comparación completa de trayectorias. No se clasifica como fallo del instrumento, error genérico de ejecución ni resultado descartable. Tampoco justifica elevar el guard, reducir la ganancia o cambiar semillas después de observar el resultado.
+
+Se interpreta como evidencia de que D, bajo la configuración, semilla, pesos y activación registrados, alcanzó el límite de seguridad computacional en ese tick. Es un punto de datos para cuantificar la divergencia O/D hasta ese límite, no una observación de lo que habría ocurrido después.
+
+El guard absoluto de 1,000,000 se mantiene sin cambios. Es un límite de seguridad computacional, no un umbral físico ni una propiedad universal del fenómeno.
+
+### 11.3 Hipótesis H-D1: ruta de retroalimentación plausible
+
+El código de `variant-engine.ts` implementa actualización de pesos a partir de las activaciones nuevas. Esto establece una ruta computacional plausible:
+
+`activación nueva → actualización de pesos → señal de vecinos modificada → activación posterior`.
+
+**H-D1 (HIPÓTESIS, no resultado):** al retirar el clipping, la plasticidad hebbiana podría contribuir a un bucle de retroalimentación positiva que amplifique activación y pesos hasta alcanzar el guard. Sin plasticidad, esa ruta específica de actualización de pesos estaría desactivada.
+
+CAL-01 no puede confirmar ni refutar por sí solo H-D1, porque su configuración mantiene plasticidad activada en ambos motores y compara O frente a D. H-D1 requiere una ablación independiente que mantenga constantes las demás variables y compare D con plasticidad activada frente a desactivada. Esa ablación tendrá protocolo, identidad de motor, semillas, criterios y artefactos propios. No forma parte de CAL-01.
+
+### 11.4 Condiciones de revisión y autorización
+
+La revisión documental se considera cerrada con estas condiciones:
+- La interpretación de `ABORTED_GUARD` está fijada antes de observar datos oficiales.
+- El motor O y el motor D permanecen sin modificaciones.
+- El guard de 1,000,000 permanece sin modificaciones.
+- Los parámetros, semillas, switches y ventanas de CAL-01 permanecen sin modificaciones.
+- PR #3 está integrado en `main`.
+
+La autorización de campaña sigue siendo una decisión separada. El workflow manual requiere seleccionar `YES` y proporcionar un identificador explícito. El identificador propuesto es `CAL01-20261123-01`. El merge de esta enmienda no despacha el workflow ni ejerce la autorización. Antes de iniciar, el workflow vuelve a ejecutar tests, build y validación del plan.
+
+### 11.5 Checklist posterior a la campaña
+
+El análisis de trazas está especificado en `docs/AT-002-CAL-01-TRACE-ANALYSIS-CHECKLIST.md`. Debe completarse usando los artefactos originales, verificando checksums e identidad antes de interpretar resultados. Deben informarse resultados completos y parciales por separado; no se deben imputar ticks posteriores a un aborto.
+
