@@ -1,4 +1,4 @@
-import type { PrincipleSwitches } from '../../../core/types';
+import type { PrincipleSwitches } from '../../core/types';
 export type EngineVariantId = 'O' | 'D' | 'S';
 export type CalibrationStage = 'CAL-01' | 'CAL-02' | 'CAL-03' | 'CAL-04';
 export interface CalibrationCondition extends PrincipleSwitches { id: string; }
