@@ -99,6 +99,8 @@ function artifactAudit() {
   const ticksBytes = unzip('tick-comparisons.jsonl');
   const manifest = JSON.parse(manifestBytes.toString('utf8'));
   const summaries = JSON.parse(summariesBytes.toString('utf8'));
+  const pinnedConfig = git(['show', contract.historicalReferences.PR13 + ':experiments/AT-002-CALIBRATION/configuration.json']);
+  const pinnedConfigSha256 = sha256(pinnedConfig);
   const internal = unzip('checksums.sha256').toString('utf8').trim().split(/\r?\n/);
   const internalChecks = [];
   for (const line of internal) {
@@ -113,11 +115,13 @@ function artifactAudit() {
     manifest.sourceCommit === contract.historicalReferences.PR13SensitivitySourceCommit &&
     manifest.trajectoryCount === contract.artifact.expectedTrajectoryCount &&
     manifest.expectedTrajectoryCount === contract.artifact.expectedTrajectoryCount &&
+    manifest.configSha256 === pinnedConfigSha256 &&
     manifest.pulseTicks === 18 && manifest.recoveryTicks === 24 &&
     JSON.stringify(manifest.levels) === JSON.stringify([1e-6, 1e-8, 1e-10]);
   add('artifact:manifest_scope', manifestOk ? 'MATCH' : 'MISMATCH', {
     runId: manifest.runId, sourceCommit: manifest.sourceCommit, trajectoryCount: manifest.trajectoryCount,
     pulseTicks: manifest.pulseTicks, recoveryTicks: manifest.recoveryTicks, levels: manifest.levels,
+    artifactConfigSha256: manifest.configSha256, pinnedConfigSha256,
     summariesCount: summaries.length, tickComparisonsBytes: ticksBytes.length
   });
   const seeds = [101, 202, 303, 404, 505, 606, 707, 808, 909, 1010];
