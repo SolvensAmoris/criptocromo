@@ -39,3 +39,16 @@ test('all declared WGT perturbation levels preserve the 552-edge topology', () =
     }
   }
 });
+
+test('reports a valid topological depth only for an acyclic graph', () => {
+  const dag = [
+    [0, 0, 0],
+    [0.1, 0, 0],
+    [0, 0.1, 0]
+  ];
+  const graph = analyzeDirectedGraph(dag);
+  assert.equal(graph.isDag, true);
+  assert.equal(graph.cycleWitness, null);
+  assert.equal(graph.topologicalDepth, 3);
+  assert.equal(graph.topologicalSortProcessedNodes, 3);
+});
