@@ -1,0 +1,180 @@
+{
+  "experimentId": "AT-002-CALIBRATION",
+  "protocolVersion": "0.2.0",
+  "status": "PROTOCOL_AND_RUNNER_SKELETON_NOT_EXECUTED",
+  "predecessor": "AT-001-PILOT-01",
+  "engineVariants": {
+    "O": {
+      "name": "original",
+      "version": "0.1.0",
+      "module": "src/experiments/at002-calibration/engines/engine-v0.1.0-O.ts",
+      "activation": "hard_clip_0_1",
+      "immutableReference": true,
+      "sourceBlobSha1": "80ab84dc86c61e15c7fc784556c86d5d2289c9b2"
+    },
+    "D": {
+      "name": "diagnostic_unclipped",
+      "version": "0.2.0-D",
+      "module": "src/experiments/at002-calibration/engines/engine-v0.2.0-D.ts",
+      "activation": "identity_activation_with_fail_fast_overflow_guard",
+      "overflowGuardAbs": 1000000,
+      "purpose": "counterfactual clipping diagnostic",
+      "sourceBlobSha1": "5938b3052667381220ef947ab8672b03b1f1f10e",
+      "sharedKernelBlobSha1": "5c1fad6c983a863c737b02d2f90155b35a304d10"
+    },
+    "S": {
+      "name": "smooth_sigmoid",
+      "version": "0.2.0-S",
+      "module": "src/experiments/at002-calibration/engines/engine-v0.2.0-S.ts",
+      "activation": "logistic_sigmoid",
+      "purpose": "alternative nonlinear activation; not a clipping-loss estimator",
+      "sourceBlobSha1": "23612fe6179620b24c572c9b63d5fada3b2ab407",
+      "sharedKernelBlobSha1": "5c1fad6c983a863c737b02d2f90155b35a304d10"
+    }
+  },
+  "seeds": [
+    101,
+    202,
+    303,
+    404,
+    505,
+    606,
+    707,
+    808,
+    909,
+    1010
+  ],
+  "protocol": {
+    "targetFrequency": 0.5,
+    "offTargetFrequency": 0.9,
+    "pulseSteps": 18,
+    "recoverySteps": 24,
+    "cal03SequenceSteps": 8,
+    "cal03Intensity": 0.5,
+    "cal04Intensity": 0.5
+  },
+  "cal01": {
+    "variants": [
+      "O",
+      "D"
+    ],
+    "intensity": 1,
+    "switches": {
+      "memory": true,
+      "resonance": true,
+      "plasticity": true
+    }
+  },
+  "cal02": {
+    "factor": "input_intensity",
+    "levels": [
+      0.1,
+      0.2,
+      0.35,
+      0.5,
+      0.75
+    ],
+    "fixedParameters": true,
+    "engineVariant": "O",
+    "switches": {
+      "memory": true,
+      "resonance": true,
+      "plasticity": true
+    }
+  },
+  "cal03": {
+    "engineVariant": "O",
+    "intensity": 0.5,
+    "sequenceSteps": 8,
+    "profiles": [
+      "repeated-target",
+      "alternating-target-offtarget"
+    ],
+    "conditions": [
+      {
+        "id": "BASELINE",
+        "memory": false,
+        "resonance": false,
+        "plasticity": false
+      },
+      {
+        "id": "A_ONLY",
+        "memory": true,
+        "resonance": false,
+        "plasticity": false
+      },
+      {
+        "id": "C_ONLY",
+        "memory": false,
+        "resonance": false,
+        "plasticity": true
+      }
+    ]
+  },
+  "cal04": {
+    "engineVariant": "O",
+    "intensity": 0.5,
+    "conditions": [
+      {
+        "id": "BASELINE",
+        "memory": false,
+        "resonance": false,
+        "plasticity": false
+      },
+      {
+        "id": "A_ONLY",
+        "memory": true,
+        "resonance": false,
+        "plasticity": false
+      },
+      {
+        "id": "C_ONLY",
+        "memory": false,
+        "resonance": false,
+        "plasticity": true
+      }
+    ]
+  },
+  "cal03TraceFields": [
+    "tick",
+    "meanActivation",
+    "meanMemory",
+    "meanAbsoluteWeightDelta",
+    "totalAbsoluteWeightDelta"
+  ],
+  "gate01": {
+    "peakMeanRange": [
+      0.4,
+      0.8
+    ],
+    "peakConditionsMinimum": 6,
+    "activeNodeFractionRange": [
+      0.3,
+      0.85
+    ],
+    "minimumOneConditionBelowPeak": 0.4,
+    "maximumConditionMeanPeak": 0.999999,
+    "minimumPeakSd": 0.02,
+    "minimumConditionsWithPeakSd": 4,
+    "minimumRecoveryDropFraction": 0.2,
+    "minimumConditionsWithRecovery": 4,
+    "decision": "all_criteria_required"
+  },
+  "artifactPolicy": {
+    "root": "artifacts/AT-002-CALIBRATION",
+    "partitionBy": [
+      "engineVariant",
+      "stage",
+      "runId"
+    ],
+    "oneEngineVariantPerArtifactSet": true,
+    "includeEngineVersionAndSourceHash": true,
+    "noOverwrite": true
+  },
+  "integrity": {
+    "preserveAt001Pilot01": true,
+    "noOverwrite": true,
+    "doNotSelectByInteraction": true,
+    "runnerMode": "plan_only"
+  }
+}

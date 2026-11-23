@@ -9,7 +9,8 @@
     "preview": "vite preview --host 0.0.0.0",
     "test": "vitest run",
     "test:watch": "vitest",
-    "factorial": "tsx src/experiments/at001/factorial.ts"
+    "factorial": "tsx src/experiments/at001/factorial.ts",
+    "at002:plan": "tsx src/experiments/at002-calibration/plan.ts"
   },
   "dependencies": {
     "react": "^18.3.1",
