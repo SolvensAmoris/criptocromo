@@ -54,10 +54,13 @@ jobs:
           set -euo pipefail
           mkdir -p "$RUNNER_TEMP/netlogo"
           curl --fail --location --retry 3 \
-            https://ccl.northwestern.edu/netlogo/7.0.4/NetLogo-7.0.4-64.tgz \
+            https://downloads.netlogo.org/7.0.4/NetLogo-7.0.4-64.tgz \
             --output "$RUNNER_TEMP/netlogo-7.0.4.tgz"
           tar -xzf "$RUNNER_TEMP/netlogo-7.0.4.tgz" -C "$RUNNER_TEMP/netlogo"
           console="$(find "$RUNNER_TEMP/netlogo" -type f -name NetLogo_Console | head -n 1)"
+          if [ -z "$console" ]; then
+            console="$(find "$RUNNER_TEMP/netlogo" -type f -path "*/bin/NetLogo" | head -n 1)"
+          fi
           test -n "$console"
           chmod +x "$console"
           echo "NETLOGO_CONSOLE=$console" >> "$GITHUB_ENV"
