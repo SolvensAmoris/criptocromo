@@ -1,8 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE experiments SYSTEM "behaviorspace.dtd">
 <experiments>
-  <experiment name="Criptocromo CAL01 shared-state equivalence" repetitions="1" runMetricsEveryStep="false">
+  <experiment name="Criptocromo CAL01 shared-state equivalence" repetitions="1" sequentialRunOrder="false" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <metric>ticks</metric>
+    <metrics>
+      <metric>ticks</metric>
+    </metrics>
   </experiment>
 </experiments>
