@@ -13,7 +13,8 @@
       "sourceBlobSha1": "80ab84dc86c61e15c7fc784556c86d5d2289c9b2",
       "dependencyBlobSha1": {
         "src/core/engine.ts": "93528403aedb708eed33729d9764918cb200bd2a",
-        "src/core/types.ts": "d22b09fda49474b7dd0b1453bb14cbb301d2a30d"
+        "src/core/types.ts": "d22b09fda49474b7dd0b1453bb14cbb301d2a30d",
+        "src/experiments/at001/config.ts": "3412c04d860aa6dacecb33fc0f0c4d101747dd8c"
       }
     },
     "D": {
@@ -27,7 +28,8 @@
       "sharedKernelBlobSha1": "5c1fad6c983a863c737b02d2f90155b35a304d10",
       "dependencyBlobSha1": {
         "src/experiments/at002-calibration/engines/variant-engine.ts": "5c1fad6c983a863c737b02d2f90155b35a304d10",
-        "src/core/types.ts": "d22b09fda49474b7dd0b1453bb14cbb301d2a30d"
+        "src/core/types.ts": "d22b09fda49474b7dd0b1453bb14cbb301d2a30d",
+        "src/experiments/at001/config.ts": "3412c04d860aa6dacecb33fc0f0c4d101747dd8c"
       }
     },
     "S": {
@@ -40,11 +42,23 @@
       "sharedKernelBlobSha1": "5c1fad6c983a863c737b02d2f90155b35a304d10",
       "dependencyBlobSha1": {
         "src/experiments/at002-calibration/engines/variant-engine.ts": "5c1fad6c983a863c737b02d2f90155b35a304d10",
-        "src/core/types.ts": "d22b09fda49474b7dd0b1453bb14cbb301d2a30d"
+        "src/core/types.ts": "d22b09fda49474b7dd0b1453bb14cbb301d2a30d",
+        "src/experiments/at001/config.ts": "3412c04d860aa6dacecb33fc0f0c4d101747dd8c"
       }
     }
   },
-  "seeds": [101, 202, 303, 404, 505, 606, 707, 808, 909, 1010],
+  "seeds": [
+    101,
+    202,
+    303,
+    404,
+    505,
+    606,
+    707,
+    808,
+    909,
+    1010
+  ],
   "protocol": {
     "targetFrequency": 0.5,
     "offTargetFrequency": 0.9,
@@ -52,17 +66,30 @@
     "recoverySteps": 24
   },
   "cal01": {
-    "variants": ["O", "D"],
+    "variants": [
+      "O",
+      "D"
+    ],
     "intensity": 1,
     "switches": {
       "memory": true,
       "resonance": true,
       "plasticity": true
+    },
+    "instrumentation": {
+      "src/experiments/at002-calibration/cal01.ts": "e9d049f065a2b039649b589148af73f008e9797c",
+      "src/experiments/at002-calibration/diagnostics.ts": "39246ee72dc63dfd59862f658e0d10c7aeca6eab"
     }
   },
   "cal02": {
     "factor": "input_intensity",
-    "levels": [0.1, 0.2, 0.35, 0.5, 0.75],
+    "levels": [
+      0.1,
+      0.2,
+      0.35,
+      0.5,
+      0.75
+    ],
     "fixedParameters": true,
     "engineVariant": "O",
     "switches": {
@@ -75,20 +102,53 @@
     "engineVariant": "O",
     "intensity": 0.5,
     "sequenceSteps": 8,
-    "profiles": ["repeated-target", "alternating-target-offtarget"],
+    "profiles": [
+      "repeated-target",
+      "alternating-target-offtarget"
+    ],
     "conditions": [
-      {"id": "BASELINE", "memory": false, "resonance": false, "plasticity": false},
-      {"id": "A_ONLY", "memory": true, "resonance": false, "plasticity": false},
-      {"id": "C_ONLY", "memory": false, "resonance": false, "plasticity": true}
+      {
+        "id": "BASELINE",
+        "memory": false,
+        "resonance": false,
+        "plasticity": false
+      },
+      {
+        "id": "A_ONLY",
+        "memory": true,
+        "resonance": false,
+        "plasticity": false
+      },
+      {
+        "id": "C_ONLY",
+        "memory": false,
+        "resonance": false,
+        "plasticity": true
+      }
     ]
   },
   "cal04": {
     "engineVariant": "O",
     "intensity": 0.5,
     "conditions": [
-      {"id": "BASELINE", "memory": false, "resonance": false, "plasticity": false},
-      {"id": "A_ONLY", "memory": true, "resonance": false, "plasticity": false},
-      {"id": "C_ONLY", "memory": false, "resonance": false, "plasticity": true}
+      {
+        "id": "BASELINE",
+        "memory": false,
+        "resonance": false,
+        "plasticity": false
+      },
+      {
+        "id": "A_ONLY",
+        "memory": true,
+        "resonance": false,
+        "plasticity": false
+      },
+      {
+        "id": "C_ONLY",
+        "memory": false,
+        "resonance": false,
+        "plasticity": true
+      }
     ]
   },
   "cal03TraceFields": [
@@ -99,9 +159,15 @@
     "totalAbsoluteWeightDelta"
   ],
   "gate01": {
-    "peakMeanRange": [0.4, 0.8],
+    "peakMeanRange": [
+      0.4,
+      0.8
+    ],
     "peakConditionsMinimum": 6,
-    "activeNodeFractionRange": [0.3, 0.85],
+    "activeNodeFractionRange": [
+      0.3,
+      0.85
+    ],
     "minimumOneConditionBelowPeak": 0.4,
     "maximumConditionMeanPeak": 0.999999,
     "minimumPeakSd": 0.02,
@@ -112,7 +178,11 @@
   },
   "artifactPolicy": {
     "root": "artifacts/AT-002-CALIBRATION",
-    "partitionBy": ["engineVariant", "stage", "runId"],
+    "partitionBy": [
+      "engineVariant",
+      "stage",
+      "runId"
+    ],
     "oneEngineVariantPerArtifactSet": true,
     "includeEngineVersionAndSourceHash": true,
     "noOverwrite": true
