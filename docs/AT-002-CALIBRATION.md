@@ -50,9 +50,9 @@ La ejecución escribe conjuntos separados:
 `artifacts/AT-002-CALIBRATION/D/CAL-01/<RUN_ID>/`
 
 Cada conjunto contiene:
-- `manifest.json`: identidad de motor, hashes de fuente/dependencias, SHA-256 de configuración, semillas, estímulo, switches y entorno del protocolo;
+- `manifest.json`: identidad de motor, hashes de fuente/dependencias e instrumentación, SHA-256 de configuración, commit de origen, semillas, estímulo, switches y runtime;
 - `traces.jsonl`: valores brutos y observados por tick y nodo;
-- `metrics.json`: métricas por semilla.
+- `metrics.json`: métricas por semilla, incluidos pasos completados y abortos del guard.\n- `checksums.sha256`: SHA-256 de manifest, trazas y métricas.
 
 El RUN_ID debe ser explícito y seguro para rutas. Si cualquiera de los directorios finales ya existe, el ejecutor rechaza la ejecución. No sobrescribe resultados anteriores. Los conjuntos O y D no se mezclan.
 
