@@ -51,7 +51,10 @@ describe('AT-002 plan-only runner',()=>{
   expect(()=>artifactPartition(job,'../escape',config.artifactPolicy.root)).toThrow();
  });
  it('rejects mixed engine artifacts',()=>{
-  const job=buildCalibrationPlan(config).find(x=>x.stage==='CAL-01'&&x.engineVariant==='O')!;\n  expect(()=>assertArtifactIdentity(job,{engineVariant:'D',stage:'CAL-01',engineVersion:job.engineVersion,engineSourceBlobSha1:job.engineSourceBlobSha1})).toThrow(/mixed engine/);\n  expect(job.engineVersion).toBe(config.engineVariants.O.version);\n  expect(job.engineSourceBlobSha1).toBe(config.engineVariants.O.sourceBlobSha1);
+  const job=buildCalibrationPlan(config).find(x=>x.stage==='CAL-01'&&x.engineVariant==='O')!;
+  expect(()=>assertArtifactIdentity(job,{engineVariant:'D',stage:'CAL-01',engineVersion:job.engineVersion,engineSourceBlobSha1:job.engineSourceBlobSha1})).toThrow(/mixed engine/);
+  expect(job.engineVersion).toBe(config.engineVariants.O.version);
+  expect(job.engineSourceBlobSha1).toBe(config.engineVariants.O.sourceBlobSha1);
  });
 });
 describe('AT-002 trace diagnostics',()=>{
