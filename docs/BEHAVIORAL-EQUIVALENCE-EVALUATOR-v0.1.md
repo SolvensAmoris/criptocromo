@@ -25,7 +25,7 @@ FLOAT_CONVERSION = FORBIDDEN
 - `T`, event timestamps, interval endpoints, and `tau` use the same unit: integer nanoseconds.
 - Runtime values are `BigInt`; serialized interchange values must be decimal integer strings. A JSON adapter must validate decimal syntax and int64 bounds before converting to `BigInt`.
 - Signed int64 bounds are `-9223372036854775808` through `9223372036854775807`. Run-relative elapsed timestamps, `T`, and `tau` must be non-negative.
-- The int64 range limits representable stored values, not physical clock accuracy. Instrument resolution, accuracy, and uncertainty are separate metadata and are never silently added to `tau`.
+- The int64 range limits representable stored values, not physical clock accuracy. Instrument resolution, accuracy, and uncertainty are separate required metadata. The evaluator validates the declared 1 ns resolution and preserves the other fields, but never silently adds accuracy or uncertainty to `tau`. If uncertainty is not quantified, record `uncertaintyStatus=NOT_QUANTIFIED` and `measurementUncertaintyNs=null`; do not omit the field or imply zero uncertainty.
 - A Number/float input, non-integer value, incompatible unit, negative horizon/tolerance, failed monotonic source, backward clock reading, or int64 overflow invalidates acquisition/evaluation. Do not wrap, saturate, round, or coerce. Record reason and evidence; return `INDETERMINATE/CENSORED`, unless an independent rejection is already demonstrated by validly observed events.
 
 ## 2. Trace schema
@@ -34,7 +34,7 @@ Each trace contains:
 - `events`: ordered records `{ id, timeNs, payload? }`. Existing array order is the emission sequence and must never be reconstructed by sorting timestamps.
 - `processActiveIntervals`: closed intervals during which the process was active.
 - `recorderValidIntervals`: closed intervals during which required event instrumentation and recording were valid.
-- `acquisitionErrors`: optional list of acquisition/clock failure reasons. Any such error prevents ACCEPT.
+- `acquisitionErrors`: optional list of acquisition/clock failure reasons. Any such error prevents ACCEPT.\n- `instrumentMetadata`: required independent record of `clockSource`, `clockResolutionNs=1`, optional `clockAccuracyNs`, `measurementUncertaintyNs`, and `uncertaintyStatus=QUANTIFIED|NOT_QUANTIFIED`.
 
 An event's `id` is a non-empty exact identity/category string. Payload is ignored unless the task protocol explicitly selects `payloadMode=EXACT`; the mode must be explicit. This evaluator does not infer relevant payload fields.
 
@@ -90,7 +90,7 @@ The v0.1 test suite covers:
 - explicit domain/unit and rejection of Number/float values;
 - int64 boundary and overflow behavior;
 - monotonic clock failure, backward reading, and sticky invalid state;
-- optional exact payload comparison.
+- optional exact payload comparison;\n- required instrument metadata and separately recorded quantified/unquantified uncertainty.
 
 ## 7. Interpretation boundary
 
