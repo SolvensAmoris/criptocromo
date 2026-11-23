@@ -94,7 +94,7 @@ La siguiente calibración ya definida en configuration.json es CAL-02: barrido d
 En la rama main revisada para este informe no existe todavía un workflow de ejecución CAL-02: solo está el workflow manual CAL-01. Por tanto, CAL-02 no se ha ejecutado ni autorizado. Antes de despacharlo se necesita implementar y revisar su ejecutor/workflow, mantener el plan pre-registrado y solicitar autorización explícita para la campaña.
 
 
-## 7. Fórmulas de reproducción
+## 8. Fórmulas de reproducción
 
 Los conteos y resúmenes anteriores se derivan directamente de los registros JSONL originales, sin imputación:
 
@@ -104,7 +104,7 @@ Los conteos y resúmenes anteriores se derivan directamente de los registros JSO
 - Caída pico-residual por semilla O: (pico de meanActivation − meanActivation del último tick de recuperación) / pico. Si el pico es cero, el cociente no se define.
 - Los registros guard_aborted se conservan para clipping y exceso bruto, pero no aportan observaciones activadas ni estados posteriores. No se calculan distancias O/D después de ese tick.
 
-La sección de artefactos pasa a ser la sección 9; la siguiente etapa recomendada es la sección 8.
+La sección de artefactos pasa a ser la sección 9; la siguiente etapa recomendada es la sección 7.
 
 ## 9. Artefactos
 
