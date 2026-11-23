@@ -30,12 +30,12 @@ El timestamp no reemplaza firmas de autor, revisión, checksums, CI ni cadena de
 El workflow manual `.github/workflows/ots-timestamp.yml` ejecuta los pasos siguientes sobre el commit seleccionado:
 
 1. Obtiene el SHA del commit y el SHA del árbol Git.
-2. Construye `timestamp-manifest.json` con esquema versionado, repositorio, commit, árbol, referencia descriptiva y protocolo.
+2. Construye `timestamp-manifest.json` con esquema versionado, repositorio, commit, árbol Git, SHA-256 de un archivo TAR generado desde el commit y protocolo. El hash del TAR aporta una huella SHA-256 del snapshot de archivos rastreados.
 3. Ejecuta `ots stamp timestamp-manifest.json`.
 4. Calcula SHA-256 del manifiesto y del recibo.
 5. Publica ambos archivos y el checksum como artefacto de GitHub Actions.
 
-El manifiesto es determinista para el mismo commit y metadatos de proyecto. La hora de solicitud no se inserta en él: la evidencia temporal procede de la atestación OTS, no de un reloj local ni de un campo autodeclarado.
+El manifiesto es determinista para el mismo commit y repositorio. La hora de solicitud no se inserta en él: la evidencia temporal procede de la atestación OTS, no de un reloj local ni de un campo autodeclarado.
 
 ## Ejecución
 
