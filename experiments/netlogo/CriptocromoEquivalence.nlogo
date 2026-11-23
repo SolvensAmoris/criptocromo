@@ -139,7 +139,6 @@ to run-one-state [state-record variant]
     ]
   ]
 end
-
 @#$#@#$#@
 GRAPHICS-WINDOW
 0
@@ -188,28 +187,31 @@ D preserves raw activation and aborts a trajectory when any raw activation excee
 the absolute guard of 1,000,000.
 @#$#@#$#@
 default
-0.0
--0.2
+true
 0
+Polygon -7500403 true true 150 5 40 250 150 205 260 250
+@#$#@#$#@
+NetLogo 7.0.4
+@#$#@#$#@
+need-to-manually-make-preview-for-this-model
+@#$#@#$#@
+
+@#$#@#$#@
+
+@#$#@#$#@
+
+@#$#@#$#@
+default
 0.0
-1.0
-0.0
-1
-1.0
-0.0
-0.2
-0
-0.0
-1.0
+-0.2 0 0.0 1.0
+0.0 1 1.0 0.0
+0.2 0 0.0 1.0
 link direction
 true
 0
 Line -7500403 true 150 150 90 180
 Line -7500403 true 150 150 210 180
 @#$#@#$#@
-NetLogo 7.0.4
-@#$#@#$#@
-need-to-manually-make-preview-for-this-model
-@#$#@#$#@
 0
 @#$#@#$#@
+
