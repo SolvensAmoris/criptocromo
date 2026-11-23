@@ -122,6 +122,7 @@ to run-one-state [state-record variant]
         ]
 
         ; Record the complete directed weight matrix after this transition.
+        let j 0
         set i 0
         while [i < 24] [
           set j 0
