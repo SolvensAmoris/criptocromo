@@ -104,7 +104,7 @@ Estos umbrales son reglas operativas iniciales para decidir si AT-001-R2 puede e
 
 | Etapa | Estado |
 |---|---|
-| CAL-01 | Ejecutor implementado; prueba temporal detecta aborto del guard D; campaña oficial pendiente de autorización |
+| CAL-01 | Ejecutor y workflow manual implementados; prueba temporal detecta aborto del guard D; campaña oficial pendiente de autorización y despacho |
 | CAL-02 | Plan definido; ejecutor pendiente |
 | CAL-03 | Plan definido; ejecutor pendiente |
 | CAL-04 | Plan definido; ejecutor pendiente |
@@ -128,4 +128,4 @@ La aprobación de código, la aprobación del plan y la autorización de una cam
 
 Las pruebas verifican equivalencia O/D antes del clipping, divergencia después del límite, guard de overflow, identidades de dependencias, captura de activación bruta, integridad de las trazas, separación de artefactos y política no-overwrite. La prueba de integración del ejecutor usa un directorio temporal y no crea una campaña oficial.
 
-El runner `npm run at002:plan` sigue siendo plan-only. El comando `npm run at002:cal01` es la única ruta de ejecución habilitada hasta ahora y exige autorización explícita mediante variable de entorno.
+El runner `npm run at002:plan` sigue siendo plan-only. El comando `npm run at002:cal01` exige `AT002_CAL01_AUTHORIZED=YES` y un `AT002_RUN_ID` explícito. El workflow manual `.github/workflows/at002-cal01.yml` encapsula esa ejecución: requiere seleccionar `YES`, valida el identificador, repite tests/build/plan, ejecuta O y D, resume los estados y publica los artefactos durante 90 días. El identificador predeterminado propuesto es `CAL01-20261123-01`; no se ejecuta automáticamente al fusionar el workflow. Un envío con autorización `NO` no inicia el job.
