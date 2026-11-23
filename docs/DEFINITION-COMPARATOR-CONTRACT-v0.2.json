@@ -1,0 +1,149 @@
+{
+  "contractVersion": "0.2.0",
+  "status": "AUDIT_CONTRACT_NOT_A_BEHAVIORAL_VERDICT",
+  "repository": "SolvensAmoris/criptocromo",
+  "historicalReferences": {
+    "PR12": "8cf190010b798ec73b0a619e1e7772bb4d1eb209",
+    "PR13": "4b1578e132d8eb4f0ea514da7889c6d6c3737569",
+    "PR13SensitivitySourceCommit": "9ccd5fccb5dab97bc724114154bf48fd39e0ba97"
+  },
+  "artifact": {
+    "runId": "BSENS-45198131816",
+    "artifactId": 14828178437,
+    "sha256": "475cc8ddd26a1b3c629c290152aec2dda7954ad633d3592092e2b66b6595fd96",
+    "expectedTrajectoryCount": 200,
+    "internalFiles": [
+      "manifest.json",
+      "summaries.json",
+      "tick-comparisons.jsonl"
+    ],
+    "expectedSeeds": [
+      101,
+      202,
+      303,
+      404,
+      505,
+      606,
+      707,
+      808,
+      909,
+      1010
+    ],
+    "expectedDGuardAbortTicks": {
+      "101": 16,
+      "202": 16,
+      "303": 17,
+      "404": 16,
+      "505": 15,
+      "606": 15,
+      "707": 16,
+      "808": 16,
+      "909": 16,
+      "1010": 15
+    }
+  },
+  "sourceFiles": {
+    "src/core/engine.ts": "93528403aedb708eed33729d9764918cb200bd2a",
+    "src/experiments/at002-calibration/engines/engine-v0.1.0-O.ts": "80ab84dc86c61e15c7fc784556c86d5d2289c9b2",
+    "src/experiments/at002-calibration/engines/engine-v0.2.0-D.ts": "5938b3052667381220ef947ab8672b03b1f1f10e",
+    "src/experiments/at002-calibration/engines/variant-engine.ts": "5c1fad6c983a863c737b02d2f90155b35a304d10",
+    "src/experiments/at002-calibration/diagnostics.ts": "190570b67fb257456c82af37811f0bc6d6a0ffbd",
+    "src/experiments/netlogo-interop.ts": "e0447f26f2bd877a5eaaa9f57fd31f68436ef447",
+    "experiments/netlogo/CriptocromoEquivalence.nlogo": "f006db6d08a1b6ef642ba18289ea753c3eae5918",
+    "experiments/AT-002-CALIBRATION/configuration.json": "f3cd7694171681d3226ac139beadf8d71cd91849",
+    "src/experiments/at001/config.ts": "3412c04d860aa6dacecb33fc0f0c4d101747dd8c"
+  },
+  "PR13OnlySourceFiles": {
+    "src/experiments/behavioral-sensitivity.ts": "04969cc243a07b371139308ae0602bee4290f024"
+  },
+  "canonicalDefinitions": {
+    "ACT_RAW": "alpha*activation_previous + beta*resonance*input + gamma*sum_j(weight_previous[i][j]*activation_previous[j]) + eta*memory_previous",
+    "ACT_OBSERVED_O": "clamp(ACT_RAW, 0, 1)",
+    "ACT_OBSERVED_D": "ACT_RAW, provided the D guard accepts it",
+    "MEM": "clamp(lambda*memory_previous + (1-lambda)*activation_previous, 0, 1)",
+    "WGT": "clamp(weight_previous + plasticityRate*activation_next[i]*activation_next[j] - decayRate*weight_previous, 0, 1), i != j; diagonal unchanged",
+    "TICK": "compute raw activation from previous complete state; stage next activation and memory; stage full next weight matrix from next activations; commit once; increment tick",
+    "GUARD_TS": "reject if raw is non-finite OR abs(raw) > 1000000",
+    "GUARD_NETLOGO": "reject if abs(raw) > 1000000",
+    "SCHEDULE": "42 attempted ticks: 18 pulse ticks at intensity 1 followed by 24 recovery ticks at intensity 0",
+    "PERTURBATIONS": {
+      "ACT": "positive delta on initial activation at even-index nodes",
+      "MEM": "positive delta on initial memory at even-index nodes",
+      "WGT": "alternating +delta/-delta on off-diagonal initial weights; diagonal unchanged",
+      "LEVELS": [
+        0.000001,
+        1e-8,
+        1e-10
+      ]
+    },
+    "PARAMETERS": {
+      "nodeCount": 24,
+      "lambda": 0.86,
+      "alpha": 0.72,
+      "beta": 0.42,
+      "gamma": 0.18,
+      "eta": 0.24,
+      "plasticityRate": 0.035,
+      "decayRate": 0.008,
+      "resonanceWidth": 18,
+      "targetFrequency": 0.5,
+      "pulseIntensity": 1,
+      "pulseTicks": 18,
+      "recoveryTicks": 24
+    }
+  },
+  "knownDomainDifference": {
+    "field": "D guard",
+    "typescript": "explicit Number.isFinite(raw) rejection plus absolute threshold",
+    "netlogo": "absolute-threshold comparison only",
+    "classification": "PARTIAL_MATCH",
+    "note": "The guard expressions are not identical over the full IEEE-754 domain. Do not promote the cross-language definition comparison to MATCH without resolving or explicitly restricting the accepted input domain."
+  },
+  "topology": {
+    "nodeCount": 24,
+    "edgeConstruction": "directed off-diagonal weight matrix; each ordered pair i != j is initialized",
+    "selfLoops": false,
+    "neighborSignalUsesPreviousTickActivation": true,
+    "plasticityUpdatesWeightsFromNextTickActivation": true,
+    "classification": "RECURRENT_DIRECTED_NETWORK_NOT_DAG",
+    "note": "Two-way directed connections permit cycles of length two. A 16-tick observation window is not a 16-layer DAG depth.",
+    "edgeSemantics": "weights[target][source] > 0 means source contributes to target; directed influence edge source -> target",
+    "artifactAdjacencyEmbedded": false,
+    "reconstruction": "Reconstruct initial weights using pinned variant-engine.ts LCG, consuming nodeCount preferred-frequency draws before row-major off-diagonal weights",
+    "cycleDetection": "Kahn topological sort; processedNodes < nodeCount means cyclic; include reciprocal 2-cycle witness when present",
+    "expectedEdgeCount": 552,
+    "perturbationLevels": [
+      0.000001,
+      1e-8,
+      1e-10
+    ],
+    "topologicalDepthRule": "null when cyclic; compute longest-path depth only for DAG"
+  },
+  "tickSemantics": {
+    "oneTick": "one synchronous full-state transition across all nodes",
+    "activationReads": "previous complete state activations and weights",
+    "memoryReads": "previous complete state memory and activation",
+    "weightUpdates": "next activation values, staged before one complete state commit",
+    "plannedStimuli": 42,
+    "pulseTicks": 18,
+    "recoveryTicks": 24,
+    "maxTicks16": false
+  },
+  "guardAudit": {
+    "cause": "D_OVERFLOW_GUARD",
+    "threshold": 1000000,
+    "abortTickMeaning": "attempted transition that raised the magnitude guard; lastCompletedTick = abortTick - 1",
+    "expectedAbortTicks": {
+      "101": 16,
+      "202": 16,
+      "303": 17,
+      "404": 16,
+      "505": 15,
+      "606": 15,
+      "707": 16,
+      "808": 16,
+      "909": 16,
+      "1010": 15
+    }
+  }
+}
