@@ -43,6 +43,10 @@ The TypeScript reference trace and NetLogo trace each record node-level raw/obse
 
 The run uses the CAL-01 pulse/recovery sequence: 18 ticks at target frequency 0.5 and intensity 1.0, then 24 ticks at target frequency 0.5 and intensity 0.0. All three switches are enabled. The variants are run separately as O and D.
 
+## Implementation notes
+
+The NetLogo model avoids shadowing the built-in `distance` reporter; the local frequency difference is named `frequency-delta`.
+
 ## Comparison
 
 The comparator requires exact agreement of record keys, status fields, and empty/null fields. Numeric fields are compared against absolute tolerance `1e-10`. It reports total and matched record counts, missing/extra keys, mismatch count, maximum absolute error, and the first mismatch. It does not compare only final aggregate metrics.
