@@ -1,0 +1,102 @@
+{
+  "experimentId": "AT-002-CALIBRATION",
+  "protocolVersion": "0.1.0",
+  "status": "PROTOCOL_ONLY_NOT_EXECUTED",
+  "predecessor": "AT-001-PILOT-01",
+  "engineVariants": {
+    "O": {
+      "name": "original",
+      "version": "0.1.0",
+      "activation": "hard_clip_0_1",
+      "immutableReference": true
+    },
+    "D": {
+      "name": "diagnostic_unclipped",
+      "status": "not_implemented",
+      "activation": "identity_no_activation_clip",
+      "purpose": "counterfactual clipping diagnostic"
+    },
+    "S": {
+      "name": "smooth_sigmoid",
+      "status": "not_implemented",
+      "activation": "sigmoid",
+      "purpose": "exploratory alternative model"
+    }
+  },
+  "seeds": [
+    101,
+    202,
+    303,
+    404,
+    505,
+    606,
+    707,
+    808,
+    909,
+    1010
+  ],
+  "cal02": {
+    "factor": "input_intensity",
+    "levels": [
+      0.1,
+      0.2,
+      0.35,
+      0.5,
+      0.75
+    ],
+    "fixedParameters": true,
+    "engineVariant": "O"
+  },
+  "cal03": {
+    "conditions": [
+      {
+        "id": "BASELINE",
+        "memory": false,
+        "plasticity": false,
+        "resonance": false
+      },
+      {
+        "id": "A_ONLY",
+        "memory": true,
+        "plasticity": false,
+        "resonance": false
+      },
+      {
+        "id": "C_ONLY",
+        "memory": false,
+        "plasticity": true,
+        "resonance": false
+      }
+    ],
+    "traceFields": [
+      "tick",
+      "meanActivation",
+      "meanMemory",
+      "meanAbsoluteWeightDelta",
+      "totalAbsoluteWeightDelta"
+    ]
+  },
+  "gate01": {
+    "peakMeanRange": [
+      0.4,
+      0.8
+    ],
+    "peakConditionsMinimum": 6,
+    "activeNodeFractionRange": [
+      0.3,
+      0.85
+    ],
+    "minimumOneConditionBelowPeak": 0.4,
+    "maximumConditionMeanPeak": 0.999999,
+    "minimumPeakSd": 0.02,
+    "minimumConditionsWithPeakSd": 4,
+    "minimumRecoveryDropFraction": 0.2,
+    "minimumConditionsWithRecovery": 4,
+    "decision": "all_criteria_required"
+  },
+  "integrity": {
+    "preserveAt001Pilot01": true,
+    "noOverwrite": true,
+    "doNotSelectByInteraction": true
+  }
+}
