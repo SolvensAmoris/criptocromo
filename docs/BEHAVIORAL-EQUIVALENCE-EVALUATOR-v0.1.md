@@ -34,7 +34,8 @@ Each trace contains:
 - `events`: ordered records `{ id, timeNs, payload? }`. Existing array order is the emission sequence and must never be reconstructed by sorting timestamps.
 - `processActiveIntervals`: closed intervals during which the process was active.
 - `recorderValidIntervals`: closed intervals during which required event instrumentation and recording were valid.
-- `acquisitionErrors`: optional list of acquisition/clock failure reasons. Any such error prevents ACCEPT.\n- `instrumentMetadata`: required independent record of `clockSource`, `clockResolutionNs=1`, optional `clockAccuracyNs`, `measurementUncertaintyNs`, and `uncertaintyStatus=QUANTIFIED|NOT_QUANTIFIED`.
+- `acquisitionErrors`: optional list of acquisition/clock failure reasons. Any such error prevents ACCEPT.
+- `instrumentMetadata`: required independent record of `clockSource`, `clockResolutionNs=1`, optional `clockAccuracyNs`, `measurementUncertaintyNs`, and `uncertaintyStatus=QUANTIFIED|NOT_QUANTIFIED`.
 
 An event's `id` is a non-empty exact identity/category string. Payload is ignored unless the task protocol explicitly selects `payloadMode=EXACT`; the mode must be explicit. This evaluator does not infer relevant payload fields.
 
@@ -90,7 +91,8 @@ The v0.1 test suite covers:
 - explicit domain/unit and rejection of Number/float values;
 - int64 boundary and overflow behavior;
 - monotonic clock failure, backward reading, and sticky invalid state;
-- optional exact payload comparison;\n- required instrument metadata and separately recorded quantified/unquantified uncertainty.
+- optional exact payload comparison;
+- required instrument metadata and separately recorded quantified/unquantified uncertainty.
 
 ## 7. Interpretation boundary
 
