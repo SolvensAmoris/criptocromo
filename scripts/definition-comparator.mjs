@@ -110,7 +110,7 @@ function sourceSemantics() {
     variant.includes('return { nodes: nextNodes, weights: nextWeights, tick: state.tick + 1 }') &&
     sensitivity.includes('for (const stimulus of stimuli())') &&
     sensitivity.includes('abortTick = tick;');
-  const noSixteenTickCap = !/max[_A-Z]?ticks?\\s*[:=]\\s*16/i.test(sensitivity + variant);
+  const noSixteenTickCap = !/max[_A-Z]?ticks?\s*[:=]\s*16/i.test(sensitivity + variant);
   add('engine:tick_semantics', synchronousTick && noSixteenTickCap ? 'MATCH' : 'MISMATCH', {
     oneTick: 'one synchronous full-state transition across all nodes',
     readsPreviousState: variant.includes('state.weights[i][j] * neighbor.activation'),
