@@ -19,7 +19,7 @@ const ROOT = path.resolve(fileURLToPath(new URL('../../', import.meta.url)));
 const OUT = path.join(ROOT, 'artifacts/BEHAVIORAL-SENSITIVITY');
 const RUN_ID = process.env.SENSITIVITY_RUN_ID ?? '';
 const sha256 = (data: Buffer | string): string => createHash('sha256').update(data).digest('hex');
-const gitBlobSha1 = (bytes: Buffer): string => createHash('sha1').update('blob ' + bytes.length + '\\0').update(bytes).digest('hex');
+const gitBlobSha1 = (bytes: Buffer): string => createHash('sha1').update('blob ' + bytes.length + '\0').update(bytes).digest('hex');
 function verifySources(): void {
   for (const variant of ['O', 'D'] as const) {
     const identity = config.engineVariants[variant];
@@ -57,16 +57,16 @@ function simulate(seed: number, variant: Variant, variable: Variable, delta: num
   for (const stimulus of stimuli()) {
     const tick = state.tick + 1;
     const raw = calculateRawActivations(state, stimulus, simConfig);
-    const clippedNodes = raw.map((value, i) => value < 0 || value > 1 ? i : -1).filter(i => i >= 0);
+    const rawOutOfRangeNodes = raw.map((value, i) => value < 0 || value > 1 ? i : -1).filter(i => i >= 0);
     try {
       const next = engines[variant].stepNetwork(state, stimulus, simConfig);
-      ticks.push({ tick, raw, state: next, clippedNodes, status: 'completed' });
+      ticks.push({ tick, raw, state: next, clippedNodes: variant === 'O' ? rawOutOfRangeNodes : [], status: 'completed' });
       state = next;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (variant !== 'D' || !message.includes('overflow guard')) throw error;
       abortTick = tick; abortReason = message;
-      ticks.push({ tick, raw, state: null, clippedNodes, status: 'guard_aborted' });
+      ticks.push({ tick, raw, state: null, clippedNodes: [], status: 'guard_aborted' });
       break;
     }
   }
@@ -100,11 +100,11 @@ function run() {
         let firstExactStateDifference: number | null = null;
         for (let index = 0; index < commonTicks; index++) {
           const a = baseResult.ticks[index], b = result.ticks[index];
-          maxRaw = Math.max(maxRaw, maxAbs(a.raw.map((value, i) => value - b.raw[i])));
+          const tickRawDifference = maxAbs(a.raw.map((value, i) => value - b.raw[i]));\n          maxRaw = Math.max(maxRaw, tickRawDifference);
           const diffs = compareState(a.state!, b.state!);
           maxActivation = Math.max(maxActivation, diffs.maxActivationObserved); maxMemory = Math.max(maxMemory, diffs.maxMemory); maxWeight = Math.max(maxWeight, diffs.maxWeight);
           if (firstExactStateDifference === null && (diffs.maxActivationObserved !== 0 || diffs.maxMemory !== 0 || diffs.maxWeight !== 0)) firstExactStateDifference = index + 1;
-          tickComparisons.push({ seed, variant, variable: spec.variable, delta: spec.delta, tick: index + 1, maxRawActivationDifference: maxRaw, ...diffs });
+          tickComparisons.push({ seed, variant, variable: spec.variable, delta: spec.delta, tick: index + 1, maxRawActivationDifference: tickRawDifference, ...diffs });
         }
         const structuralChanged = baseResult.status !== result.status || baseResult.abortTick !== result.abortTick || baseResult.firstClippingTick !== result.firstClippingTick || JSON.stringify(baseResult.firstClippingNodes) !== JSON.stringify(result.firstClippingNodes);
         const y16Difference = baseResult.y16 !== null && result.y16 !== null ? Math.abs(result.y16 - baseResult.y16) : null;
@@ -119,9 +119,9 @@ function run() {
   const manifest = { experimentId: 'BEHAVIORAL-SENSITIVITY-001', protocolVersion: '0.1.0', runId: RUN_ID, status: 'EXECUTED', sourceCommit, configSha256: sha256(configRaw), seedSet: config.seeds, variants: ['O', 'D'], variables: ['ACT', 'MEM', 'WGT'], levels: LEVELS, trajectoryCount: summaries.length, expectedTrajectoryCount: expected, pulseTicks: config.protocol.pulseSteps, recoveryTicks: config.protocol.recoverySteps, yWindowTicks: [1, 16], runtime: { node: process.version, platform: process.platform, arch: process.arch }, createdAt: new Date().toISOString() };
   const directory = path.join(OUT, RUN_ID);
   mkdirSync(directory, { recursive: true });
-  const files: Record<string, string> = { 'manifest.json': JSON.stringify(manifest, null, 2) + '\\n', 'summaries.json': JSON.stringify(summaries, null, 2) + '\\n', 'tick-comparisons.jsonl': tickComparisons.map(row => JSON.stringify(row)).join('\\n') + '\\n' };
+  const files: Record<string, string> = { 'manifest.json': JSON.stringify(manifest, null, 2) + '\n', 'summaries.json': JSON.stringify(summaries, null, 2) + '\n', 'tick-comparisons.jsonl': tickComparisons.map(row => JSON.stringify(row)).join('\n') + '\n' };
   for (const [name, content] of Object.entries(files)) writeFileSync(path.join(directory, name), content, { flag: 'wx' });
-  writeFileSync(path.join(directory, 'checksums.sha256'), Object.entries(files).map(([name, content]) => sha256(content) + '  ' + name).join('\\n') + '\\n', { flag: 'wx' });
-  process.stdout.write(JSON.stringify({ manifest, summaryCount: summaries.length, structuralChanges: summaries.filter(row => row.structuralChanged === true).length, y16ChangesOver001: summaries.filter(row => row.y16ChangeOver001 === true).length, artifactDirectory: 'artifacts/BEHAVIORAL-SENSITIVITY/' + RUN_ID }, null, 2) + '\\n');
+  writeFileSync(path.join(directory, 'checksums.sha256'), Object.entries(files).map(([name, content]) => sha256(content) + '  ' + name).join('\n') + '\n', { flag: 'wx' });
+  process.stdout.write(JSON.stringify({ manifest, summaryCount: summaries.length, structuralChanges: summaries.filter(row => row.structuralChanged === true).length, y16ChangesOver001: summaries.filter(row => row.y16ChangeOver001 === true).length, artifactDirectory: 'artifacts/BEHAVIORAL-SENSITIVITY/' + RUN_ID }, null, 2) + '\n');
 }
 run();
