@@ -20,7 +20,7 @@ if (artifactIndex < 0 || !args[artifactIndex + 1]) {
   process.exit(2);
 }
 const artifactPath = path.resolve(process.cwd(), args[artifactIndex + 1]);
-const unzip = (member) => execFileSync('unzip', ['-p', artifactPath, member], { encoding: 'buffer', stdio: ['ignore', 'pipe', 'pipe'] });
+const unzip = (member) => execFileSync('unzip', ['-p', artifactPath, member], { encoding: 'buffer', maxBuffer: 64 * 1024 * 1024, stdio: ['ignore', 'pipe', 'pipe'] });
 const checks = [];
 const add = (id, status, detail) => checks.push({ id, status, detail });
 
