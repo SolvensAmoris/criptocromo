@@ -131,11 +131,26 @@ Para este ejemplo, antes de ejecutar las pruebas se fijan:
 
 Dos ejecuciones son equivalentes hasta 100 ticks si existe una correspondencia uno a uno entre todas sus señales, cada señal emparejada conserva identidad y posición en la secuencia, la diferencia absoluta entre sus tiempos de emisión es como máximo 1 tick, no falta ni aparece ninguna señal adicional y ambas ejecuciones completan el horizonte.
 
-Ejemplo de decisión para una señal correspondiente:
-- diferencia de 0 o 1 tick: cumple el criterio temporal;
-- diferencia de 2 ticks: `REJECT` para esa pareja de ejecuciones bajo este criterio.
+La regla temporal se aplica a cada evento emparejado:
 
-Una diferencia de 2 ticks no demuestra por sí sola un fallo general del sistema ni explica su causa. Significa que esa perturbación no conservó la conducta definida para esa tarea y esa tolerancia. Si una tolerancia mayor fuera apropiada para la tarea, debe justificarse y fijarse prospectivamente antes de evaluar los resultados; no puede ampliarse después para convertir un rechazo en aceptación.
+```text
+Delta_i = abs(t_i_perturbada - t_i_referencia)
+ACCEPT temporal si Delta_i <= tau para todo evento i
+```
+
+La tolerancia `tau` no se estima a partir de las diferencias observadas entre las ejecuciones. Se justifica desde los requisitos funcionales de la tarea, la resolución del reloj y la incertidumbre del método de detección; después se fija y congela antes de evaluar las perturbaciones. Por ejemplo, `tau = 1 tick` expresa que la tarea considera funcionalmente aceptable una emisión hasta un tick antes o después de la referencia. No existe una fórmula universal para obtener `tau`: la justificación debe documentarse para cada tarea.
+
+Ejemplos con `tau = 1 tick`:
+
+**Caso 1: rechazo por retraso excesivo.** La referencia emite `A → B → C` en los ticks `10, 20, 30`; la perturbada emite la misma secuencia en `10, 22, 30`. Los desfases son `0, 2, 0`. Se conserva identidad, cantidad y orden, pero B excede la tolerancia. Resultado: `REJECT` para esa pareja, únicamente por el retraso de B.
+
+**Caso 2: aceptación en el límite.** La referencia emite `A → B → C` en `10, 20, 30`; la perturbada en `10, 21, 30`. Los desfases son `0, 1, 0`. Si no hay eventos ausentes o adicionales y el orden se conserva, el criterio se cumple: `ACCEPT`.
+
+**Caso 3: aceptación con varios desfases.** La referencia emite `A → B → C → D → E` en `5, 12, 20, 27, 35`; la perturbada emite las mismas señales en `6, 12, 21, 26, 35`. Los desfases absolutos son `1, 0, 1, 1, 0`. Ninguno supera `tau`, y la identidad, cantidad y orden coinciden: `ACCEPT`.
+
+**Caso 4: cuatro eventos, todos en el límite.** La referencia emite `A → B → C → D` en `5, 12, 20, 27`; la perturbada emite las mismas señales en `6, 11, 21, 28`. Los desfases son `1, 1, 1, 1`. Todos cumplen `Delta_i <= tau`; con identidad, cantidad y orden conservados, el resultado es `ACCEPT`.
+
+Estos ejemplos ilustran decisiones para parejas individuales. Un rechazo por exceder la tolerancia significa que esa pareja no conservó la conducta definida para esa tarea y ese criterio. No demuestra por sí solo un fallo general del sistema ni identifica una causa. Si una tolerancia mayor fuera apropiada para la tarea, debe justificarse y fijarse prospectivamente; no puede ampliarse después para convertir un rechazo en aceptación.
 
 Si una ejecución termina antes del tick 100 por guard, no se declara equivalente hasta 100 ticks. Para preservar la distinción entre conducta y observación incompleta, el resultado se registra como `INDETERMINATE/CENSORED` cuando la terminación impide observar el horizonte completo y no existe otra regla de rechazo predefinida que ya se haya violado. El guard y su tick quedan registrados como diagnóstico. Si la tarea define expresamente la terminación anticipada como fallo cualitativo, se registra además ese rechazo por la regla de tarea, sin atribuirlo automáticamente a divergencia de señales no observadas.
 
