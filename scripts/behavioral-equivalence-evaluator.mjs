@@ -308,7 +308,7 @@ export function evaluateEventEquivalence(reference, perturbed, options) {
     return { verdict: 'REJECT', reasons, evidence };
   }
 
-  if (!fullCoverage) {
+  if (!fullCoverage && ref.events.length === pert.events.length) {
     return {
       verdict: 'INDETERMINATE/CENSORED',
       reasons: ['Full horizon [0,T] is not validly observable in both executions'],
