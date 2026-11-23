@@ -1,5 +1,10 @@
 # Criptocromo | ATANOR Ω
 
+**Autor e investigador principal:** Luis Alberto Burciaga Miker  
+**Afiliación / ubicación:** Sonora, México  
+**Proyecto:** ATANOR Ω · Criptocromo  
+© 2026 Luis Alberto Burciaga Miker · Sonora, México  
+
 **Laboratorio computacional de principios y comportamientos emergentes.**
 
 Criptocromo es el entorno experimental de ATANOR Ω. Investiga qué ocurre cuando principios de distintos dominios se formalizan como operadores ejecutables y se componen en mecanismos computacionales.
@@ -73,6 +78,18 @@ El comando anterior no ejecuta una campaña. La campaña oficial CAL-01 tiene un
 - [Protocolo AT-002](docs/AT-002-CALIBRATION.md)
 - [Checklist de análisis de trazas CAL-01](docs/AT-002-CAL-01-TRACE-ANALYSIS-CHECKLIST.md)
 - [Workflow manual CAL-01](.github/workflows/at002-cal01.yml)
+
+## Procedencia y timestamps verificables
+
+Criptocromo incorpora un flujo opcional de timestamping criptográfico con OpenTimestamps. El flujo genera un manifiesto determinista que identifica el repositorio, el commit y el árbol Git seleccionados; calcula su huella y solicita a calendarios públicos que la incorporen a una agregación Merkle anclada posteriormente en Bitcoin.
+
+- Workflow manual: [OpenTimestamps](.github/workflows/ots-timestamp.yml).
+- Especificación y procedimiento de verificación: [Procedencia y timestamps](docs/PROVENANCE-AND-OPEN-TIMESTAMPS.md).
+- Los archivos `.ots` son recibos/proofs asociados al manifiesto exacto.
+- Un recibo recién creado puede estar pendiente de anclaje. Debe actualizarse y verificarse antes de declararlo completo.
+- Un timestamp acredita existencia previa del dato comprometido, no autoría, exactitud científica, integridad de todo el historial ni aprobación institucional.
+
+No se crean timestamps automáticamente en cada commit: el despacho es manual y queda asociado a un commit concreto. Los artefactos de prueba deben conservarse junto con el manifiesto y sus checksums.
 
 ## Colaboración con modelos de IA
 
