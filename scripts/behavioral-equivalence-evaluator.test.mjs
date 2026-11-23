@@ -46,6 +46,40 @@ test('rejects missing or additional events only with complete coverage', () => {
   assert.equal(evaluate(trace([event('A', 10), event('B', 20)]), trace([event('A', 10)])).verdict, 'REJECT');
 });
 
+test('rejects an additional observed event against a fully covered reference, despite perturbed censoring', () => {
+  const partial = [{ startNs: 0n, endNs: 80n }];
+  const result = evaluate(
+    trace([event('A', 10)]),
+    trace([event('A', 10), event('EXTRA', 70)], {
+      processActiveIntervals: partial,
+      recorderValidIntervals: partial
+    })
+  );
+  assert.equal(result.verdict, 'REJECT');
+  assert.equal(result.evidence[0].basis, 'SHORTER_SEQUENCE_TRACE_FULLY_COVERED');
+});
+
+test('rejects an observed missing event when the shorter perturbed trace has full coverage', () => {
+  const partial = [{ startNs: 0n, endNs: 80n }];
+  const result = evaluate(
+    trace([event('A', 10), event('B', 70)], {
+      processActiveIntervals: partial,
+      recorderValidIntervals: partial
+    }),
+    trace([event('A', 10)])
+  );
+  assert.equal(result.verdict, 'REJECT');
+});
+
+test('does not infer an event-count violation when both shorter/longer traces are censored', () => {
+  const partial = [{ startNs: 0n, endNs: 80n }];
+  const result = evaluate(
+    trace([event('A', 10)], { processActiveIntervals: partial, recorderValidIntervals: partial }),
+    trace([event('A', 10), event('B', 70)], { processActiveIntervals: partial, recorderValidIntervals: partial })
+  );
+  assert.equal(result.verdict, 'INDETERMINATE/CENSORED');
+});
+
 test('censors an apparently matching prefix when either execution ends before T', () => {
   const partial = [{ startNs: 0n, endNs: 80n }];
   const result = evaluate(
