@@ -8,6 +8,7 @@ import * as O from '../src/experiments/at002-calibration/engines/engine-v0.1.0-O
 import * as D from '../src/experiments/at002-calibration/engines/engine-v0.2.0-D';
 import * as S from '../src/experiments/at002-calibration/engines/engine-v0.2.0-S';
 import { runCal01 } from '../src/experiments/at002-calibration/cal01';
+import { runCal02 } from '../src/experiments/at002-calibration/cal02';
 import { calculateRawActivations, runCalibrationTrace, transformActivation } from '../src/experiments/at002-calibration/diagnostics';
 import { assertArtifactIdentity, artifactPartition, buildCalibrationPlan, type At002Configuration } from '../src/experiments/at002-calibration/runner';
 import configJson from '../experiments/AT-002-CALIBRATION/configuration.json';
@@ -144,6 +145,41 @@ describe('AT-002 CAL-01 execution and evidence writer', () => {
         }
       }
       expect(() => runCal01(config, 'test-cal01-run-001', process.cwd(), temp, configRaw)).toThrow(/overwrite is forbidden/);
+    } finally {
+      rmSync(temp, { recursive: true, force: true });
+    }
+  });
+});
+
+
+describe('AT-002 CAL-02 execution and evidence writer', () => {
+  it('runs the preregistered O intensity sweep with paired seeds and verifies artifacts', () => {
+    const temp = mkdtempSync(path.join(os.tmpdir(), 'at002-cal02-'));
+    try {
+      const configRaw = readFileSync(path.join(process.cwd(), 'experiments/AT-002-CALIBRATION/configuration.json'), 'utf8');
+      const result = runCal02(config, 'test-cal02-run-001', process.cwd(), temp, configRaw);
+      expect(result.recordCount).toBe(config.seeds.length * config.cal02.levels.length *
+        (config.protocol.pulseSteps + config.protocol.recoverySteps));
+      expect(result.seedCount).toBe(config.seeds.length * config.cal02.levels.length);
+      expect(result.intensityLevels).toEqual(config.cal02.levels);
+      const traces = readFileSync(path.join(result.output, 'traces.jsonl'), 'utf8').trim().split('\n').map(line => JSON.parse(line));
+      expect(traces).toHaveLength(result.recordCount);
+      expect(new Set(traces.map(record => record.engineVariant))).toEqual(new Set(['O']));
+      expect(new Set(traces.map(record => record.intensity))).toEqual(new Set(config.cal02.levels));
+      expect(new Set(traces.map(record => record.seed))).toEqual(new Set(config.seeds));
+      expect(traces.every(record => record.observedActivations.length === 24)).toBe(true);
+      const metrics = JSON.parse(readFileSync(path.join(result.output, 'metrics.json'), 'utf8'));
+      expect(metrics.seedMetrics).toHaveLength(result.seedCount);
+      expect(metrics.seedMetrics.every((metric: { completedTickCount: number; plannedTickCount: number }) =>
+        metric.completedTickCount === metric.plannedTickCount)).toBe(true);
+      const checksums = readFileSync(path.join(result.output, 'checksums.sha256'), 'utf8').trim().split('\n');
+      for (const line of checksums) {
+        const digest = line.slice(0, 64);
+        const name = line.slice(66);
+        const actual = createHash('sha256').update(readFileSync(path.join(result.output, name))).digest('hex');
+        expect(actual).toBe(digest);
+      }
+      expect(() => runCal02(config, 'test-cal02-run-001', process.cwd(), temp, configRaw)).toThrow(/overwrite is forbidden/);
     } finally {
       rmSync(temp, { recursive: true, force: true });
     }
