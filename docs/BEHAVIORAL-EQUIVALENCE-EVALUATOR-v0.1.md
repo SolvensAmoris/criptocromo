@@ -81,7 +81,9 @@ The v0.1 test suite covers:
 - identity/order mismatch;
 - missing/additional event count under complete coverage;
 - incomplete horizon with no demonstrated rejection;
-- demonstrated prefix rejection followed by censoring;\n- an additional/missing event demonstrated by the shorter fully covered trace while the longer trace is censored;\n- event-count difference with both traces censored remains indeterminate;
+- demonstrated prefix rejection followed by censoring;
+- an additional/missing event demonstrated by the shorter fully covered trace while the longer trace is censored;
+- event-count difference with both traces censored remains indeterminate;
 - process-active but recorder-invalid gaps;
 - event exactly at `T`;
 - overlapping, adjacent, and one-nanosecond-gap intervals;
