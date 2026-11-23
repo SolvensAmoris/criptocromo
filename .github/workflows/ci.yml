@@ -16,6 +16,6 @@ jobs:
       - name: Dependency audit report
         run: |
           npm audit --json > /tmp/npm-audit.json || true
-          node -e "const a=require('/tmp/npm-audit.json'); const v=Object.entries(a.vulnerabilities||{}).map(([name,x])=>({name,severity:x.severity,range:x.range,fixAvailable:x.fixAvailable,via:x.via.map(y=>typeof y==='string'?y:{title:y.title,url:y.url,range:y.range})})); console.log(JSON.stringify({metadata:a.metadata?.vulnerabilities, vulnerabilities:v},null,2))"
+          node -e "const a=require('/tmp/npm-audit.json'); const v=Object.entries(a.vulnerabilities||{}).map(([name,x])=>({name,severity:x.severity,range:x.range,fixAvailable:x.fixAvailable,via:x.via.map(y=>typeof y==='string'?y:{title:y.title,url:y.url,range:y.range})})); console.log(JSON.stringify({metadata:a.metadata?.vulnerabilities, vulnerabilities:v},null,2)); if ((a.metadata?.vulnerabilities?.total ?? 0) > 0) process.exit(1)"
       - run: npm test
       - run: npm run build
