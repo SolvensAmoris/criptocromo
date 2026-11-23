@@ -49,8 +49,8 @@ to run-one-state [state-record variant]
 
       ; Compute every raw activation from the previous complete state.
       while [i < 24] [
-        let distance 0.5 - item i preferred
-        let resonance exp (0 - 18 * distance * distance)
+        let frequency-delta 0.5 - item i preferred
+        let resonance exp (0 - 18 * frequency-delta * frequency-delta)
         let neighbor-signal 0
         let j 0
         while [j < 24] [
