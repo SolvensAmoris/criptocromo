@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto';
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
@@ -130,7 +131,17 @@ describe('AT-002 CAL-01 execution and evidence writer', () => {
       expect(dTrace.some(record => record.rawActivations.some((value: number) => Math.abs(value) > 1000000))).toBe(true);
       expect(oTrace.every(record => record.engineVariant === 'O')).toBe(true);
       expect(dTrace.every(record => record.engineVariant === 'D')).toBe(true);
-      expect(readFileSync(path.join(result.outputs.O, 'manifest.json'), 'utf8')).toContain('engineDependencyBlobSha1');
+      const manifest = JSON.parse(readFileSync(path.join(result.outputs.O, 'manifest.json'), 'utf8'));
+      expect(manifest.engineDependencyBlobSha1).toBeDefined();
+      expect(manifest.sourceCommitSha).toMatch(/^[a-f0-9]{40}$/);
+      for (const variantPath of [result.outputs.O, result.outputs.D]) {
+        const checksums = readFileSync(path.join(variantPath, 'checksums.sha256'), 'utf8').trim().split('\\n');
+        for (const line of checksums) {
+          const [digest, name] = line.split(/\\s+/);
+          const actual = createHash('sha256').update(readFileSync(path.join(variantPath, name))).digest('hex');
+          expect(actual).toBe(digest);
+        }
+      }
       expect(() => runCal01(config, 'test-cal01-run-001', process.cwd(), temp, configRaw)).toThrow(/overwrite is forbidden/);
     } finally {
       rmSync(temp, { recursive: true, force: true });
