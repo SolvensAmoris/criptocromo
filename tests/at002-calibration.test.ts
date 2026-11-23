@@ -119,11 +119,15 @@ describe('AT-002 CAL-01 execution and evidence writer', () => {
     try {
       const configRaw = readFileSync(path.join(process.cwd(), 'experiments/AT-002-CALIBRATION/configuration.json'), 'utf8');
       const result = runCal01(config, 'test-cal01-run-001', process.cwd(), temp, configRaw);
-      expect(result.recordCountPerVariant).toBe(config.seeds.length * (config.protocol.pulseSteps + config.protocol.recoverySteps));
+      expect(result.statusByVariant).toEqual({ O: 'COMPLETE', D: 'ABORTED_GUARD' });
+      expect(result.completedStepCountByVariant.O).toBe(config.seeds.length * (config.protocol.pulseSteps + config.protocol.recoverySteps));
+      expect(result.guardAbortCountByVariant.D).toBeGreaterThan(0);
       const oTrace = readFileSync(path.join(result.outputs.O, 'traces.jsonl'), 'utf8').trim().split('\n').map(line => JSON.parse(line));
       const dTrace = readFileSync(path.join(result.outputs.D, 'traces.jsonl'), 'utf8').trim().split('\n').map(line => JSON.parse(line));
-      expect(oTrace).toHaveLength(result.recordCountPerVariant);
-      expect(dTrace).toHaveLength(result.recordCountPerVariant);
+      expect(oTrace).toHaveLength(result.recordCountByVariant.O);
+      expect(dTrace).toHaveLength(result.recordCountByVariant.D);
+      expect(dTrace.some(record => record.stepStatus === 'guard_aborted' && record.observedActivations === null)).toBe(true);
+      expect(dTrace.some(record => record.rawActivations.some(value => Math.abs(value) > 1000000))).toBe(true);
       expect(oTrace.every(record => record.engineVariant === 'O')).toBe(true);
       expect(dTrace.every(record => record.engineVariant === 'D')).toBe(true);
       expect(readFileSync(path.join(result.outputs.O, 'manifest.json'), 'utf8')).toContain('engineDependencyBlobSha1');
