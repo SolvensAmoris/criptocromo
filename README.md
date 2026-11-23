@@ -83,8 +83,11 @@ El comando anterior no ejecuta una campaña. CAL-01 y CAL-02 se despacharon medi
 - [Protocolo AT-002](docs/AT-002-CALIBRATION.md)
 - [Checklist de análisis de trazas CAL-01](docs/AT-002-CAL-01-TRACE-ANALYSIS-CHECKLIST.md)
 - [Resultados oficiales CAL-01](docs/AT-002-CAL-01-RESULTS.md)
-- [Workflow manual CAL-01](.github/workflows/at002-cal01.yml)\n- [Workflow manual CAL-02](.github/workflows/at002-cal02.yml)
-
+- [Resultados oficiales CAL-02](docs/AT-002-CAL-02-RESULTS.md)
+- [Revisión pre-ejecución CAL-02](docs/AT-002-CAL-02-PRE-EXECUTION-REVIEW.md)
+- [Pre-registro AT-003 v1.0](docs/AT-003-PREREGISTRATION-v1.0.md)
+- [Workflow manual CAL-01](.github/workflows/at002-cal01.yml)
+- [Workflow manual CAL-02](.github/workflows/at002-cal02.yml)
 ## Procedencia y timestamps verificables
 
 Criptocromo incorpora un flujo opcional de timestamping criptográfico con OpenTimestamps. El flujo genera un manifiesto determinista que identifica el repositorio, el commit y el árbol Git seleccionados; calcula su huella y solicita a calendarios públicos que la incorporen a una agregación Merkle anclada posteriormente en Bitcoin.
