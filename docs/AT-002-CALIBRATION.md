@@ -78,3 +78,27 @@ Cada ejecución debe producir configuración serializada, semilla, variante/vers
 - La ausencia de saturación no demuestra por sí sola que exista resolución suficiente.
 - Superar GATE-01 habilita una campaña factorial; no anticipa ni garantiza sinergia.
 - AT-001-PILOT-01 permanece como evidencia histórica y no se recalcula retroactivamente.
+
+## 10. Motores versionados y límites de comparación
+
+- **O (`0.1.0`)** es un adaptador al motor histórico `src/core/engine.ts`. No modifica sus ecuaciones ni su clipping.
+- **D (`0.2.0-D`)** usa las mismas ecuaciones, pero deja sin clipping la activación de nodo. Conserva los límites históricos de entrada, memoria y pesos. Incorpora un guard fail-fast de overflow absoluto en `1,000,000`; no recorta ni sustituye el valor. Si se dispara, la ejecución se marca como error.
+- **S (`0.2.0-S`)** aplica la logística `1/(1+exp(-x))` a la activación bruta. Es un modelo no lineal distinto desde valores bajos; no se espera que coincida con O antes del techo y no debe usarse para estimar la pérdida por clipping.
+
+La comparación de equivalencia pre-techo corresponde a O frente a D, bajo estados y entradas que no alcancen el clipping. La divergencia posterior al techo comprueba que D retiene valores que O recorta. S se contrasta como modelo alternativo, no como contrafactual de clipping. No es matemáticamente correcto exigir que una sigmoide logística ordinaria sea idéntica a la identidad antes del techo.
+
+Los módulos versionados conservan la misma inicialización PRNG y las mismas ecuaciones de acoplamiento, memoria y plasticidad. Cualquier cambio adicional invalida la atribución de diferencias exclusivamente a la función de activación.
+
+## 11. Runner en modo plan
+
+`runner.ts` construye el plan de trabajos a partir de `configuration.json`; no ejecuta simulaciones ni escribe resultados. Rechaza semillas duplicadas, niveles de entrada fuera de [0,1] y políticas de artefactos que permitan mezclar motores o sobrescribir datos. Cada job lleva etapa, variante, semilla, condición, switches, intensidad y perfil de estímulo explícitos.
+
+La partición obligatoria de artefactos es `artifacts/AT-002-CALIBRATION/<ENGINE>/<STAGE>/<RUN_ID>/`. Cada manifiesto futuro deberá incluir `engineVariant`, `engineVersion`, hash de fuente/configuración, semilla y etapa. Un artefacto solo puede contener una variante de motor y una etapa. Los archivos de O, D y S nunca se agregan en un mismo JSONL, CSV o análisis.
+
+**No se ha ejecutado CAL-01, CAL-02, CAL-03 ni CAL-04.** El runner actual solo genera el plan; el adaptador de ejecución y el escritor de artefactos son tareas posteriores.
+
+## 12. Pruebas unitarias y evidencia experimental
+
+> Una prueba unitaria demuestra que una función cumple una propiedad especificada. Una campaña demuestra qué ocurrió al ejecutar el sistema bajo condiciones experimentales. No son intercambiables.
+
+Las pruebas del runner verifican la expansión del plan y sus barreras de aislamiento. No constituyen calibración, no producen resultados experimentales y no habilitan por sí solas GATE-01.
