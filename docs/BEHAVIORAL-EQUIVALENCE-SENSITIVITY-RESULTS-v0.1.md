@@ -73,3 +73,6 @@ Para las otras nueve semillas, D abortó antes de completar tick 16; `Y_s` se ma
 Este estudio es sensibilidad local en diez estados iniciales CAL-01, no replicación independiente ni robustez global. No compara plataformas, no demuestra equivalencia científica y no valida el modelo. No modifica los artefactos históricos CAL-01 ni AT-003.
 
 **Conclusión:** el estudio fue ejecutado e íntegro. Su resultado principal no es que `1e-6` haya pasado, sino que no puede sostenerse como margen conductual general ni como epsilon estricto de trayectoria a partir de estos datos.
+## 6. Nota de procedencia sobre el ejecutor
+
+La ejecución reportada corresponde al commit de workflow `1a4cf8058db2510e1549116496405e90a9385781` y al artifact de CI #107. Después de esa ejecución se corrigió únicamente el contador auxiliar `totalRawOutOfRange` para conservar también los valores brutos fuera de [0,1] en D. Esa corrección no modifica el estado inicial, las perturbaciones, las transiciones, los estados comparados, el clipping O, los abortos D ni `Y_s`; por tanto, no cambia las cifras ni decisiones reportadas arriba. El artefacto histórico no se reescribe. La corrección queda en el código del PR y deberá validarse en la siguiente ejecución autorizada si se decide repetir el estudio.
