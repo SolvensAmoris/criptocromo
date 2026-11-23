@@ -96,7 +96,7 @@ to run-one-state [state-record variant]
         ]
 
         let next-weights []
-        let i 0
+        set i 0
         while [i < 24] [
           let next-row []
           let j 0
