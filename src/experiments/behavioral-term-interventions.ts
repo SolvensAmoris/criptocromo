@@ -57,18 +57,19 @@ export function stepWithTermIntervention(
     );
     const neighborContribution = config.gamma * neighborSignal;
     const retainedMemory = config.switches.memory ? node.memory : 0;
-    const localTerms =
-      config.alpha * node.activation +
-      config.beta * resonance * input +
-      config.eta * retainedMemory;
+    const retainedTerm = config.alpha * node.activation;
+    const resonantTerm = config.beta * resonance * input;
+    const memoryTerm = config.eta * retainedMemory;
 
-    let raw = localTerms + neighborContribution;
+    // Preserve the historical left-to-right floating-point addition order
+    // exactly when no intervention is active.
+    let raw = retainedTerm + resonantTerm + neighborContribution + memoryTerm;
     if (applyIntervention && intervention) {
       const signedDelta = i % 2 === 0 ? intervention.delta : -intervention.delta;
       const factor = 1 + signedDelta;
       raw = intervention.kind === 'ACT_RAW_SCALE'
         ? raw * factor
-        : localTerms + neighborContribution * factor;
+        : retainedTerm + resonantTerm + neighborContribution * factor + memoryTerm;
     }
 
     if (!Number.isFinite(raw)) throw new Error('Non-finite activation');
