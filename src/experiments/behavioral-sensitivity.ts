@@ -100,7 +100,8 @@ function run() {
         let firstExactStateDifference: number | null = null;
         for (let index = 0; index < commonTicks; index++) {
           const a = baseResult.ticks[index], b = result.ticks[index];
-          const tickRawDifference = maxAbs(a.raw.map((value, i) => value - b.raw[i]));\n          maxRaw = Math.max(maxRaw, tickRawDifference);
+          const tickRawDifference = maxAbs(a.raw.map((value, i) => value - b.raw[i]));
+          maxRaw = Math.max(maxRaw, tickRawDifference);
           const diffs = compareState(a.state!, b.state!);
           maxActivation = Math.max(maxActivation, diffs.maxActivationObserved); maxMemory = Math.max(maxMemory, diffs.maxMemory); maxWeight = Math.max(maxWeight, diffs.maxWeight);
           if (firstExactStateDifference === null && (diffs.maxActivationObserved !== 0 || diffs.maxMemory !== 0 || diffs.maxWeight !== 0)) firstExactStateDifference = index + 1;
