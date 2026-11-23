@@ -37,7 +37,6 @@ export function stepNetwork(
     throw new Error('Stimulus values must be finite numbers');
   }
   const input = clamp(stimulus.intensity);
-  const width = Math.max(config.resonanceWidth, 1e-6);
 
   const nextNodes = state.nodes.map((node, i) => {
     const distance = stimulus.frequency - node.preferredFrequency;
