@@ -1,7 +1,7 @@
 {
   "experimentId": "AT-002-CALIBRATION",
-  "protocolVersion": "0.2.0",
-  "status": "PROTOCOL_AND_RUNNER_SKELETON_NOT_EXECUTED",
+  "protocolVersion": "0.3.0",
+  "status": "CAL01_EXECUTOR_IMPLEMENTED_NOT_EXECUTED_REQUIRES_REVIEW",
   "predecessor": "AT-001-PILOT-01",
   "engineVariants": {
     "O": {
@@ -10,7 +10,12 @@
       "module": "src/experiments/at002-calibration/engines/engine-v0.1.0-O.ts",
       "activation": "hard_clip_0_1",
       "immutableReference": true,
-      "sourceBlobSha1": "80ab84dc86c61e15c7fc784556c86d5d2289c9b2"
+      "sourceBlobSha1": "80ab84dc86c61e15c7fc784556c86d5d2289c9b2",
+      "dependencyBlobSha1": {
+        "src/core/engine.ts": "93528403aedb708eed33729d9764918cb200bd2a",
+        "src/core/types.ts": "d22b09fda49474b7dd0b1453bb14cbb301d2a30d",
+        "src/experiments/at001/config.ts": "3412c04d860aa6dacecb33fc0f0c4d101747dd8c"
+      }
     },
     "D": {
       "name": "diagnostic_unclipped",
@@ -20,7 +25,12 @@
       "overflowGuardAbs": 1000000,
       "purpose": "counterfactual clipping diagnostic",
       "sourceBlobSha1": "5938b3052667381220ef947ab8672b03b1f1f10e",
-      "sharedKernelBlobSha1": "5c1fad6c983a863c737b02d2f90155b35a304d10"
+      "sharedKernelBlobSha1": "5c1fad6c983a863c737b02d2f90155b35a304d10",
+      "dependencyBlobSha1": {
+        "src/experiments/at002-calibration/engines/variant-engine.ts": "5c1fad6c983a863c737b02d2f90155b35a304d10",
+        "src/core/types.ts": "d22b09fda49474b7dd0b1453bb14cbb301d2a30d",
+        "src/experiments/at001/config.ts": "3412c04d860aa6dacecb33fc0f0c4d101747dd8c"
+      }
     },
     "S": {
       "name": "smooth_sigmoid",
@@ -29,7 +39,12 @@
       "activation": "logistic_sigmoid",
       "purpose": "alternative nonlinear activation; not a clipping-loss estimator",
       "sourceBlobSha1": "23612fe6179620b24c572c9b63d5fada3b2ab407",
-      "sharedKernelBlobSha1": "5c1fad6c983a863c737b02d2f90155b35a304d10"
+      "sharedKernelBlobSha1": "5c1fad6c983a863c737b02d2f90155b35a304d10",
+      "dependencyBlobSha1": {
+        "src/experiments/at002-calibration/engines/variant-engine.ts": "5c1fad6c983a863c737b02d2f90155b35a304d10",
+        "src/core/types.ts": "d22b09fda49474b7dd0b1453bb14cbb301d2a30d",
+        "src/experiments/at001/config.ts": "3412c04d860aa6dacecb33fc0f0c4d101747dd8c"
+      }
     }
   },
   "seeds": [
@@ -48,10 +63,7 @@
     "targetFrequency": 0.5,
     "offTargetFrequency": 0.9,
     "pulseSteps": 18,
-    "recoverySteps": 24,
-    "cal03SequenceSteps": 8,
-    "cal03Intensity": 0.5,
-    "cal04Intensity": 0.5
+    "recoverySteps": 24
   },
   "cal01": {
     "variants": [
@@ -63,6 +75,11 @@
       "memory": true,
       "resonance": true,
       "plasticity": true
+    },
+    "instrumentation": {
+      "src/experiments/at002-calibration/cal01.ts": "b3dc5421a6bfae4d0d929b51181b55f9907832b1",
+      "src/experiments/at002-calibration/diagnostics.ts": "190570b67fb257456c82af37811f0bc6d6a0ffbd",
+      "src/experiments/at002-calibration/runner.ts": "29071a422493956f5ac50b051154b8d8167131d5"
     }
   },
   "cal02": {
