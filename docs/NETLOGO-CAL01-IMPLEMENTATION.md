@@ -21,7 +21,6 @@ Then run BehaviorSpace from `experiments/netlogo`:
 ```bash
 "$NETLOGO_CONSOLE" --headless \
   --model "CriptocromoEquivalence.nlogo" \
-  --setup-file "behaviorspace.xml" \
   --experiment "Criptocromo CAL01 shared-state equivalence" \
   --threads 1 \
   --table /dev/null
