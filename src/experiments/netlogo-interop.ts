@@ -129,6 +129,7 @@ function exportInputs(): void {
     referenceEngines: config.engineVariants,
     tolerance,
     netlogoVersion: '7.0.4',
+    netlogoModelFormat: 'legacy .nlogo with 12 preserved sections and embedded BehaviorSpace experiment',
     hashes: {
       configSha256: sha256(configRaw),
       protocolSha256: sha256(protocolRaw),
