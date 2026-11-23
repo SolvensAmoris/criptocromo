@@ -40,7 +40,7 @@ Métricas por semilla y motor:
 - ticks con al menos un valor fuera de rango;
 - pico medio, residual medio y fracción media de nodos activos.
 
-D no se interpreta como salida de O. Su trayectoria diverge cuando la activación bruta rebasa el intervalo histórico. S no participa en CAL-01.
+D no se interpreta como salida de O. Su trayectoria diverge cuando la activación bruta rebasa el intervalo histórico. S no participa en CAL-01. El guard de D puede detener una semilla antes de completar la ventana. En ese caso se conserva una fila `guard_aborted` con la activación bruta que disparó el guard, `observedActivations=null`, el error y las métricas parciales. La salida de esa variante se marca `ABORTED_GUARD`; nunca se presenta como trayectoria completa.
 
 ### Artefactos y protección contra sobrescritura
 
@@ -62,7 +62,7 @@ El ejecutor puede invocarse con:
 AT002_CAL01_AUTHORIZED=YES AT002_RUN_ID=cal01-run-001 npm run at002:cal01
 ```
 
-La variable de autorización es una barrera explícita para evitar ejecuciones accidentales. No se ha autorizado ni ejecutado la campaña oficial. Las pruebas automatizadas invocan el ejecutor únicamente en directorios temporales y verifican separación de artefactos y rechazo de sobrescritura.
+La variable de autorización es una barrera explícita para evitar ejecuciones accidentales. No se ha autorizado ni ejecutado la campaña oficial. Las pruebas automatizadas invocan el ejecutor únicamente en directorios temporales y verifican separación de artefactos y rechazo de sobrescritura. La primera prueba de integración detectó que D rebasa el guard de 1,000,000 (un valor observado fue aproximadamente 3,033,517). El ejecutor ahora conserva ese aborto como evidencia parcial en lugar de perder toda la ejecución o elevar el límite para forzar una finalización. Este hallazgo procede de una prueba automatizada temporal, no de una campaña oficial.
 
 ## 4. CAL-02 | Barrido de ganancia
 
@@ -103,14 +103,14 @@ Estos umbrales son reglas operativas iniciales para decidir si AT-001-R2 puede e
 
 | Etapa | Estado |
 |---|---|
-| CAL-01 | Ejecutor implementado; campaña oficial pendiente de autorización |
+| CAL-01 | Ejecutor implementado; prueba temporal detecta aborto del guard D; campaña oficial pendiente de autorización |
 | CAL-02 | Plan definido; ejecutor pendiente |
 | CAL-03 | Plan definido; ejecutor pendiente |
 | CAL-04 | Plan definido; ejecutor pendiente |
 | GATE-01 | No evaluado |
 | AT-001-R2 | Bloqueado hasta que GATE-01 pase |
 
-La aprobación de código, la aprobación del plan y la autorización de una campaña son decisiones distintas. Un CI verde no autoriza una campaña. Una prueba unitaria no sustituye una ejecución experimental.
+La aprobación de código, la aprobación del plan y la autorización de una campaña son decisiones distintas. Si D termina en `ABORTED_GUARD`, CAL-01 debe leerse como diagnóstico parcial y no como comparación O/D completa; esa condición debe resolverse o aceptarse explícitamente en una revisión del protocolo antes de interpretar la etapa. Un CI verde no autoriza una campaña. Una prueba unitaria no sustituye una ejecución experimental.
 
 ## 9. Limitaciones explícitas
 
