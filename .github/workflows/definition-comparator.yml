@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'scripts/**'
+      - 'docs/BEHAVIORAL-EQUIVALENCE-EVALUATOR-v0.1.md'
       - 'docs/DEFINITION-COMPARATOR-CONTRACT-*.json'
       - 'src/core/engine.ts'
       - 'src/experiments/at002-calibration/engines/**'
