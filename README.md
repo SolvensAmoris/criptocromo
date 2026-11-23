@@ -23,6 +23,7 @@ El objetivo no es asumir que una combinación produce emergencia. Es diseñar ex
 - **Reproducción entre motores:** [PR #12](https://github.com/SolvensAmoris/criptocromo/pull/12) integró la reproducción NetLogo de CAL-01. La coincidencia numérica exacta observada se limita a esa configuración y secuencia.
 - **Sensibilidad conductual:** [PR #13](https://github.com/SolvensAmoris/criptocromo/pull/13) integró el estudio de 200 trayectorias. El candidato 1e-6 fue rechazado como margen general.
 - **Criterio conductual v0.2:** [PR #14](https://github.com/SolvensAmoris/criptocromo/pull/14) dejó un borrador metodológico no congelado. 1e-8 y 1e-10 permanecen sin aceptación; el margen general está sin resolver.
+- **Contrato de equivalencia conductual v0.3:** borrador prospectivo común para futuras pruebas de margen. Separa observables conductuales Yₜ de variables diagnósticas Zₜ, define tolerancias por observable, eventos categóricos, fallos cualitativos y censura por guard. No selecciona ACT por defecto ni modifica campañas anteriores. Ver [Contrato metodológico v0.3](docs/BEHAVIORAL-EQUIVALENCE-CONTRACT-v0.3.md).
 - **Topología y comparador:** [PR #15](https://github.com/SolvensAmoris/criptocromo/pull/15) y [PR #16](https://github.com/SolvensAmoris/criptocromo/pull/16) integraron la auditoría de red recurrente y el comparador de definición v0.2. La salida esperada es DEFINITION_PARTIAL_MATCH: el comparador detecta una diferencia conocida en el dominio de guardas TypeScript/NetLogo. No es una prueba formal de equivalencia semántica ni conductual.
 - **Análisis de semilla 303:** la evidencia original muestra que 303 es la única semilla D con 16 ticks completos, pero no la de mayor amplificación en el prefijo común 1–14. El informe específico está en [Análisis de sensibilidad D: semilla 303](docs/BEHAVIORAL-EQUIVALENCE-SEED-303-ANALYSIS-v0.1.md).
 - **BEHAVIORAL-SENSITIVITY-002:** protocolo v0.1 en borrador para intervenir por separado la activación bruta y la contribución vecinal. La primitiva tiene pruebas unitarias; no existe ejecutor de campaña y no se ha ejecutado ni autorizado el estudio. Ver [Protocolo de sensibilidad por términos](docs/BEHAVIORAL-SENSITIVITY-002-PROTOCOL-v0.1.md).
@@ -93,6 +94,7 @@ El comando anterior no ejecuta una campaña. Las campañas oficiales se despacha
 - [Resultados oficiales CAL-02](docs/AT-002-CAL-02-RESULTS.md)
 - [Pre-registro AT-003 v1.0](docs/AT-003-PREREGISTRATION-v1.0.md)
 - [Criterio de equivalencia conductual v0.2](docs/BEHAVIORAL-EQUIVALENCE-CRITERION-v0.2.md)
+- [Contrato metodológico de equivalencia conductual v0.3](docs/BEHAVIORAL-EQUIVALENCE-CONTRACT-v0.3.md)
 - [Resultados de sensibilidad conductual v0.1](docs/BEHAVIORAL-EQUIVALENCE-SENSITIVITY-RESULTS-v0.1.md)
 - [Análisis de semilla 303 v0.1](docs/BEHAVIORAL-EQUIVALENCE-SEED-303-ANALYSIS-v0.1.md)
 - [Contrato del comparador de definición v0.2](docs/DEFINITION-COMPARATOR-CONTRACT-v0.2.json)
