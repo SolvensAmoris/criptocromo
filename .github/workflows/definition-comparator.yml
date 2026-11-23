@@ -1,0 +1,51 @@
+name: Definition comparator audit
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'docs/DEFINITION-COMPARATOR-CONTRACT-*.json'
+      - 'src/core/engine.ts'
+      - 'src/experiments/at002-calibration/engines/**'
+      - 'src/experiments/behavioral-sensitivity.ts'
+      - 'experiments/netlogo/**'
+      - 'package.json'
+      - '.github/workflows/definition-comparator.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  comparator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:definitions
+      - name: Download pinned historical sensitivity artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: behavioral-sensitivity-45198131816
+          run-id: 45198131816
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: artifacts/comparator-input
+      - name: Verify definitions and artifact provenance
+        shell: bash
+        run: |
+          set +e
+          npm run verify:definitions -- --artifact artifacts/comparator-input/behavioral-sensitivity-45198131816.zip --out artifacts/comparator-report.json
+          status=$?
+          set -e
+          node -e "const r=require('./artifacts/comparator-report.json'); if(r.overall!=='DEFINITION_PARTIAL_MATCH' || r.checks.some(x=>x.status==='MISMATCH')) process.exit(1)"
+          if [ "$status" -ne 1 ]; then
+            echo "Comparator must fail closed with exit code 1 while the known guard-domain difference remains PARTIAL_MATCH; got $status"
+            exit 1
+          fi
