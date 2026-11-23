@@ -166,7 +166,7 @@ El margen se define únicamente después de fijar:
 
 Para una clase de perturbación (P) y una magnitud (delta), se evalúa si la comparación recibe `ACCEPT`, `REJECT` o `INDETERMINATE/CENSORED`.
 
-El **margen operacional observado** es el mayor nivel de perturbación efectivamente probado que satisface el criterio de aceptación en el conjunto y las condiciones declaradas. Debe informarse como resultado condicionado, por ejemplo:
+El **margen operacional observado** es el mayor nivel de perturbación efectivamente probado que satisface el criterio de aceptación bajo una regla de agregación de casos declarada antes de la campaña. Esa regla debe indicar si se exige aceptación en todos los casos, una proporción mínima u otro criterio justificable; los resultados por caso siempre se conservan y reportan. Una tasa de aceptación agregada no convierte los casos rechazados o censurados en aceptados. Debe informarse como resultado condicionado, por ejemplo:
 
 [
 `M_obs(P, Y, T, C, V, S)`
