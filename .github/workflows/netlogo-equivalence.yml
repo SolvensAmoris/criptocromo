@@ -7,6 +7,7 @@ on:
       - "src/experiments/netlogo-interop.ts"
       - "experiments/netlogo/**"
       - "docs/NETLOGO-CROSS-PLATFORM-EQUIVALENCE-v0.1.md"
+      - "docs/NETLOGO-CAL01-IMPLEMENTATION.md"
       - ".github/workflows/netlogo-equivalence.yml"
       - "package.json"
       - "package-lock.json"
