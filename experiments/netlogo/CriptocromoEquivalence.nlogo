@@ -196,13 +196,7 @@ NetLogo 7.0.4
 @#$#@#$#@
 @#$#@#$#@
 @#$#@#$#@
-<experiments>
-  <experiment name="Criptocromo CAL01 shared-state equivalence" repetitions="1" runMetricsEveryStep="false">
-    <setup>setup</setup>
-    <go>go</go>
-    <metric>ticks</metric>
-  </experiment>
-</experiments>@#$#@#$#@
+@#$#@#$#@
 
 @#$#@#$#@
 default
