@@ -1,4 +1,5 @@
 import { createHash } from 'node:crypto';
+import { execFileSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -222,6 +223,7 @@ function writeVariantOutput(
   config: At002Configuration,
   runId: string,
   configSha256: string,
+  sourceCommitSha: string,
   temporaryDirectory: string
 ): string {
   const identity = config.engineVariants[output.variant];
@@ -239,6 +241,7 @@ function writeVariantOutput(
     engineDependencyBlobSha1: identity.dependencyBlobSha1,
     instrumentationBlobSha1: config.cal01.instrumentation,
     configSha256,
+    sourceCommitSha,
     seedSet: config.seeds,
     pulseSteps: config.protocol.pulseSteps,
     recoverySteps: config.protocol.recoverySteps,
@@ -262,6 +265,11 @@ function writeVariantOutput(
     status: output.status,
     seedMetrics: output.metrics
   }, null, 2) + '\n', { flag: 'wx' });
+  const checksumNames = ['manifest.json', 'traces.jsonl', 'metrics.json'];
+  const checksumText = checksumNames.map(name =>
+    `${sha256(readFileSync(path.join(temporaryDirectory, name)))}  ${name}`
+  ).join('\n') + '\n';
+  writeFileSync(path.join(temporaryDirectory, 'checksums.sha256'), checksumText, { flag: 'wx' });
 
   const finalDirectory = path.join(path.dirname(temporaryDirectory), runId);
   renameSync(temporaryDirectory, finalDirectory);
@@ -277,6 +285,7 @@ export function runCal01(
 ): {
   runId: string;
   configSha256: string;
+  sourceCommitSha: string;
   outputs: Record<Variant, string>;
   statusByVariant: Record<Variant, 'COMPLETE' | 'ABORTED_GUARD'>;
   recordCountByVariant: Record<Variant, number>;
@@ -291,6 +300,8 @@ export function runCal01(
   verifyEngineIdentity(config, repoRoot);
 
   const configSha256 = sha256(configRaw);
+  const sourceCommitSha = process.env.GITHUB_SHA ?? execFileSync('git', ['rev-parse', 'HEAD'], { cwd: repoRoot, encoding: 'utf8' }).trim();
+  if (!/^[a-f0-9]{40}$/.test(sourceCommitSha)) throw new Error('Unable to establish a valid source commit SHA');
   const outputs = (['O', 'D'] as const).map(variant => simulateVariant(config, variant));
   const finalDirectories = outputs.map(output => path.join(outputRoot, output.variant, 'CAL-01', runId));
   const temporaryDirectories = outputs.map(output => path.join(outputRoot, output.variant, 'CAL-01', `.tmp-${runId}`));
@@ -304,7 +315,7 @@ export function runCal01(
   try {
     const published: Record<Variant, string> = { O: '', D: '' };
     outputs.forEach((output, index) => {
-      const directory = writeVariantOutput(output, config, runId, configSha256, temporaryDirectories[index]);
+      const directory = writeVariantOutput(output, config, runId, configSha256, sourceCommitSha, temporaryDirectories[index]);
       published[output.variant] = directory;
       publishedDirectories.push(directory);
     });
@@ -312,6 +323,7 @@ export function runCal01(
     return {
       runId,
       configSha256,
+      sourceCommitSha,
       outputs: published,
       statusByVariant: { O: byVariant('O').status, D: byVariant('D').status },
       recordCountByVariant: { O: byVariant('O').records.length, D: byVariant('D').records.length },
