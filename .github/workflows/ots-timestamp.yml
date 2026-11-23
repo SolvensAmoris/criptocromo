@@ -1,0 +1,52 @@
+name: OpenTimestamps provenance
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: "Type STAMP to create an OpenTimestamps receipt for this commit"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  stamp:
+    if: ${{ inputs.confirm == 'STAMP' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout selected revision
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install OpenTimestamps client
+        run: python -m pip install --disable-pip-version-check opentimestamps-client==0.7.2
+
+      - name: Create deterministic provenance manifest
+        run: python scripts/create_timestamp_manifest.py
+
+      - name: Create OpenTimestamps receipt
+        run: ots stamp timestamp-manifest.json
+
+      - name: Record local checksums
+        run: |
+          sha256sum timestamp-manifest.json timestamp-manifest.json.ots > timestamp-SHA256SUMS.txt
+          cat timestamp-SHA256SUMS.txt
+
+      - name: Upload manifest and timestamp receipt
+        uses: actions/upload-artifact@v4
+        with:
+          name: criptocromo-opentimestamps-${{ github.sha }}
+          path: |
+            timestamp-manifest.json
+            timestamp-manifest.json.ots
+            timestamp-SHA256SUMS.txt
+          if-no-files-found: error
+          retention-days: 365
