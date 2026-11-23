@@ -61,7 +61,7 @@ For each position shared by both observed sequences:
 
 Because BigInt arithmetic is arbitrary precision in the evaluator, subtraction is performed without int64 intermediate overflow. Inputs are nevertheless validated against int64 before comparison.
 
-A demonstrated identity/order, selected-payload, or timing violation in the valid observed common prefix yields `REJECT`, even if coverage is later lost. An event-count difference yields `REJECT` only when both traces have complete coverage; with incomplete coverage, the shorter trace may simply be censored before a later event.
+A demonstrated identity/order, selected-payload, or timing violation in the valid observed common prefix yields `REJECT`, even if coverage is later lost. An event-count difference yields `REJECT` when both traces have complete coverage, or when the shorter sequence belongs to a trace that independently has complete process and recorder coverage. In the latter case, the fully observed shorter trace establishes that the event is absent/additional relative to that horizon. If the shorter trace is not fully covered, its sequence may simply be censored before a later event, so the count difference alone is `INDETERMINATE/CENSORED`.
 
 ## 5. Decision precedence
 
@@ -81,7 +81,7 @@ The v0.1 test suite covers:
 - identity/order mismatch;
 - missing/additional event count under complete coverage;
 - incomplete horizon with no demonstrated rejection;
-- demonstrated prefix rejection followed by censoring;
+- demonstrated prefix rejection followed by censoring;\n- an additional/missing event demonstrated by the shorter fully covered trace while the longer trace is censored;\n- event-count difference with both traces censored remains indeterminate;
 - process-active but recorder-invalid gaps;
 - event exactly at `T`;
 - overlapping, adjacent, and one-nanosecond-gap intervals;
