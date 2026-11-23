@@ -24,7 +24,7 @@ AT-001-PILOT-01 se conserva como registro histórico. AT-002 mantiene motores ve
 
 **CAL-01:** campaña oficial ejecutada el 23 de noviembre de 2026. O completó 420/420 pasos y presentó saturación persistente; D terminó con ABORTED_GUARD en las diez semillas, con los datos parciales preservados. La integridad de los artefactos y sus checksums fue verificada. El análisis descriptivo está documentado en [Resultados oficiales CAL-01](docs/AT-002-CAL-01-RESULTS.md). CAL-01 no demuestra causalidad, sinergia ni emergencia.
 
-**CAL-02:** siguiente calibración prevista, con barrido pre-registrado de intensidad en O. Su ejecutor y workflow manual aún no están implementados; no ha sido ejecutada ni autorizada.
+**CAL-02:** ejecutor y workflow manual implementados en rama de trabajo, pendientes de revisión e integración. El barrido pre-registrado usa O, cinco intensidades, diez semillas pareadas y 2,100 pasos. La campaña no ha sido ejecutada ni autorizada.
 
 ## Principios metodológicos
 
@@ -80,7 +80,7 @@ El comando anterior no ejecuta una campaña. CAL-01 tuvo un workflow manual sepa
 - [Protocolo AT-002](docs/AT-002-CALIBRATION.md)
 - [Checklist de análisis de trazas CAL-01](docs/AT-002-CAL-01-TRACE-ANALYSIS-CHECKLIST.md)
 - [Resultados oficiales CAL-01](docs/AT-002-CAL-01-RESULTS.md)
-- [Workflow manual CAL-01](.github/workflows/at002-cal01.yml)
+- [Workflow manual CAL-01](.github/workflows/at002-cal01.yml)\n- [Workflow manual CAL-02](.github/workflows/at002-cal02.yml)
 
 ## Procedencia y timestamps verificables
 
