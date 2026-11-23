@@ -31,17 +31,21 @@ jobs:
       - run: npm ci
       - run: npm run test:definitions
       - name: Download pinned historical sensitivity artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: behavioral-sensitivity-45198131816
-          run-id: 45198131816
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          path: artifacts/comparator-input
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p artifacts/comparator-input
+          curl --fail --location \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/SolvensAmoris/criptocromo/actions/artifacts/14828178437/zip \
+            --output artifacts/comparator-input/BSENS-45198131816-artifact.zip
+          echo "475cc8ddd26a1b3c629c290152aec2dda7954ad633d3592092e2b66b6595fd96  artifacts/comparator-input/BSENS-45198131816-artifact.zip" | sha256sum --check
       - name: Verify definitions and artifact provenance
         shell: bash
         run: |
           set +e
-          npm run verify:definitions -- --artifact artifacts/comparator-input/behavioral-sensitivity-45198131816.zip --out artifacts/comparator-report.json
+          npm run verify:definitions -- --artifact artifacts/comparator-input/BSENS-45198131816-artifact.zip --out artifacts/comparator-report.json
           status=$?
           set -e
           node -e "const r=require('./artifacts/comparator-report.json'); if(r.overall!=='DEFINITION_PARTIAL_MATCH' || r.checks.some(x=>x.status==='MISMATCH')) process.exit(1)"
