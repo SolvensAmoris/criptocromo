@@ -14,13 +14,26 @@ type Variant = 'O' | 'D';
 type Engine = { createNetwork(config: SimulationConfig): NetworkState; stepNetwork(state: NetworkState, stimulus: Stimulus, config: SimulationConfig): NetworkState };
 const engines: Record<Variant, Engine> = { O, D };
 const config = configJson as {
+  engineVariants: Record<Variant, { module: string; sourceBlobSha1: string; dependencyBlobSha1: Record<string, string> }>;
   seeds: number[];
   protocol: { targetFrequency: number; pulseSteps: number; recoverySteps: number };
   cal01: { intensity: number; switches: { memory: boolean; resonance: boolean; plasticity: boolean } };
 };
 const tolerance = 1e-10;
-const outDir = fileURLToPath(new URL('../../../experiments/netlogo/interop-data/', import.meta.url));
+const outDir = fileURLToPath(new URL('../../experiments/netlogo/interop-data/', import.meta.url));
 const sha256 = (value: string | Buffer): string => createHash('sha256').update(value).digest('hex');
+const gitBlobSha1 = (value: Buffer): string => createHash('sha1').update(`blob ${value.length}\\0`).update(value).digest('hex');
+function verifyReferenceIdentity(): void {
+  for (const variant of ['O', 'D'] as const) {
+    const identity = config.engineVariants[variant];
+    const moduleBytes = readFileSync(path.resolve(process.cwd(), identity.module));
+    if (gitBlobSha1(moduleBytes) !== identity.sourceBlobSha1) throw new Error(`Pinned source identity mismatch for ${variant}`);
+    for (const [relativePath, expected] of Object.entries(identity.dependencyBlobSha1)) {
+      const bytes = readFileSync(path.resolve(process.cwd(), relativePath));
+      if (gitBlobSha1(bytes) !== expected) throw new Error(`Pinned dependency identity mismatch for ${variant}: ${relativePath}`);
+    }
+  }
+}
 const numberText = (value: number): string => Number.isInteger(value) ? String(value) : value.toFixed(17);
 const nlList = (value: unknown): string => {
   if (typeof value === 'number') return numberText(value);
@@ -71,6 +84,7 @@ function appendStateRows(lines: string[], seed: number, variant: Variant): void 
 }
 
 function exportInputs(): void {
+  verifyReferenceIdentity();
   mkdirSync(outDir, { recursive: true });
   const initialLines: string[] = [];
   const expectedLines = ['kind,seed,variant,tick,node_or_i,j_or_empty,raw_or_weight,observed_or_empty,memory_or_empty,status'];
