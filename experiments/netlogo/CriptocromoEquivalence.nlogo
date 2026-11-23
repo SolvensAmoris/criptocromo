@@ -141,6 +141,33 @@ to run-one-state [state-record variant]
 end
 
 @#$#@#$#@
+GRAPHICS-WINDOW
+0
+0
+160
+160
+-1
+-1
+5.0
+1
+10
+1
+1
+1
+0
+0
+0
+1
+-10
+10
+-10
+10
+1
+1
+1
+ticks
+30.0
+@#$#@#$#@
 ## PURPOSE
 Cross-platform implementation comparison for the Criptocromo CAL-01 O/D model.
 The model consumes canonical initial states exported by the Criptocromo TypeScript engine.
@@ -160,6 +187,29 @@ O applies hard clipping to [0,1].
 D preserves raw activation and aborts a trajectory when any raw activation exceeds
 the absolute guard of 1,000,000.
 @#$#@#$#@
+default
+0.0
+-0.2
+0
+0.0
+1.0
+0.0
+1
+1.0
+0.0
+0.2
+0
+0.0
+1.0
+link direction
+true
+0
+Line -7500403 true 150 150 90 180
+Line -7500403 true 150 150 210 180
 @#$#@#$#@
 NetLogo 7.0.4
+@#$#@#$#@
+need-to-manually-make-preview-for-this-model
+@#$#@#$#@
+0
 @#$#@#$#@
