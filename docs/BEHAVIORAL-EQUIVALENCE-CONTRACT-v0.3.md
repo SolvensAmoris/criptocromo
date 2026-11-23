@@ -94,13 +94,17 @@ No se aceptará una tolerancia solo porque coincida con la resolución de punto 
 ### 4.1 Eventos categóricos
 
 Para los eventos categóricos relevantes, el protocolo debe definir un vocabulario cerrado o una regla explícita de codificación. La equivalencia exige:
-- coincidencia exacta de ocurrencia;
-- coincidencia exacta de identidad o categoría;
-- coincidencia del tick o instante de ocurrencia dentro de la resolución declarada;
-- conservación del orden de los eventos;
-- coincidencia de atributos relevantes, como entidad, nodo, origen o destino, cuando correspondan.
+- correspondencia uno a uno entre los eventos de ambas ejecuciones;
+- coincidencia exacta de identidad o categoría y de los atributos relevantes;
+- conservación exacta del número de eventos y de su orden;
+- diferencia temporal no mayor que la tolerancia de evento predefinida;
+- ausencia de eventos omitidos, adicionales, sustituidos o reordenados.
 
-No se permite que una distancia numérica pequeña compense la aparición, desaparición, sustitución o reordenamiento de un evento categórico primario.
+La tolerancia temporal de eventos debe expresarse en la unidad temporal de la tarea (por ejemplo, ticks) y justificarse por su significado práctico antes de observar los resultados. No se debe confundir la tolerancia temporal con una tolerancia sobre la identidad del evento: la identidad y la secuencia deben coincidir exactamente, aunque el instante de ocurrencia pueda variar dentro del límite declarado.
+
+Cuando existan eventos repetidos de la misma categoría, el protocolo debe fijar una regla de emparejamiento determinista y preservar el orden. Una opción es emparejar el evento número k de cada categoría en una ejecución con el evento número k de esa categoría en la otra, siempre que la secuencia global también conserve el orden. No se permite escoger retrospectivamente el emparejamiento que minimice las diferencias.
+
+No se permite que una distancia temporal pequeña compense la aparición, desaparición, sustitución o reordenamiento de un evento categórico primario.
 
 ### 4.2 Fallos cualitativos
 
@@ -114,7 +118,28 @@ Antes de la ejecución, el protocolo debe enumerar los fallos cualitativos que i
 
 La lista debe derivarse de la tarea. No se debe inventar ni ampliar después de observar qué ejecución falló. Un fallo cualitativo predefinido implica rechazo de equivalencia para la comparación evaluable.
 
-### 4.3 Guard y terminación anticipada
+### 4.3 Ejemplo operativo: emisión de señales
+
+Supóngase que la tarea consiste en emitir una señal al detectar un evento. El protocolo específico define como observable conductual primario la secuencia de señales emitidas y sus tiempos. Las variables internas del detector se registran por separado como diagnóstico, salvo que la tarea justifique incluir alguna de ellas en el conjunto primario.
+
+Para este ejemplo, antes de ejecutar las pruebas se fijan:
+- horizonte: 100 ticks;
+- tolerancia temporal por señal: máximo 1 tick;
+- identidad y orden de las señales: coincidencia exacta;
+- número de señales: coincidencia exacta;
+- cobertura: ambas ejecuciones deben completar el tick 100.
+
+Dos ejecuciones son equivalentes hasta 100 ticks si existe una correspondencia uno a uno entre todas sus señales, cada señal emparejada conserva identidad y posición en la secuencia, la diferencia absoluta entre sus tiempos de emisión es como máximo 1 tick, no falta ni aparece ninguna señal adicional y ambas ejecuciones completan el horizonte.
+
+Ejemplo de decisión para una señal correspondiente:
+- diferencia de 0 o 1 tick: cumple el criterio temporal;
+- diferencia de 2 ticks: `REJECT` para esa pareja de ejecuciones bajo este criterio.
+
+Una diferencia de 2 ticks no demuestra por sí sola un fallo general del sistema ni explica su causa. Significa que esa perturbación no conservó la conducta definida para esa tarea y esa tolerancia. Si una tolerancia mayor fuera apropiada para la tarea, debe justificarse y fijarse prospectivamente antes de evaluar los resultados; no puede ampliarse después para convertir un rechazo en aceptación.
+
+Si una ejecución termina antes del tick 100 por guard, no se declara equivalente hasta 100 ticks. Para preservar la distinción entre conducta y observación incompleta, el resultado se registra como `INDETERMINATE/CENSORED` cuando la terminación impide observar el horizonte completo y no existe otra regla de rechazo predefinida que ya se haya violado. El guard y su tick quedan registrados como diagnóstico. Si la tarea define expresamente la terminación anticipada como fallo cualitativo, se registra además ese rechazo por la regla de tarea, sin atribuirlo automáticamente a divergencia de señales no observadas.
+
+### 4.4 Guard y terminación anticipada
 
 Un guard es, ante todo, un mecanismo de control o protección de la ejecución. Si una ejecución termina por guard antes de completar (T):
 - la ejecución se marca como `INDETERMINATE/CENSORED` para la equivalencia sobre el horizonte completo;
