@@ -174,7 +174,7 @@ function artifactAudit() {
       baseline.lastCompletedTick === expectedAbortTick - 1 &&
       baseline.status === 'ABORTED_GUARD' && cause === contract.guardAudit.cause;
     const sameGuard = baselineMatches && perturbed.length === 9 &&
-      perturbed.every((row) => row.abortTick === baseline.abortTick && row.lastCompletedTick === baseline.lastCompletedTick);
+      perturbed.every((row) => row.abortTick === baseline.abortTick && row.status === 'ABORTED_GUARD' && row.abortReason?.includes('D overflow guard triggered:'));
     return {
       seed, cause, expectedAbortTick, baselineAbortTick: baseline?.abortTick ?? null,
       lastCompletedTick: baseline?.lastCompletedTick ?? null,
