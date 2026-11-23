@@ -104,11 +104,8 @@ to run-one-state [state-record variant]
             let old-weight item j (item i weights)
             let new-weight old-weight
             if i != j [
-              set new-weight ifelse-value (true) [
-                ifelse-value (variant = "O" or variant = "D") [
-                  min (list 1 (max (list 0 (old-weight + (0.035 * item i next-activations * item j next-activations) - (0.008 * old-weight)))))
-                ] [old-weight]
-              ] [old-weight]
+              set new-weight min (list 1 (max (list 0
+                (old-weight + (0.035 * item i next-activations * item j next-activations) - (0.008 * old-weight)))))
             ]
             set next-row lput new-weight next-row
             set j j + 1
