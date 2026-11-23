@@ -16,7 +16,8 @@
     "netlogo:export": "tsx src/experiments/netlogo-interop.ts export",
     "netlogo:compare": "tsx src/experiments/netlogo-interop.ts compare",
     "verify:definitions": "node scripts/definition-comparator.mjs",
-    "test:definitions": "node --test scripts/topology-audit.test.mjs"
+    "test:definitions": "node --test scripts/topology-audit.test.mjs",
+    "test:behavioral-equivalence": "node --test scripts/behavioral-equivalence-evaluator.test.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
