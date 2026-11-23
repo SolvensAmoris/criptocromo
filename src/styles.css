@@ -1,0 +1,44 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+:root{font-family:Manrope,system-ui,sans-serif;color:#e9e3d7;background:#11100e;font-synthesis:none;text-rendering:optimizeLegibility}
+*{box-sizing:border-box}
+body{margin:0;min-width:320px;background:radial-gradient(ellipse at 75% 0%,#292116 0%,#11100e 48%);min-height:100vh}
+button,input{font:inherit}
+.shell{max-width:1160px;margin:0 auto;padding:34px 42px 24px}
+.topbar{display:flex;align-items:center;gap:15px;border-bottom:1px solid #393329;padding-bottom:24px}
+.mark{width:43px;height:43px;border:1px solid #b99a60;color:#d7b979;display:grid;place-items:center;font-size:28px;border-radius:50%}
+.eyebrow,.tiny,.status,.chart-legend,.metrics span,footer{font-family:'DM Mono',monospace;letter-spacing:.11em;font-size:10px;color:#b59a69}
+.eyebrow{margin:0 0 7px}
+h1{font-size:16px;letter-spacing:.24em;margin:0;font-weight:700}
+.status{margin-left:auto;border:1px solid #665337;padding:8px 10px;border-radius:2px}
+.intro{padding:62px 0 38px;max-width:700px}
+.intro h2{font-size:clamp(42px,7vw,76px);line-height:.99;letter-spacing:-.065em;margin:12px 0 20px;font-weight:600}
+.intro h2 em{font-family:Georgia,serif;font-weight:400;color:#c8a96c}
+.lead{color:#aaa398;max-width:590px;font-size:15px;line-height:1.8}
+.workspace{display:grid;grid-template-columns:300px 1fr;gap:16px}
+.panel{border:1px solid #393329;background:#191714;padding:22px}
+.panel-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:28px}
+.tiny{font-size:9px;color:#716a5e}
+.controls label{display:flex;justify-content:space-between;color:#c8c0b3;font-size:12px;margin:18px 0 10px}
+.controls label strong{font-family:'DM Mono',monospace;color:#d7b979;font-weight:400}
+input[type=range]{width:100%;accent-color:#c5a368}
+input[type=number]{width:100%;background:#11100e;border:1px solid #484033;color:#eee;padding:10px}
+.switches{display:grid;gap:12px;margin:28px 0;color:#bcb4a7;font-size:12px}
+.switches .eyebrow{margin-bottom:2px}
+.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#c6a467;margin-right:9px}
+button{width:100%;padding:13px 14px;background:#c6a467;color:#15120d;border:0;font-weight:700;font-size:12px;cursor:pointer;text-align:left}
+button span{float:right;font-size:17px;line-height:12px}
+button:hover{background:#ddc18b}
+.chart{height:190px;display:flex;align-items:end;gap:3px;border-bottom:1px solid #494033;background:repeating-linear-gradient(to bottom,transparent 0,transparent 46px,#302b24 47px)}
+.bar{flex:1;min-width:2px;transition:height .2s ease}
+.bar.pulse{background:#c6a467}
+.bar.recovery{background:#6d806f}
+.chart-legend{display:flex;justify-content:space-between;margin-top:10px;font-size:9px;color:#81796c}
+.metrics{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:34px}
+.metrics div{border-top:1px solid #393329;padding-top:12px}
+.metrics span{display:block;font-size:9px;color:#8f8677;margin-bottom:8px}
+.metrics strong{font-family:'DM Mono',monospace;font-size:23px;font-weight:400;color:#e1d3b6}
+.note{border-left:2px solid #a98c59;padding:2px 0 2px 18px;margin:28px 0 46px;max-width:800px}
+.note p{font-size:12px;line-height:1.8;color:#9d968a;margin:7px 0}
+footer{display:flex;justify-content:space-between;border-top:1px solid #393329;padding-top:17px;font-size:9px;color:#777064}
+@media(max-width:760px){.shell{padding:22px 18px}.intro{padding:45px 0 28px}.workspace{grid-template-columns:1fr}.panel{padding:18px}.status{font-size:8px}.metrics{gap:14px}.metrics strong{font-size:20px}footer{gap:15px;flex-direction:column}}
