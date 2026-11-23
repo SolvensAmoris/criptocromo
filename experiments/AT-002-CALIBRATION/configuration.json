@@ -9,7 +9,8 @@
       "version": "0.1.0",
       "module": "src/experiments/at002-calibration/engines/engine-v0.1.0-O.ts",
       "activation": "hard_clip_0_1",
-      "immutableReference": true
+      "immutableReference": true,
+      "sourceBlobSha1": "80ab84dc86c61e15c7fc784556c86d5d2289c9b2"
     },
     "D": {
       "name": "diagnostic_unclipped",
@@ -17,14 +18,18 @@
       "module": "src/experiments/at002-calibration/engines/engine-v0.2.0-D.ts",
       "activation": "identity_activation_with_fail_fast_overflow_guard",
       "overflowGuardAbs": 1000000,
-      "purpose": "counterfactual clipping diagnostic"
+      "purpose": "counterfactual clipping diagnostic",
+      "sourceBlobSha1": "5938b3052667381220ef947ab8672b03b1f1f10e",
+      "sharedKernelBlobSha1": "5c1fad6c983a863c737b02d2f90155b35a304d10"
     },
     "S": {
       "name": "smooth_sigmoid",
       "version": "0.2.0-S",
       "module": "src/experiments/at002-calibration/engines/engine-v0.2.0-S.ts",
       "activation": "logistic_sigmoid",
-      "purpose": "alternative nonlinear activation; not a clipping-loss estimator"
+      "purpose": "alternative nonlinear activation; not a clipping-loss estimator",
+      "sourceBlobSha1": "23612fe6179620b24c572c9b63d5fada3b2ab407",
+      "sharedKernelBlobSha1": "5c1fad6c983a863c737b02d2f90155b35a304d10"
     }
   },
   "seeds": [
