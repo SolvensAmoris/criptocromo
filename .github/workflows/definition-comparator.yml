@@ -1,0 +1,63 @@
+name: Definition comparator audit
+
+on:
+  pull_request:
+    paths:
+      - 'scripts/**'
+      - 'docs/DEFINITION-COMPARATOR-CONTRACT-*.json'
+      - 'src/core/engine.ts'
+      - 'src/experiments/at002-calibration/engines/**'
+      - 'src/experiments/behavioral-sensitivity.ts'
+      - 'experiments/netlogo/**'
+      - 'package.json'
+      - '.github/workflows/definition-comparator.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  comparator:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run test:definitions
+      - name: Download pinned historical sensitivity artifact
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          mkdir -p artifacts/comparator-input
+          curl --fail --location \
+            --header "Authorization: Bearer $GH_TOKEN" \
+            --header "Accept: application/vnd.github+json" \
+            https://api.github.com/repos/SolvensAmoris/criptocromo/actions/artifacts/14828178437/zip \
+            --output artifacts/comparator-input/BSENS-45198131816-artifact.zip
+          echo "475cc8ddd26a1b3c629c290152aec2dda7954ad633d3592092e2b66b6595fd96  artifacts/comparator-input/BSENS-45198131816-artifact.zip" | sha256sum --check
+      - name: Verify definitions and artifact provenance
+        shell: bash
+        run: |
+          set +e
+          npm run verify:definitions -- --artifact artifacts/comparator-input/BSENS-45198131816-artifact.zip --out artifacts/comparator-report.json
+          status=$?
+          set -e
+          if [ "$status" -ne 1 ] || [ ! -f artifacts/comparator-report.json ]; then
+            echo "Comparator did not produce the expected fail-closed partial report (exit=$status)"
+            exit 1
+          fi
+          node -e "const r=require('./artifacts/comparator-report.json'); if(r.overall!=='DEFINITION_PARTIAL_MATCH' || r.checks.some(x=>x.status==='MISMATCH')) process.exit(1)"
+
+      - name: Preserve comparator report
+        uses: actions/upload-artifact@v4
+        with:
+          name: definition-comparator-report-v0.2
+          path: artifacts/comparator-report.json
+          if-no-files-found: error
+          retention-days: 90
