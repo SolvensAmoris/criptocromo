@@ -1,6 +1,6 @@
 # AT-002 | Protocolo de calibración
 
-**Estado:** CAL-01 ejecutado y analizado; CAL-02 integrado en `main` mediante PR #7 (`5000c7d`), con CI posterior al merge exitosa; revisión pre-ejecución y autorización de campaña pendientes.  
+**Estado al 23 de noviembre de 2026:** CAL-01 y CAL-02 ejecutados y documentados. CAL-02 completó 2,100/2,100 pasos. CAL-03 y CAL-04 tienen planes definidos, pero sus ejecutores no están implementados. GATE-01 no ha sido evaluado.  
 **Predecesor conservado:** AT-001-PILOT-01, motor 0.1.0.  
 **Versión del protocolo:** 0.3.0.
 
@@ -71,7 +71,7 @@ Barrido predefinido de intensidad de entrada: **0.10, 0.20, 0.35, 0.50, 0.75**. 
 
 Usar las diez semillas pareadas: 101, 202, 303, 404, 505, 606, 707, 808, 909, 1010. Registrar todos los resultados, incluidos los que saturen o no produzcan respuesta. La intensidad es el único factor manipulado en esta fase.
 
-El motor 0.1.0 limita la intensidad de entrada a [0,1]; por tanto, el barrido propuesto usa valores dentro de ese intervalo. El ejecutor de CAL-02 está implementado en `src/experiments/at002-calibration/cal02.ts`. Ejecuta exclusivamente O, con las cinco intensidades pre-registradas, las diez semillas pareadas y los 18 pasos de pulso más 24 de recuperación por combinación. El total planificado es 5 × 10 × 42 = 2,100 pasos. Registra trazas por tick/nodo, activación bruta y observada, clipping, fracción activa, pico y residual por semilla. Produce manifiesto, trazas, métricas y checksums SHA-256 en `artifacts/AT-002-CALIBRATION/O/CAL-02/<RUN_ID>/`. Verifica la identidad Git blob SHA-1 del motor O y sus dependencias; verifica la paridad de la instrumentación frente al motor; rechaza IDs inseguros y sobrescrituras. El comando `npm run at002:cal02` exige `AT002_CAL02_AUTHORIZED=YES` y `AT002_RUN_ID` explícito. El workflow manual `.github/workflows/at002-cal02.yml` requiere seleccionar YES. El workflow no se ejecuta automáticamente al fusionar código. La integración y la CI posterior al merge están verificadas. La revisión pre-ejecución y la autorización explícita de la campaña siguen pendientes; el merge y el CI verde no autorizan su despacho.
+El motor 0.1.0 limita la intensidad de entrada a [0,1]; por tanto, el barrido propuesto usa valores dentro de ese intervalo. El ejecutor de CAL-02 está implementado en `src/experiments/at002-calibration/cal02.ts`. Ejecuta exclusivamente O, con las cinco intensidades pre-registradas, las diez semillas pareadas y los 18 pasos de pulso más 24 de recuperación por combinación. El total planificado es 5 × 10 × 42 = 2,100 pasos. Registra trazas por tick/nodo, activación bruta y observada, clipping, fracción activa, pico y residual por semilla. Produce manifiesto, trazas, métricas y checksums SHA-256 en `artifacts/AT-002-CALIBRATION/O/CAL-02/<RUN_ID>/`. Verifica la identidad Git blob SHA-1 del motor O y sus dependencias; verifica la paridad de la instrumentación frente al motor; rechaza IDs inseguros y sobrescrituras. El comando `npm run at002:cal02` exige `AT002_CAL02_AUTHORIZED=YES` y `AT002_RUN_ID` explícito. El workflow manual `.github/workflows/at002-cal02.yml` requiere seleccionar YES. El workflow no se ejecuta automáticamente al fusionar código. La integración y la CI posterior al merge fueron verificadas. La campaña oficial se ejecutó mediante el workflow #45184129343; los resultados están documentados en `docs/AT-002-CAL-02-RESULTS.md`. La revisión pre-ejecución se conserva como registro histórico.
 
 ## 5. CAL-03 | Disociación de memoria y plasticidad
 
@@ -105,13 +105,13 @@ Estos umbrales son reglas operativas iniciales para decidir si AT-001-R2 puede e
 | Etapa | Estado |
 |---|---|
 | CAL-01 | Ejecutado y analizado; resultados oficiales documentados |
-| CAL-02 | Ejecutor y workflow manual integrados; CI posterior al merge exitosa; revisión pre-ejecución y autorización pendientes |
+| CAL-02 | Ejecutado oficialmente; 2,100/2,100 pasos; resultados documentados |
 | CAL-03 | Plan definido; ejecutor pendiente |
 | CAL-04 | Plan definido; ejecutor pendiente |
 | GATE-01 | No evaluado |
 | AT-001-R2 | Bloqueado hasta que GATE-01 pase |
 
-La aprobación de código, la aprobación del plan y la autorización de una campaña son decisiones distintas. Si D termina en `ABORTED_GUARD`, CAL-01 se lee como diagnóstico parcial y no como comparación O/D completa, conforme a la enmienda de revisión pre-ejecución de la sección 11. Un CI verde no autoriza una campaña. Una prueba unitaria no sustituye una ejecución experimental.
+La aprobación de código, la aprobación del plan y la autorización de una campaña son decisiones distintas. Si D termina en `ABORTED_GUARD`, CAL-01 se lee como diagnóstico parcial y no como comparación O/D completa, conforme a la enmienda de revisión pre-ejecución de la sección 11. CAL-02 ya fue despachada con autorización manual y sus resultados se conservan por separado. Un CI verde no autoriza por sí solo una campaña. Una prueba unitaria no sustituye una ejecución experimental.
 
 ## 9. Limitaciones explícitas
 
@@ -205,6 +205,38 @@ El análisis de trazas está especificado en `docs/AT-002-CAL-01-TRACE-ANALYSIS-
 
 **Estado de implementación:** INTEGRADA. PR #7 fue fusionado en `main` mediante el commit `5000c7dba29661c83b584d629d5e288854eff39f`. La ejecución CI posterior al merge (#71, run `45182805251`) terminó con `success`; sus pasos de instalación, auditoría, pruebas, build, validación del plan y carga de evidencia concluyeron correctamente.
 
-**Estado de campaña:** PENDIENTE. No se ha despachado ni ejecutado CAL-02. Esta integración y su CI no constituyen autorización.
+**Estado de campaña:** EJECUTADA. La revisión pre-ejecución y la autorización manual fueron completadas antes del despacho. El resultado oficial se documenta en `docs/AT-002-CAL-02-RESULTS.md`.
 
-La revisión pre-ejecución debe seguir `docs/AT-002-CAL-02-PRE-EXECUTION-REVIEW.md`. Se conserva sin cambios el diseño preregistrado: O/0.1.0, intensidades 0.10, 0.20, 0.35, 0.50 y 0.75; diez semillas; 18 ticks de pulso y 24 de recuperación; switches A/B/C habilitados; 2,100 pasos planeados. No seleccionar ni modificar niveles después de observar resultados de CAL-01.
+Se conserva sin cambios el diseño preregistrado: O/0.1.0, intensidades 0.10, 0.20, 0.35, 0.50 y 0.75; diez semillas; 18 ticks de pulso y 24 de recuperación; switches A/B/C habilitados; 2,100 pasos. La revisión histórica está en `docs/AT-002-CAL-02-PRE-EXECUTION-REVIEW.md`. Los resultados no se utilizan para modificar retrospectivamente los niveles, el motor o el protocolo.
+
+
+## 13. CAL-02 | Resultados oficiales de campaña
+
+**Campaña:** `CAL02-20261123-01`  
+**Workflow:** [GitHub Actions #45184129343](https://github.com/SolvensAmoris/criptocromo/actions/runs/45184129343)  
+**Artifact ID:** `14823130453`  
+**Commit ejecutado:** `3002ba013a33fa7919fdb46c6cdc2aaf7aed87cb`  
+**Motor:** O / 0.1.0  
+**Resultado del job:** `success`  
+**Pasos:** 2,100/2,100.  
+**SHA-256 del ZIP:** `264d823bf9165ba8f0c7fbf4977bee7951ce9071f0b7544828a2384a2aca0e3d`.
+
+CAL-02 ejecutó las cinco intensidades pre-registradas (0.10, 0.20, 0.35, 0.50 y 0.75), diez semillas pareadas (101, 202, 303, 404, 505, 606, 707, 808, 909 y 1010), 18 ticks de pulso y 24 de recuperación. Se generaron 2,100 registros de tick y 50 resúmenes semilla-intensidad.
+
+| Intensidad | Fracción media de valores recortados (42 ticks) | Activación media residual | Pico medio |
+|---:|---:|---:|---:|
+| 0.10 | 55.35% | 1.00 | 0.7407 |
+| 0.20 | 68.65% | 1.00 | 1.00 |
+| 0.35 | 77.21% | 1.00 | 1.00 |
+| 0.50 | 81.78% | 1.00 | 1.00 |
+| 0.75 | 85.92% | 1.00 | 1.00 |
+
+La fracción media de nodos activos fue 1.0 en las cinco intensidades. En las diez semillas de cada intensidad, la activación residual media fue exactamente 1.0.
+
+**Ventana temporal:** la fracción recortada de la tabla se calcula sobre los 42 ticks completos (pulso y recuperación). No debe confundirse con la ventana primaria de ticks 1–16 usada en AT-003. En CAL-02, a intensidad 0.10 no hubo clipping en ticks 1–16 en las diez semillas, según el recálculo incluido en el pre-registro AT-003. Aun así, la activación residual final se saturó en todas las semillas.
+
+**Interpretación permitida:** reducir la intensidad disminuyó la proporción total de valores recortados en los 42 ticks, pero ninguna intensidad evitó la saturación residual. La fracción activa tampoco discriminó entre intensidades. Estos resultados describen una limitación de resolución y recuperación del motor O bajo las condiciones probadas.
+
+**No permite concluir:** emergencia, sinergia, causalidad de la plasticidad, inteligencia, conciencia ni equivalencia biológica/física. CAL-02 ejecutó únicamente O; no constituye una comparación empírica con D o S.
+
+La ficha de resultados, los metadatos de procedencia y el SHA-256 del artefacto están en `docs/AT-002-CAL-02-RESULTS.md`.

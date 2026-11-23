@@ -15,16 +15,19 @@ El objetivo no es asumir que una combinación produce emergencia. Es diseñar ex
 
 ## Estado del proyecto
 
-**Fase:** fundación experimental y calibración del instrumento.  
-**Experimento histórico:** AT-001, Memoria resonante autoorganizada.  
-**Experimento activo:** AT-002, calibración del motor y diagnóstico de clipping.  
+**Fase:** cierre documental de AT-002 y preparación metodológica de AT-003.  
+**Experimento histórico:** AT-001, campaña factorial exploratoria.  
+**Campaña de calibración:** AT-002, CAL-01 y CAL-02 ejecutadas; CAL-03/CAL-04 y GATE-01 siguen pendientes.  
+**Siguiente experimento:** AT-003, pre-registro v1.0 integrado; revisión independiente y ejecutor de calibración pendientes.  
 **Plataforma:** aplicación web adaptable, ejecutable en navegadores de escritorio y móviles.
 
-AT-001-PILOT-01 se conserva como registro histórico. AT-002 mantiene motores versionados O, D y S para separar el comportamiento original con clipping, una variante diagnóstica sin clipping y una alternativa logística.
+AT-001 se conserva como campaña exploratoria histórica. AT-002 mantiene motores versionados O, D y S: O conserva el clipping histórico; D elimina el clipping y aplica un guard de seguridad; S sustituye el corte por una transformación logística. Las campañas oficiales CAL-01 y CAL-02 no deben confundirse con una comparación empírica de las tres variantes: CAL-01 ejecutó O y D; CAL-02 ejecutó únicamente O.
 
 **CAL-01:** campaña oficial ejecutada el 23 de noviembre de 2026. O completó 420/420 pasos y presentó saturación persistente; D terminó con ABORTED_GUARD en las diez semillas, con los datos parciales preservados. La integridad de los artefactos y sus checksums fue verificada. El análisis descriptivo está documentado en [Resultados oficiales CAL-01](docs/AT-002-CAL-01-RESULTS.md). CAL-01 no demuestra causalidad, sinergia ni emergencia.
 
-**CAL-02:** ejecutor y workflow manual integrados en `main` mediante PR #7 (commit `5000c7d`). La CI posterior al merge terminó correctamente: tests, build, auditoría de dependencias y plan AT-002. El barrido pre-registrado usa O, cinco intensidades, diez semillas pareadas y 2,100 pasos. La campaña oficial no ha sido ejecutada; permanece pendiente de revisión pre-ejecución y autorización explícita.
+**CAL-02:** campaña oficial ejecutada el 23 de noviembre de 2026 mediante [workflow #45184129343](https://github.com/SolvensAmoris/criptocromo/actions/runs/45184129343), run ID `CAL02-20261123-01`, commit `3002ba013a33fa7919fdb46c6cdc2aaf7aed87cb`. O completó 2,100/2,100 pasos: cinco intensidades, diez semillas pareadas, 18 ticks de pulso y 24 de recuperación. La activación residual media fue 1.0 en las cinco intensidades y en las diez semillas de cada nivel; la fracción activa también fue 1.0. El barrido redujo la fracción total de valores recortados al disminuir la intensidad, pero no evitó la saturación residual. Esto documenta un límite de resolución del motor bajo las condiciones probadas, no emergencia ni sinergia. Ver [Resultados oficiales CAL-02](docs/AT-002-CAL-02-RESULTS.md).
+
+**AT-003:** el pre-registro v1.0 quedó integrado en `main` mediante [PR #9](https://github.com/SolvensAmoris/criptocromo/pull/9), merge commit `7fda37275d00e93f89807d87a8b22228c7fa5ba1`. La CI posterior al merge, run #76 (`45186968981`), terminó `success`. El documento está congelado como protocolo, pendiente de revisión independiente. Su ejecutor de calibración no está implementado; la calibración y la campaña confirmatoria no se han ejecutado ni autorizado. Ver [Pre-registro AT-003 v1.0](docs/AT-003-PREREGISTRATION-v1.0.md).
 
 ## Principios metodológicos
 
@@ -37,7 +40,7 @@ AT-001-PILOT-01 se conserva como registro histórico. AT-002 mantiene motores ve
 - Los resultados negativos, los abortos controlados y las limitaciones también forman parte del registro.
 - Cada campaña debe conservar identidad del motor, configuración, semillas, entorno y checksums de sus artefactos.
 
-La hipótesis H-D1 sobre la posible contribución de la plasticidad a una retroalimentación positiva permanece como hipótesis. CAL-01 mide divergencia O/D; la atribución causal requiere una ablación independiente y pre-registrada.
+La hipótesis H-D1 sobre la posible contribución de la plasticidad a una retroalimentación positiva permanece como hipótesis. CAL-01 midió divergencia O/D; no aisló causalmente la plasticidad. AT-003 es un protocolo factorial independiente dentro de Criptocromo y no debe presentarse como validado por AT-002.
 
 ## Inicio rápido
 
@@ -64,7 +67,7 @@ Generar el plan AT-002 en modo de solo planificación:
 npm run at002:plan
 ```
 
-El comando anterior no ejecuta una campaña. CAL-01 tuvo un workflow manual separado y exigió autorización explícita `YES` más un identificador de ejecución. No se despacha al hacer merge ni al ejecutar el plan.
+El comando anterior no ejecuta una campaña. CAL-01 y CAL-02 se despacharon mediante workflows manuales separados, con autorización explícita `YES` e identificador de ejecución. El merge, la CI y la generación del plan no autorizan ni despachan campañas.
 
 ## Arquitectura
 
@@ -80,8 +83,11 @@ El comando anterior no ejecuta una campaña. CAL-01 tuvo un workflow manual sepa
 - [Protocolo AT-002](docs/AT-002-CALIBRATION.md)
 - [Checklist de análisis de trazas CAL-01](docs/AT-002-CAL-01-TRACE-ANALYSIS-CHECKLIST.md)
 - [Resultados oficiales CAL-01](docs/AT-002-CAL-01-RESULTS.md)
-- [Workflow manual CAL-01](.github/workflows/at002-cal01.yml)\n- [Workflow manual CAL-02](.github/workflows/at002-cal02.yml)
-
+- [Resultados oficiales CAL-02](docs/AT-002-CAL-02-RESULTS.md)
+- [Revisión pre-ejecución CAL-02](docs/AT-002-CAL-02-PRE-EXECUTION-REVIEW.md)
+- [Pre-registro AT-003 v1.0](docs/AT-003-PREREGISTRATION-v1.0.md)
+- [Workflow manual CAL-01](.github/workflows/at002-cal01.yml)
+- [Workflow manual CAL-02](.github/workflows/at002-cal02.yml)
 ## Procedencia y timestamps verificables
 
 Criptocromo incorpora un flujo opcional de timestamping criptográfico con OpenTimestamps. El flujo genera un manifiesto determinista que identifica el repositorio, el commit y el árbol Git seleccionados; calcula su huella y solicita a calendarios públicos que la incorporen a una agregación Merkle anclada posteriormente en Bitcoin.
