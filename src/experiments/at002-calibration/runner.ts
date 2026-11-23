@@ -17,7 +17,7 @@ export interface At002Configuration {
   seeds: number[];
   engineVariants: Record<EngineVariantId, EngineIdentity>;
   protocol: { targetFrequency: number; offTargetFrequency: number; pulseSteps: number; recoverySteps: number };
-  cal01: { variants: EngineVariantId[]; intensity: number; switches: PrincipleSwitches };
+  cal01: { variants: EngineVariantId[]; intensity: number; switches: PrincipleSwitches; instrumentation: Record<string, string> };
   cal02: { factor: string; levels: number[]; fixedParameters: boolean; engineVariant: EngineVariantId; switches: PrincipleSwitches };
   cal03: { engineVariant: EngineVariantId; intensity: number; sequenceSteps: number; profiles: string[]; conditions: CalibrationCondition[] };
   cal04: { engineVariant: EngineVariantId; intensity: number; conditions: CalibrationCondition[] };
@@ -54,6 +54,7 @@ function assertConfig(c: At002Configuration): void {
   }
   if (c.cal01.variants.length !== 2 || c.cal01.variants[0] !== 'O' || c.cal01.variants[1] !== 'D') throw new Error('CAL-01 must compare O and D only, in that order');
   if (!inUnitInterval(c.cal01.intensity)) throw new Error('CAL-01 intensity must be finite and within [0,1]');
+  if (!c.cal01.instrumentation || Object.keys(c.cal01.instrumentation).length !== 2 || Object.values(c.cal01.instrumentation).some(hash => !isHash(hash))) throw new Error('CAL-01 instrumentation source hashes must be pinned');
   if (!c.cal02.levels.length || c.cal02.levels.some(x => !inUnitInterval(x))) throw new Error('CAL-02 levels must be finite and within [0,1]');
   if (c.cal02.engineVariant !== 'O') throw new Error('CAL-02 is preregistered for O only');
   if (c.cal03.engineVariant !== 'O' || c.cal04.engineVariant !== 'O') throw new Error('CAL-03 and CAL-04 are preregistered for O only');
