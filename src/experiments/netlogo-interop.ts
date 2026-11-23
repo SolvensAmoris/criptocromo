@@ -36,7 +36,7 @@ function verifyReferenceIdentity(): void {
 }
 const numberText = (value: number): string => {
   if (Number.isInteger(value)) return String(value);
-  const encoded = value.toPrecision(17).replace(/e([+-]?\\d+)$/i, 'E$1');
+  const encoded = value.toPrecision(17).replace(/e([+-]?\d+)$/i, 'E$1');
   if (Number(encoded) !== value) throw new Error(`Initial-state value failed IEEE-754 decimal round-trip: ${value}`);
   return encoded;
 };
