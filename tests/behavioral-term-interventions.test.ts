@@ -14,10 +14,18 @@ describe('term-level sensitivity intervention primitive', () => {
   it('matches the historical O and D transitions when no intervention is supplied', () => {
     for (const seed of [101, 303, 606]) {
       const cfg = config(seed);
-      const oInitial = O.createNetwork(cfg);
-      const dInitial = D.createNetwork(cfg);
-      expect(stepWithTermIntervention(oInitial, stimulus, cfg, 'O')).toEqual(O.stepNetwork(oInitial, stimulus, cfg));
-      expect(stepWithTermIntervention(dInitial, stimulus, cfg, 'D')).toEqual(D.stepNetwork(dInitial, stimulus, cfg));
+      let actualO = O.createNetwork(cfg);
+      let expectedO = O.createNetwork(cfg);
+      let actualD = D.createNetwork(cfg);
+      let expectedD = D.createNetwork(cfg);
+      for (let tick = 0; tick < 5; tick += 1) {
+        actualO = stepWithTermIntervention(actualO, stimulus, cfg, 'O');
+        expectedO = O.stepNetwork(expectedO, stimulus, cfg);
+        actualD = stepWithTermIntervention(actualD, stimulus, cfg, 'D');
+        expectedD = D.stepNetwork(expectedD, stimulus, cfg);
+        expect(actualO).toEqual(expectedO);
+        expect(actualD).toEqual(expectedD);
+      }
     }
   });
 
@@ -34,9 +42,9 @@ describe('term-level sensitivity intervention primitive', () => {
 
   it('applies ACT_RAW_SCALE at the transition that produces tick 2', () => {
     const cfg = config();
-    const tick1 = stepWithTermIntervention(O.createNetwork(cfg), stimulus, cfg, 'O');
-    const baseline2 = stepWithTermIntervention(tick1, stimulus, cfg, 'O');
-    const perturbed2 = stepWithTermIntervention(tick1, stimulus, cfg, 'O', {
+    const tick1 = stepWithTermIntervention(D.createNetwork(cfg), stimulus, cfg, 'D');
+    const baseline2 = stepWithTermIntervention(tick1, stimulus, cfg, 'D');
+    const perturbed2 = stepWithTermIntervention(tick1, stimulus, cfg, 'D', {
       kind: 'ACT_RAW_SCALE', delta: 1e-6
     });
     expect(perturbed2).not.toEqual(baseline2);
@@ -45,9 +53,9 @@ describe('term-level sensitivity intervention primitive', () => {
 
   it('applies NEIGHBOR_TERM_SCALE at the transition that produces tick 2', () => {
     const cfg = config();
-    const tick1 = stepWithTermIntervention(O.createNetwork(cfg), stimulus, cfg, 'O');
-    const baseline2 = stepWithTermIntervention(tick1, stimulus, cfg, 'O');
-    const perturbed2 = stepWithTermIntervention(tick1, stimulus, cfg, 'O', {
+    const tick1 = stepWithTermIntervention(D.createNetwork(cfg), stimulus, cfg, 'D');
+    const baseline2 = stepWithTermIntervention(tick1, stimulus, cfg, 'D');
+    const perturbed2 = stepWithTermIntervention(tick1, stimulus, cfg, 'D', {
       kind: 'NEIGHBOR_TERM_SCALE', delta: 1e-6
     });
     expect(perturbed2).not.toEqual(baseline2);
