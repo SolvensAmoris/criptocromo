@@ -1,0 +1,7 @@
+AT-001 execution request
+Design: full 2^3 factorial
+Seeds: 101,202,303,404,505,606,707,808,909,1010
+Expected records: 80
+Protocol runs per record: target frequency 0.5 and off-target frequency 0.9
+Engine: repository implementation only; no mock fallback
+Requested by repository owner through ChatGPT on 2026-11-23

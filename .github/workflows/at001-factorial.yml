@@ -1,0 +1,31 @@
+name: AT-001 Factorial Experiment
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'experiments/AT-001/EXECUTE_FACTORIAL'
+
+permissions:
+  contents: read
+
+jobs:
+  factorial:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Install dependencies
+        run: npm install
+      - name: Run real AT-001 factorial experiment
+        run: npm run factorial
+      - name: Upload immutable experiment outputs
+        uses: actions/upload-artifact@v4
+        with:
+          name: AT-001-factorial-${{ github.run_id }}-${{ github.run_attempt }}
+          path: experiments/AT-001/results/
+          if-no-files-found: error
+          retention-days: 90
