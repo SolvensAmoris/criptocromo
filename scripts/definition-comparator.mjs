@@ -54,6 +54,7 @@ function sourceSemantics() {
   const dEngine = git(['show', 'HEAD:src/experiments/at002-calibration/engines/engine-v0.2.0-D.ts']).toString('utf8');
   const netlogo = git(['show', 'HEAD:experiments/netlogo/CriptocromoEquivalence.nlogo']).toString('utf8');
   const sensitivity = git(['show', 'HEAD:src/experiments/behavioral-sensitivity.ts']).toString('utf8');
+  const config = git(['show', 'HEAD:src/experiments/at001/config.ts']).toString('utf8');
   const tests = [
     ['ACT_RAW_previous_state', core.includes('state.weights[i][j] * neighbor.activation') && variant.includes('state.weights[i][j] * neighbor.activation')],
     ['MEM_previous_activation', core.includes('(1 - config.lambda) * node.activation') && variant.includes('(1 - config.lambda) * node.activation')],
@@ -62,6 +63,7 @@ function sourceSemantics() {
     ['D_identity', dEngine.includes('return raw;') && netlogo.includes('[raw]')],
     ['synchronous_tick_commit', core.includes('return { nodes: nextNodes, weights: nextWeights, tick: state.tick + 1 }') && netlogo.includes('set activations next-activations') && netlogo.includes('set weights next-weights')],
     ['42_tick_schedule', sensitivity.includes('pulseSteps + config.protocol.recoverySteps') && netlogo.includes('repeat 42')],
+    ['shared_numeric_parameters', ['nodeCount: 24','lambda: 0.86','alpha: 0.72','beta: 0.42','gamma: 0.18','eta: 0.24','plasticityRate: 0.035','decayRate: 0.008','resonanceWidth: 18'].every((v) => config.includes(v)) && ['0.72 *','0.42 *','18 *','0.18 *','0.24 *','0.86 *','0.14 *','0.035 *','0.008 *'].every((v) => netlogo.includes(v))],
     ['perturbation_levels', sensitivity.includes('1e-6, 1e-8, 1e-10') && sensitivity.includes("if (variable === 'ACT')") && sensitivity.includes("else if (variable === 'MEM')")]
   ];
   for (const [id, ok] of tests) add('semantic:' + id, ok ? 'MATCH' : 'MISMATCH', { staticSourcePatternCheck: true });
