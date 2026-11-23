@@ -1,4 +1,4 @@
-import type { NetworkState, SimulationConfig, Stimulus } from '../../../../core/types';
+import type { NetworkState, SimulationConfig, Stimulus } from '../../../core/types';
 
 export type ActivationPolicy = (rawActivation: number) => number;
 
