@@ -162,7 +162,7 @@ describe('AT-002 CAL-02 execution and evidence writer', () => {
         (config.protocol.pulseSteps + config.protocol.recoverySteps));
       expect(result.seedCount).toBe(config.seeds.length * config.cal02.levels.length);
       expect(result.intensityLevels).toEqual(config.cal02.levels);
-      const traces = readFileSync(path.join(result.output, 'traces.jsonl'), 'utf8').trim().split('\\n').map(line => JSON.parse(line));
+      const traces = readFileSync(path.join(result.output, 'traces.jsonl'), 'utf8').trim().split('\n').map(line => JSON.parse(line));
       expect(traces).toHaveLength(result.recordCount);
       expect(new Set(traces.map(record => record.engineVariant))).toEqual(new Set(['O']));
       expect(new Set(traces.map(record => record.intensity))).toEqual(new Set(config.cal02.levels));
@@ -172,7 +172,7 @@ describe('AT-002 CAL-02 execution and evidence writer', () => {
       expect(metrics.seedMetrics).toHaveLength(result.seedCount);
       expect(metrics.seedMetrics.every((metric: { completedTickCount: number; plannedTickCount: number }) =>
         metric.completedTickCount === metric.plannedTickCount)).toBe(true);
-      const checksums = readFileSync(path.join(result.output, 'checksums.sha256'), 'utf8').trim().split('\\n');
+      const checksums = readFileSync(path.join(result.output, 'checksums.sha256'), 'utf8').trim().split('\n');
       for (const line of checksums) {
         const digest = line.slice(0, 64);
         const name = line.slice(66);
