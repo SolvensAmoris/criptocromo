@@ -1,7 +1,7 @@
 {
   "experimentId": "AT-002-CALIBRATION",
   "protocolVersion": "0.3.0",
-  "status": "CAL01_EXECUTOR_IMPLEMENTATION_PENDING_REVIEW",
+  "status": "CAL01_EXECUTOR_IMPLEMENTED_NOT_EXECUTED_REQUIRES_REVIEW",
   "predecessor": "AT-001-PILOT-01",
   "engineVariants": {
     "O": {
