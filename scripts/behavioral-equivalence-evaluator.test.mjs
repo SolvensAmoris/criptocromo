@@ -11,8 +11,10 @@ import {
 
 const options = { timeDomain: 'FIXED_TICK', timeUnit: 'ns', horizonNs: 100n, toleranceNs: 5n, payloadMode: 'IGNORE' };
 const full = [{ startNs: 0n, endNs: 100n }];
+const instrumentMetadata = { clockSource: 'process.hrtime.bigint', clockResolutionNs: 1n, clockAccuracyNs: null, measurementUncertaintyNs: null, uncertaintyStatus: 'NOT_QUANTIFIED' };
 const trace = (events = [], overrides = {}) => ({
   events,
+  instrumentMetadata,
   processActiveIntervals: full,
   recorderValidIntervals: full,
   acquisitionErrors: [],
@@ -187,6 +189,19 @@ test('rejects elapsed int64 overflow without wrapping or saturation', () => {
   const clock = createMonotonicRunClock(() => readings.shift());
   assert.equal(clock.readElapsedNs().timeNs, 0n);
   assert.equal(clock.readElapsedNs().reason, 'INT64_OVERFLOW');
+});
+
+test('requires instrument uncertainty metadata separately from temporal tolerance', () => {
+  const missing = trace([], { instrumentMetadata: undefined });
+  assert.equal(evaluate(missing, trace()).verdict, 'INDETERMINATE/CENSORED');
+  const malformed = trace([], { instrumentMetadata: { ...instrumentMetadata, clockResolutionNs: 2n } });
+  assert.equal(evaluate(malformed, trace()).verdict, 'INDETERMINATE/CENSORED');
+  const quantified = trace([], { instrumentMetadata: {
+    ...instrumentMetadata,
+    uncertaintyStatus: 'QUANTIFIED',
+    measurementUncertaintyNs: 3n
+  } });
+  assert.equal(evaluate(quantified, trace()).verdict, 'ACCEPT');
 });
 
 test('rejects malformed interval bounds and malformed event timestamps', () => {
