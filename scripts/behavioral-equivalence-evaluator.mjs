@@ -280,9 +280,9 @@ export function evaluateEventEquivalence(reference, perturbed, options) {
   const pertProcessCoverage = coversHorizon(pert.processIntervals, horizonNs);
   const refRecorderCoverage = coversHorizon(ref.recorderIntervals, horizonNs);
   const pertRecorderCoverage = coversHorizon(pert.recorderIntervals, horizonNs);
-  const fullCoverage = refProcessCoverage && pertProcessCoverage &&
-    refRecorderCoverage && pertRecorderCoverage &&
-    ref.acquisitionErrors.length === 0 && pert.acquisitionErrors.length === 0;
+  const refCoverage = refProcessCoverage && refRecorderCoverage && ref.acquisitionErrors.length === 0;
+  const pertCoverage = pertProcessCoverage && pertRecorderCoverage && pert.acquisitionErrors.length === 0;
+  const fullCoverage = refCoverage && pertCoverage;
 
   evidence.push({
     type: 'COVERAGE',
@@ -292,11 +292,13 @@ export function evaluateEventEquivalence(reference, perturbed, options) {
     reference: {
       process: refProcessCoverage,
       recorder: refRecorderCoverage,
+      fullCoverage: refCoverage,
       acquisitionErrors: ref.acquisitionErrors
     },
     perturbed: {
       process: pertProcessCoverage,
       recorder: pertRecorderCoverage,
+      fullCoverage: pertCoverage,
       acquisitionErrors: pert.acquisitionErrors
     }
   });
@@ -315,11 +317,26 @@ export function evaluateEventEquivalence(reference, perturbed, options) {
   }
 
   if (ref.events.length !== pert.events.length) {
+    const shorterTraceIsComplete = ref.events.length < pert.events.length ? refCoverage : pertCoverage;
+    if (fullCoverage || shorterTraceIsComplete) {
+      return {
+        verdict: 'REJECT',
+        reasons: [ref.events.length < pert.events.length
+          ? 'An additional event is demonstrated against the fully observed shorter reference sequence'
+          : 'An event is missing from the fully observed shorter perturbed sequence'],
+        evidence: [{
+          type: 'EVENT_COUNT_MISMATCH',
+          referenceCount: ref.events.length,
+          perturbedCount: pert.events.length,
+          basis: fullCoverage ? 'BOTH_TRACES_FULLY_COVERED' : 'SHORTER_SEQUENCE_TRACE_FULLY_COVERED'
+        }, ...evidence]
+      };
+    }
     return {
-      verdict: 'REJECT',
-      reasons: ['Event count differs under complete horizon coverage'],
+      verdict: 'INDETERMINATE/CENSORED',
+      reasons: ['Observed event counts differ, but the shorter sequence may be incomplete'],
       evidence: [{
-        type: 'EVENT_COUNT_MISMATCH',
+        type: 'EVENT_COUNT_DIFFERENCE_NOT_YET_DEMONSTRABLE',
         referenceCount: ref.events.length,
         perturbedCount: pert.events.length
       }, ...evidence]
