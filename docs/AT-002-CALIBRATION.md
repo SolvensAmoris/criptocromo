@@ -95,7 +95,7 @@ Los módulos versionados conservan la misma inicialización PRNG y las mismas ec
 
 La partición obligatoria de artefactos es `artifacts/AT-002-CALIBRATION/<ENGINE>/<STAGE>/<RUN_ID>/`. Cada manifiesto futuro deberá incluir `engineVariant`, `engineVersion`, hash de fuente/configuración, semilla y etapa. Un artefacto solo puede contener una variante de motor y una etapa. Los archivos de O, D y S nunca se agregan en un mismo JSONL, CSV o análisis.
 
-**No se ha ejecutado CAL-01, CAL-02, CAL-03 ni CAL-04.** El runner actual solo genera el plan; el adaptador de ejecución y el escritor de artefactos son tareas posteriores.
+**No se ha ejecutado CAL-01, CAL-02, CAL-03 ni CAL-04.** El runner actual solo genera el plan; el adaptador de ejecución y el escritor de artefactos son tareas posteriores. El plan puede inspeccionarse con `npm run at002:plan`; el comando imprime JSON en stdout y no crea artefactos experimentales.
 
 ## 12. Pruebas unitarias y evidencia experimental
 
