@@ -10,7 +10,7 @@ on:
       - main
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
@@ -30,25 +30,30 @@ jobs:
         run: |
           mkdir -p ci-evidence
           {
-            echo "commit_sha=${GITHUB_SHA}"
+            echo "github_sha=${GITHUB_SHA}"
+            echo "checked_out_sha=$(git rev-parse HEAD)"
             echo "ref=${GITHUB_REF}"
             echo "node=$(node --version)"
             echo "npm=$(npm --version)"
             echo "runner_os=${RUNNER_OS}"
             echo "runner_arch=${RUNNER_ARCH}"
           } | tee ci-evidence/environment.txt
-
-      # Temporary bootstrap: the lockfile is committed by the push run below.
-      - name: Bootstrap package lock
-        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          sha256sum package-lock.json | tee ci-evidence/package-lock.sha256
 
       - name: Install locked dependencies
         run: npm ci
 
       - name: Dependency audit
         run: |
+          set +e
           npm audit --json > ci-evidence/npm-audit.json
+          audit_exit=$?
+          set -e
           node -e "const a=require('./ci-evidence/npm-audit.json'); const v=Object.entries(a.vulnerabilities||{}).map(([name,x])=>({name,severity:x.severity,range:x.range,fixAvailable:x.fixAvailable,via:x.via.map(y=>typeof y==='string'?y:{title:y.title,url:y.url,range:y.range})})); console.log(JSON.stringify({metadata:a.metadata?.vulnerabilities, vulnerabilities:v},null,2)); if ((a.metadata?.vulnerabilities?.total ?? 0) > 0) process.exit(1)"
+          if [ "$audit_exit" -ne 0 ]; then
+            echo "npm audit exited with status $audit_exit"
+            exit "$audit_exit"
+          fi
 
       - name: Run tests
         run: |
@@ -65,28 +70,14 @@ jobs:
           set -o pipefail
           npm run at002:plan 2>&1 | tee ci-evidence/at002-plan.log
 
-      - name: Commit generated lockfile
-        if: github.event_name == 'push'
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          if git ls-files --error-unmatch package-lock.json >/dev/null 2>&1; then
-            echo "package-lock.json is already tracked"
-            exit 0
-          fi
-          lock_content="$(base64 -w 0 package-lock.json)"
-          gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/package-lock.json" \
-            -f message="chore: add reproducible npm lockfile" \
-            -f content="$lock_content" \
-            -f branch="${GITHUB_REF_NAME}"
+      - name: Record dependency tree
+        run: npm ls --depth=0 2>&1 | tee ci-evidence/dependencies.log
 
-      - name: Upload CI evidence and bootstrapped lockfile
+      - name: Upload CI evidence
         if: always()
-        uses: actions/upload-artifact@v6
+        uses: actions/upload-artifact@v7.0.2
         with:
-          name: at002-ci-evidence-bootstrap
-          path: |
-            ci-evidence/
-            package-lock.json
+          name: at002-ci-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ci-evidence/
           if-no-files-found: warn
           retention-days: 30
