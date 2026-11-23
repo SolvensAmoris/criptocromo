@@ -1,13 +1,13 @@
 # AT-004 | Resultados del estudio de sensibilidad conductual v0.1
 
-**Run ID:** `BSENS-20261123-01`  
+**Run ID:** `BSENS-45197908602`  
 **Estado:** `EXECUTED_TECHNICALLY_VALID_INTERPRETATION_PENDING_REVIEW`  
-**Workflow:** [CI run #107](https://github.com/SolvensAmoris/criptocromo/actions/runs/45197104838)  
+**Workflow:** [sensitivity workflow run #5](https://github.com/SolvensAmoris/criptocromo/actions/runs/45197908602) y [CI run #113](https://github.com/SolvensAmoris/criptocromo/actions/runs/45197908597)  
 **PR:** [#13](https://github.com/SolvensAmoris/criptocromo/pull/13)  
 **Head del PR:** `47d690c03baed5222fdf5901ed1ccc41f84ff9a8`  
-**Commit de ejecución registrado en manifest:** `1a4cf8058db2510e1549116496405e90a9385781`  
-**Artifact ID:** `14829955023`  
-**SHA-256 del artifact reportado por GitHub:** `b2b63ff593767c208017d760053cf344ac0d5db7ae06f569ce99265e79291ecc`
+**Commit de ejecución registrado en manifest:** `f8be7c086171528c9e7d0a3368947fa5ccc6dc91`  
+**Artifact ID:** `14827797652`  
+**SHA-256 del artifact reportado por GitHub:** `ff78b3dc37937796bfb53fcc3886d3aa7f405aab19f0dd62599bf64373ed9f0d`
 
 ## 1. Integridad y cobertura
 
@@ -73,6 +73,6 @@ Para las otras nueve semillas, D abortó antes de completar tick 16; `Y_s` se ma
 Este estudio es sensibilidad local en diez estados iniciales CAL-01, no replicación independiente ni robustez global. No compara plataformas, no demuestra equivalencia científica y no valida el modelo. No modifica los artefactos históricos CAL-01 ni AT-003.
 
 **Conclusión:** el estudio fue ejecutado e íntegro. Su resultado principal no es que `1e-6` haya pasado, sino que no puede sostenerse como margen conductual general ni como epsilon estricto de trayectoria a partir de estos datos.
-## 6. Nota de procedencia sobre el ejecutor
+## 6. Confirmación de la ejecución final
 
-La ejecución reportada corresponde al commit de workflow `1a4cf8058db2510e1549116496405e90a9385781` y al artifact de CI #107. Después de esa ejecución se corrigió únicamente el contador auxiliar `totalRawOutOfRange` para conservar también los valores brutos fuera de [0,1] en D. Esa corrección no modifica el estado inicial, las perturbaciones, las transiciones, los estados comparados, el clipping O, los abortos D ni `Y_s`; por tanto, no cambia las cifras ni decisiones reportadas arriba. El artefacto histórico no se reescribe. La corrección queda en el código del PR y deberá validarse en la siguiente ejecución autorizada si se decide repetir el estudio.
+La ejecución final se realizó con el contador diagnóstico corregido, commit registrado `f8be7c086171528c9e7d0a3368947fa5ccc6dc91`, y run ID `BSENS-45197908602`. El conteo de valores brutos fuera de [0,1] en D quedó preservado (283 por cada una de las diez semillas en las condiciones perturbadas de `1e-6`, según la agregación del resumen). Los checksums del paquete final se verificaron 3/3. Esta es la ejecución reportada en las secciones anteriores; las ejecuciones previas se conservan como historial y no se mezclan con ella.
