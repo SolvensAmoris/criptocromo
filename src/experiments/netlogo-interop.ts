@@ -121,6 +121,12 @@ function exportInputs(): void {
     targetFrequency: config.protocol.targetFrequency,
     intensity: config.cal01.intensity,
     switches: config.cal01.switches,
+    simulationParameters: {
+      lambda: defaultConfig.lambda, alpha: defaultConfig.alpha, beta: defaultConfig.beta,
+      gamma: defaultConfig.gamma, eta: defaultConfig.eta, plasticityRate: defaultConfig.plasticityRate,
+      decayRate: defaultConfig.decayRate, resonanceWidth: defaultConfig.resonanceWidth
+    },
+    referenceEngines: config.engineVariants,
     tolerance,
     netlogoVersion: '7.0.4',
     hashes: {
@@ -128,6 +134,7 @@ function exportInputs(): void {
       protocolSha256: sha256(protocolRaw),
       netlogoModelSha256: sha256(modelRaw),
       behaviorSpaceSha256: sha256(experimentRaw),
+      exporterSha256: sha256(readFileSync(fileURLToPath(import.meta.url))),
       initialStatesSha256: sha256(initialText),
       typescriptExpectedSha256: sha256(expectedText)
     },
