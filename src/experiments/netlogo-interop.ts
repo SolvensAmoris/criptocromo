@@ -34,7 +34,12 @@ function verifyReferenceIdentity(): void {
     }
   }
 }
-const numberText = (value: number): string => Number.isInteger(value) ? String(value) : value.toFixed(17);
+const numberText = (value: number): string => {
+  if (Number.isInteger(value)) return String(value);
+  const encoded = value.toPrecision(17).replace(/e([+-]?\\d+)$/i, 'E$1');
+  if (Number(encoded) !== value) throw new Error(`Initial-state value failed IEEE-754 decimal round-trip: ${value}`);
+  return encoded;
+};
 const nlList = (value: unknown): string => {
   if (typeof value === 'number') return numberText(value);
   if (Array.isArray(value)) return `[${value.map(nlList).join(' ')}]`;
@@ -129,7 +134,8 @@ function exportInputs(): void {
     referenceEngines: config.engineVariants,
     tolerance,
     netlogoVersion: '7.0.4',
-    netlogoModelFormat: 'legacy .nlogo with 12 preserved sections and embedded BehaviorSpace experiment',
+    netlogoModelFormat: 'legacy .nlogo with 12 preserved sections; standalone BehaviorSpace XML setup',
+    initialStateNumberEncoding: 'IEEE-754 round-trip decimal with 17 significant digits (toPrecision(17))',
     hashes: {
       configSha256: sha256(configRaw),
       protocolSha256: sha256(protocolRaw),
