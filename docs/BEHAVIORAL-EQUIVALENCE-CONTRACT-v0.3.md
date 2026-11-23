@@ -23,14 +23,14 @@ La equivalencia es relativa a:
 
 Por tanto, no existe en este contrato una equivalencia conductual universal ni un margen universal.
 
-## 2. Dos capas de variables: (Y_t) y (Z_t)
+## 2. Dos capas de variables: `Y_t` y `Z_t`
 
-### 2.1 Observables conductuales primarios: (Y_t)
+### 2.1 Observables conductuales primarios: `Y_t`
 
-(Y_t) contiene las salidas que representan la conducta relevante para la tarea evaluada. Son las variables sobre las que se decide equivalencia.
+`Y_t` contiene las salidas que representan la conducta relevante para la tarea evaluada. Son las variables sobre las que se decide equivalencia.
 
 Antes de cada campaña, el protocolo específico debe:
-1. enumerar cada observable (Y_j);
+1. enumerar cada observable `Y_j`;
 2. definir su significado operativo y su relación con la tarea;
 3. especificar unidad, dominio, escala y método de captura;
 4. justificar por qué es una salida conductual relevante y no solo una variable interna disponible;
@@ -39,43 +39,43 @@ Antes de cada campaña, el protocolo específico debe:
 
 La selección debe hacerse antes de inspeccionar los resultados de la campaña. Si se utiliza un agregado, se debe justificar por qué no oculta diferencias conductualmente relevantes. Cuando corresponda, se conservarán observables desagregados como primarios y los agregados como secundarios.
 
-**ACT no queda designada aquí como observable primario por defecto.** Puede formar parte de (Y_t) si la especificación de la tarea justifica que la activación observada representa una salida conductual relevante. Tampoco se excluye por anticipado.
+**ACT no queda designada aquí como observable primario por defecto.** Puede formar parte de `Y_t` si la especificación de la tarea justifica que la activación observada representa una salida conductual relevante. Tampoco se excluye por anticipado.
 
-### 2.2 Variables internas de diagnóstico: (Z_t)
+### 2.2 Variables internas de diagnóstico: `Z_t`
 
-(Z_t) contiene variables útiles para explicar, auditar o caracterizar el mecanismo, pero que no forman parte de la decisión primaria de equivalencia salvo justificación expresa en el protocolo de tarea.
+`Z_t` contiene variables útiles para explicar, auditar o caracterizar el mecanismo, pero que no forman parte de la decisión primaria de equivalencia salvo justificación expresa en el protocolo de tarea.
 
 Candidatas como memoria (MEM), pesos (WGT), activación bruta, contribución vecinal u otros estados internos no se clasifican automáticamente como conducta ni automáticamente como diagnóstico. Su clasificación depende de la interfaz observable y de la pregunta experimental.
 
-Las variables (Z_t):
+Las variables `Z_t`:
 - se registran cuando sea posible;
 - pueden explicar divergencias o fallos;
-- no sustituyen a (Y_t) en la decisión primaria;
+- no sustituyen a `Y_t` en la decisión primaria;
 - no pueden convertirse retrospectivamente en observables primarios porque sus resultados sean más convenientes.
 
-Si una variable inicialmente diagnóstica pasa a ser relevante para otra tarea, debe declararse como (Y_t) en un protocolo nuevo o en una enmienda prospectiva, con justificación y tolerancia propias.
+Si una variable inicialmente diagnóstica pasa a ser relevante para otra tarea, debe declararse como `Y_t` en un protocolo nuevo o en una enmienda prospectiva, con justificación y tolerancia propias.
 
 ### 2.3 El motor y la validez de ejecución no son observables conductuales por defecto
 
-La identidad del motor, el estado del proceso, el motivo de aborto, el guard y la integridad del artefacto son metadatos o diagnósticos de ejecución. Deben registrarse, pero no deben confundirse con la conducta de (Y_t).
+La identidad del motor, el estado del proceso, el motivo de aborto, el guard y la integridad del artefacto son metadatos o diagnósticos de ejecución. Deben registrarse, pero no deben confundirse con la conducta de `Y_t`.
 
 Un evento de ejecución puede impedir evaluar equivalencia sin demostrar por sí mismo que las conductas divergieron.
 
 ## 3. Comparación de observables continuos
 
-Para cada observable continuo (j), el protocolo debe establecer una tolerancia positiva (	au_j), con unidad y justificación práctica explícitas.
+Para cada observable continuo `j`, el protocolo debe establecer una tolerancia positiva `tau_j`, con unidad y justificación práctica explícitas.
 
-Para la ejecución baseline (b) y la ejecución perturbada (p), una distancia normalizada admisible es:
+Para la ejecución baseline `b` y la ejecución perturbada `p`, una distancia normalizada admisible es:
 
-[
-d_j(t)=\frac{|Y^{(p)}_j(t)-Y^{(b)}_j(t)|}{\tau_j}
-]
+```text
+d_j(t) = abs(Y_p,j(t) - Y_b,j(t)) / tau_j
+```
 
-La condición numérica de equivalencia para el observable (j) durante el horizonte (0\leq t\leq T) es:
+La condición numérica de equivalencia para cada observable `j` durante el horizonte `0 <= t <= T` es:
 
-[
-\max_{0\leq t\leq T} d_j(t)\leq 1
-]
+```text
+max_{0 <= t <= T} d_j(t) <= 1
+```
 
 La condición debe cumplirse para **cada** observable continuo primario. No se permite promediar observables para compensar el incumplimiento de otro.
 
@@ -151,12 +151,12 @@ Cada comparación debe terminar en exactamente uno de estos estados:
 
 Una ejecución puede tener un estado diagnóstico de terminación como `COMPLETED`, `ABORTED_GUARD` o `ERROR`, pero ese estado no sustituye la clasificación de equivalencia.
 
-La coincidencia de terminación o de tick de guard no implica equivalencia de (Y_t). La equivalencia de un prefijo no implica equivalencia de la trayectoria completa.
+La coincidencia de terminación o de tick de guard no implica equivalencia de `Y_t`. La equivalencia de un prefijo no implica equivalencia de la trayectoria completa.
 
 ## 7. Definición operacional del margen de perturbación
 
 El margen se define únicamente después de fijar:
-- el contrato de observables (Y_t);
+- el contrato de observables `Y_t`;
 - el horizonte (T);
 - las tolerancias y eventos;
 - las condiciones iniciales y entradas;
@@ -169,10 +169,10 @@ Para una clase de perturbación (P) y una magnitud (delta), se evalúa si la com
 El **margen operacional observado** es el mayor nivel de perturbación efectivamente probado que satisface el criterio de aceptación en el conjunto y las condiciones declaradas. Debe informarse como resultado condicionado, por ejemplo:
 
 [
-M_{obs}(P, Y, T, C, V, S)
+`M_obs(P, Y, T, C, V, S)`
 ]
 
-donde (C) representa las condiciones de ejecución, (V) la variante/versión y (S) el conjunto de casos o semillas.
+donde `C` representa las condiciones de ejecución, `V` la variante/versión y `S` el conjunto de casos o semillas.
 
 Reglas:
 - No mezclar tipos de perturbación ni métricas de magnitud incompatibles.
@@ -204,7 +204,7 @@ No se puede convertir una tasa observada en una garantía poblacional sin incert
 
 Cada campaña que use este contrato debe preservar:
 - versión y hash del contrato metodológico;
-- protocolo de tarea y justificación de (Y_t) y (Z_t);
+- protocolo de tarea y justificación de `Y_t` y `Z_t`;
 - unidades, tolerancias y sus justificaciones;
 - horizonte (T), entradas, condiciones y reglas de eventos/fallo;
 - definición exacta de cada perturbación y su magnitud;
@@ -233,8 +233,8 @@ AT-003, CAL-01, CAL-02 y los estudios de sensibilidad anteriores conservan sus d
 ## 11. Checklist de aprobación para una campaña futura
 
 - [ ] Tarea y conducta relevante definidas.
-- [ ] (Y_t) seleccionado y justificado antes de observar resultados.
-- [ ] (Z_t) separado y clasificado como diagnóstico, salvo justificación explícita.
+- [ ] `Y_t` seleccionado y justificado antes de observar resultados.
+- [ ] `Z_t` separado y clasificado como diagnóstico, salvo justificación explícita.
 - [ ] Unidades, escalas y tolerancias por observable justificadas.
 - [ ] Eventos categóricos y orden definidos.
 - [ ] Fallos cualitativos definidos antes de la ejecución.
