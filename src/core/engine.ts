@@ -40,9 +40,11 @@ export function stepNetwork(
 
   const nextNodes = state.nodes.map((node, i) => {
     const distance = stimulus.frequency - node.preferredFrequency;
+    // With resonance disabled, retain a broad input path. Zero would disable
+    // the whole experiment and confound B with the presence/absence of input.
     const resonance = config.switches.resonance
       ? Math.exp(-config.resonanceWidth * distance * distance)
-      : 0;
+      : 1;
     const neighborSignal = state.nodes.reduce(
       (sum, neighbor, j) => sum + state.weights[i][j] * neighbor.activation,
       0
