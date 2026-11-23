@@ -57,6 +57,7 @@ Generated under `experiments/netlogo/interop-data/`:
 - `typescript_expected.csv`
 - `netlogo_trace.csv`
 - `comparison.json`
+- `netlogo-runtime.txt` (version, archive SHA-256 and console path)
 - `manifest.json`
 - `checksums.sha256`
 
