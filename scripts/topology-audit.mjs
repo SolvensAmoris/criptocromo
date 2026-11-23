@@ -35,6 +35,7 @@ export function analyzeDirectedGraph(weights) {
   for (let target = 0; target < n; target += 1) {
     for (let source = 0; source < n; source += 1) {
       const weight = weights[target][source];
+      if (!Number.isFinite(weight) || weight < 0) throw new Error('weights must be finite and non-negative');
       if (target === source && weight !== 0) throw new Error('self-loop detected where diagonal must be zero');
       if (target !== source && weight > 0) {
         adjacency[source].push(target);
