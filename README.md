@@ -22,7 +22,9 @@ El objetivo no es asumir que una combinación produce emergencia. Es diseñar ex
 
 AT-001-PILOT-01 se conserva como registro histórico. AT-002 mantiene motores versionados O, D y S para separar el comportamiento original con clipping, una variante diagnóstica sin clipping y una alternativa logística.
 
-**CAL-01:** revisión pre-ejecución documentada y cerrada. El ejecutor y el despacho manual están implementados. La campaña oficial todavía no se ha ejecutado; no hay resultados oficiales de CAL-01 publicados.
+**CAL-01:** campaña oficial ejecutada el 23 de noviembre de 2026. O completó 420/420 pasos y presentó saturación persistente; D terminó con ABORTED_GUARD en las diez semillas, con los datos parciales preservados. La integridad de los artefactos y sus checksums fue verificada. El análisis descriptivo está documentado en [Resultados oficiales CAL-01](docs/AT-002-CAL-01-RESULTS.md). CAL-01 no demuestra causalidad, sinergia ni emergencia.
+
+**CAL-02:** siguiente calibración prevista, con barrido pre-registrado de intensidad en O. Su ejecutor y workflow manual aún no están implementados; no ha sido ejecutada ni autorizada.
 
 ## Principios metodológicos
 
@@ -62,7 +64,7 @@ Generar el plan AT-002 en modo de solo planificación:
 npm run at002:plan
 ```
 
-El comando anterior no ejecuta una campaña. La campaña oficial CAL-01 tiene un workflow manual separado y exige autorización explícita `YES` más un identificador de ejecución. No se despacha al hacer merge ni al ejecutar el plan.
+El comando anterior no ejecuta una campaña. CAL-01 tuvo un workflow manual separado y exigió autorización explícita `YES` más un identificador de ejecución. No se despacha al hacer merge ni al ejecutar el plan.
 
 ## Arquitectura
 
@@ -77,6 +79,7 @@ El comando anterior no ejecuta una campaña. La campaña oficial CAL-01 tiene un
 
 - [Protocolo AT-002](docs/AT-002-CALIBRATION.md)
 - [Checklist de análisis de trazas CAL-01](docs/AT-002-CAL-01-TRACE-ANALYSIS-CHECKLIST.md)
+- [Resultados oficiales CAL-01](docs/AT-002-CAL-01-RESULTS.md)
 - [Workflow manual CAL-01](.github/workflows/at002-cal01.yml)
 
 ## Procedencia y timestamps verificables

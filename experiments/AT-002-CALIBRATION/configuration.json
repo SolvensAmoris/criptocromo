@@ -1,7 +1,7 @@
 {
   "experimentId": "AT-002-CALIBRATION",
   "protocolVersion": "0.3.0",
-  "status": "CAL01_REVIEW_CLOSED_NOT_EXECUTED_REQUIRES_EXPLICIT_AUTHORIZATION",
+  "status": "CAL01_EXECUTED_ANALYSIS_REVIEWED_PENDING_CAL02_IMPLEMENTATION",
   "predecessor": "AT-001-PILOT-01",
   "engineVariants": {
     "O": {
