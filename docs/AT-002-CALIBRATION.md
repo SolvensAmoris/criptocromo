@@ -102,3 +102,5 @@ La partición obligatoria de artefactos es `artifacts/AT-002-CALIBRATION/<ENGINE
 > Una prueba unitaria demuestra que una función cumple una propiedad especificada. Una campaña demuestra qué ocurrió al ejecutar el sistema bajo condiciones experimentales. No son intercambiables.
 
 Las pruebas del runner verifican la expansión del plan y sus barreras de aislamiento. No constituyen calibración, no producen resultados experimentales y no habilitan por sí solas GATE-01.
+
+La configuración fija además el identificador Git blob SHA-1 de cada módulo de motor y del kernel compartido D/S. El runner copia la versión y el hash de fuente al job planificado y rechaza identidades ausentes. SHA-1 aquí identifica el objeto Git del archivo; no debe etiquetarse como SHA-256 ni sustituir un digest SHA-256 de los artefactos finales.
