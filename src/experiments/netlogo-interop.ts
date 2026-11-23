@@ -22,7 +22,7 @@ const config = configJson as {
 const tolerance = 1e-10;
 const outDir = fileURLToPath(new URL('../../experiments/netlogo/interop-data/', import.meta.url));
 const sha256 = (value: string | Buffer): string => createHash('sha256').update(value).digest('hex');
-const gitBlobSha1 = (value: Buffer): string => createHash('sha1').update(`blob ${value.length}\\0`).update(value).digest('hex');
+const gitBlobSha1 = (value: Buffer): string => createHash('sha1').update(`blob ${value.length}\0`).update(value).digest('hex');
 function verifyReferenceIdentity(): void {
   for (const variant of ['O', 'D'] as const) {
     const identity = config.engineVariants[variant];
