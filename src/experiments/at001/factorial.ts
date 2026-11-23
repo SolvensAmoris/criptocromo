@@ -1,7 +1,6 @@
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
-import packageJson from '../../../package.json';
 import type { SimulationConfig } from '../../core/types';
 import { defaultConfig } from './config';
 import { runAt001 } from './model';
@@ -84,6 +83,7 @@ export const FACTORIAL_PROTOCOL = {
   recoverySteps: 24
 } as const;
 export const SYNERGY_THRESHOLD = 0.05;
+const packageJson = JSON.parse(readFileSync(path.resolve('package.json'), 'utf8')) as { version: string };
 const METRIC_KEYS: MetricKey[] = [
   'targetPeakActivation',
   'targetResidualActivation',

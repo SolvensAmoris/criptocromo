@@ -36,6 +36,12 @@ describe('deterministic simulation engine', () => {
     expect(meanActivation(createNetwork(defaultConfig))).toBe(0);
   });
 
+  it('keeps a broad input path when resonance is disabled', () => {
+    const config = { ...defaultConfig, switches: { ...defaultConfig.switches, resonance: false } };
+    const next = stepNetwork(createNetwork(config), { frequency: 0.5, intensity: 1 }, config);
+    expect(meanActivation(next)).toBeGreaterThan(0);
+  });
+
   it('rejects networks smaller than two nodes', () => {
     expect(() => createNetwork({ ...defaultConfig, nodeCount: 1 })).toThrow();
   });
