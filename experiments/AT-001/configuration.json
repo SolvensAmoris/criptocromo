@@ -1,0 +1,20 @@
+{
+  "experiment_id": "AT-001",
+  "engine_version": "0.1.0",
+  "seed": 1701,
+  "node_count": 24,
+  "steps": { "pulse": 18, "recovery": 24 },
+  "parameters": {
+    "lambda": 0.86,
+    "alpha": 0.72,
+    "beta": 0.42,
+    "gamma": 0.18,
+    "eta": 0.24,
+    "plasticityRate": 0.035,
+    "decayRate": 0.008,
+    "resonanceWidth": 18
+  },
+  "switches": { "memory": true, "resonance": true, "plasticity": true },
+  "stimulus": { "frequency": 0.5, "intensity": 1 },
+  "note": "Configuración inicial exploratoria. Congelar y versionar una configuración antes de cada campaña confirmatoria."
+}
