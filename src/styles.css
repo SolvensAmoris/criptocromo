@@ -42,3 +42,6 @@ button:hover{background:#ddc18b}
 .note p{font-size:12px;line-height:1.8;color:#9d968a;margin:7px 0}
 footer{display:flex;justify-content:space-between;border-top:1px solid #393329;padding-top:17px;font-size:9px;color:#777064}
 @media(max-width:760px){.shell{padding:22px 18px}.intro{padding:45px 0 28px}.workspace{grid-template-columns:1fr}.panel{padding:18px}.status{font-size:8px}.metrics{gap:14px}.metrics strong{font-size:20px}footer{gap:15px;flex-direction:column}}
+
+.toggle{display:flex!important;align-items:center;justify-content:flex-start!important;gap:9px;margin:0!important;color:#bcb4a7;font-size:12px}
+.toggle input{accent-color:#c6a467;width:14px;height:14px;margin:0}
