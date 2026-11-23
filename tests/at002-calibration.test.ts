@@ -135,9 +135,10 @@ describe('AT-002 CAL-01 execution and evidence writer', () => {
       expect(manifest.engineDependencyBlobSha1).toBeDefined();
       expect(manifest.sourceCommitSha).toMatch(/^[a-f0-9]{40}$/);
       for (const variantPath of [result.outputs.O, result.outputs.D]) {
-        const checksums = readFileSync(path.join(variantPath, 'checksums.sha256'), 'utf8').trim().split('\\n');
+        const checksums = readFileSync(path.join(variantPath, 'checksums.sha256'), 'utf8').trim().split('\n');
         for (const line of checksums) {
-          const [digest, name] = line.split(/\\s+/);
+          const digest = line.slice(0, 64);
+          const name = line.slice(66);
           const actual = createHash('sha256').update(readFileSync(path.join(variantPath, name))).digest('hex');
           expect(actual).toBe(digest);
         }
