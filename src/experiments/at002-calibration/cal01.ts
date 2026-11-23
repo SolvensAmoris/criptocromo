@@ -241,15 +241,16 @@ export function runCal01(
 
   try {
     const published: Record<Variant, string> = { O: '', D: '' };
+    const publishedDirectories: string[] = [];
     outputs.forEach((output, index) => {
-      published[output.variant] = writeVariantOutput(
-        output, config, runId, configSha256, temporaryDirectories[index]
-      );
+      const directory = writeVariantOutput(output, config, runId, configSha256, temporaryDirectories[index]);
+      published[output.variant] = directory;
+      publishedDirectories.push(directory);
     });
     return { runId, configSha256, outputs: published, recordCountPerVariant: outputs[0].records.length };
   } catch (error) {
     for (const directory of temporaryDirectories) if (existsSync(directory)) rmSync(directory, { recursive: true, force: true });
-    for (const directory of finalDirectories) if (existsSync(directory)) rmSync(directory, { recursive: true, force: true });
+    for (const directory of publishedDirectories) if (existsSync(directory)) rmSync(directory, { recursive: true, force: true });
     throw error;
   }
 }
