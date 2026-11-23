@@ -24,7 +24,7 @@ AT-001-PILOT-01 se conserva como registro histórico. AT-002 mantiene motores ve
 
 **CAL-01:** campaña oficial ejecutada el 23 de noviembre de 2026. O completó 420/420 pasos y presentó saturación persistente; D terminó con ABORTED_GUARD en las diez semillas, con los datos parciales preservados. La integridad de los artefactos y sus checksums fue verificada. El análisis descriptivo está documentado en [Resultados oficiales CAL-01](docs/AT-002-CAL-01-RESULTS.md). CAL-01 no demuestra causalidad, sinergia ni emergencia.
 
-**CAL-02:** ejecutor y workflow manual implementados en rama de trabajo, pendientes de revisión e integración. El barrido pre-registrado usa O, cinco intensidades, diez semillas pareadas y 2,100 pasos. La campaña no ha sido ejecutada ni autorizada.
+**CAL-02:** ejecutor y workflow manual integrados en `main` mediante PR #7 (commit `5000c7d`). La CI posterior al merge terminó correctamente: tests, build, auditoría de dependencias y plan AT-002. El barrido pre-registrado usa O, cinco intensidades, diez semillas pareadas y 2,100 pasos. La campaña oficial no ha sido ejecutada; permanece pendiente de revisión pre-ejecución y autorización explícita.
 
 ## Principios metodológicos
 
@@ -70,7 +70,7 @@ El comando anterior no ejecuta una campaña. CAL-01 tuvo un workflow manual sepa
 
 - `src/core/`: tipos y motor histórico.
 - `src/experiments/at001/`: modelo, configuración y métricas AT-001.
-- `src/experiments/at002-calibration/`: variantes O/D/S, instrumentación, diagnósticos y ejecutor CAL-01.
+- `src/experiments/at002-calibration/`: variantes O/D/S, instrumentación, diagnósticos y ejecutores CAL-01/CAL-02.
 - `experiments/AT-002-CALIBRATION/`: configuración versionada del protocolo.
 - `tests/`: pruebas automatizadas.
 - `docs/`: protocolos, límites metodológicos y procedimientos de análisis.
