@@ -1,21 +1,77 @@
 name: CI
+
 on:
   push:
-    branches: [main]
+    branches:
+      - main
+      - experiment/at-002-calibration-protocol
   pull_request:
-    branches: [main]
+    branches:
+      - main
+
+permissions:
+  contents: read
+
 jobs:
   verify:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout source
+        uses: actions/checkout@v7
+
+      - name: Set up Node.js 24
+        uses: actions/setup-node@v7
         with:
-          node-version: 20
-      - run: npm install
-      - name: Dependency audit report
+          node-version: 24
+          package-manager-cache: false
+
+      - name: Record execution identity
         run: |
-          npm audit --json > /tmp/npm-audit.json || true
-          node -e "const a=require('/tmp/npm-audit.json'); const v=Object.entries(a.vulnerabilities||{}).map(([name,x])=>({name,severity:x.severity,range:x.range,fixAvailable:x.fixAvailable,via:x.via.map(y=>typeof y==='string'?y:{title:y.title,url:y.url,range:y.range})})); console.log(JSON.stringify({metadata:a.metadata?.vulnerabilities, vulnerabilities:v},null,2)); if ((a.metadata?.vulnerabilities?.total ?? 0) > 0) process.exit(1)"
-      - run: npm test
-      - run: npm run build
+          mkdir -p ci-evidence
+          {
+            echo "commit_sha=${GITHUB_SHA}"
+            echo "ref=${GITHUB_REF}"
+            echo "node=$(node --version)"
+            echo "npm=$(npm --version)"
+            echo "runner_os=${RUNNER_OS}"
+            echo "runner_arch=${RUNNER_ARCH}"
+          } | tee ci-evidence/environment.txt
+
+      # Temporary bootstrap: this branch has no committed package-lock.json yet.
+      - name: Bootstrap package lock
+        run: npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Dependency audit
+        run: |
+          npm audit --json > ci-evidence/npm-audit.json
+          node -e "const a=require('./ci-evidence/npm-audit.json'); const v=Object.entries(a.vulnerabilities||{}).map(([name,x])=>({name,severity:x.severity,range:x.range,fixAvailable:x.fixAvailable,via:x.via.map(y=>typeof y==='string'?y:{title:y.title,url:y.url,range:y.range})})); console.log(JSON.stringify({metadata:a.metadata?.vulnerabilities, vulnerabilities:v},null,2)); if ((a.metadata?.vulnerabilities?.total ?? 0) > 0) process.exit(1)"
+
+      - name: Run tests
+        run: |
+          set -o pipefail
+          npm test 2>&1 | tee ci-evidence/npm-test.log
+
+      - name: Build application
+        run: |
+          set -o pipefail
+          npm run build 2>&1 | tee ci-evidence/npm-build.log
+
+      - name: Validate AT-002 plan
+        run: |
+          set -o pipefail
+          npm run at002:plan 2>&1 | tee ci-evidence/at002-plan.log
+
+      - name: Upload CI evidence and bootstrapped lockfile
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: at002-ci-evidence-bootstrap
+          path: |
+            ci-evidence/
+            package-lock.json
+          if-no-files-found: warn
+          retention-days: 30
