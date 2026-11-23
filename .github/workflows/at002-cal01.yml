@@ -1,0 +1,111 @@
+name: AT-002 CAL-01 authorized campaign
+
+on:
+  workflow_dispatch:
+    inputs:
+      authorization:
+        description: "Explicitly authorize the official CAL-01 campaign"
+        type: choice
+        required: true
+        default: "NO"
+        options:
+          - "NO"
+          - "YES"
+      run_id:
+        description: "Immutable campaign identifier"
+        type: string
+        required: true
+        default: "CAL01-20261123-01"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: at002-cal01-${{ inputs.run_id }}
+  cancel-in-progress: false
+
+jobs:
+  cal01:
+    if: ${{ inputs.authorization == 'YES' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Node.js 24.22.3
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24.22.3
+          package-manager-cache: false
+
+      - name: Validate authorization and run identity
+        env:
+          AUTHORIZATION: ${{ inputs.authorization }}
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          set -euo pipefail
+          test "$AUTHORIZATION" = "YES"
+          [[ "$RUN_ID" =~ ^[a-zA-Z0-9._-]+$ ]]
+          mkdir -p ci-evidence
+          {
+            echo "github_sha=${GITHUB_SHA}"
+            echo "checked_out_sha=$(git rev-parse HEAD)"
+            echo "run_id=$RUN_ID"
+            echo "authorization=$AUTHORIZATION"
+            echo "node=$(node --version)"
+            echo "npm=$(npm --version)"
+          } | tee ci-evidence/campaign-environment.txt
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run repository tests
+        run: npm test
+
+      - name: Build application
+        run: npm run build
+
+      - name: Validate AT-002 plan
+        run: npm run at002:plan
+
+      - name: Execute official CAL-01 campaign
+        env:
+          AT002_CAL01_AUTHORIZED: ${{ inputs.authorization }}
+          AT002_RUN_ID: ${{ inputs.run_id }}
+        run: npm run at002:cal01
+
+      - name: Summarize campaign outputs
+        if: always()
+        env:
+          RUN_ID: ${{ inputs.run_id }}
+        run: |
+          node --input-type=module <<'NODE'
+          import { existsSync, readFileSync, appendFileSync } from 'node:fs';
+          import path from 'node:path';
+          const root = 'artifacts/AT-002-CALIBRATION';
+          const lines = ['## AT-002 CAL-01 campaign result', '', `Run ID: ${process.env.RUN_ID}`, ''];
+          for (const variant of ['O', 'D']) {
+            const dir = path.join(root, variant, 'CAL-01', process.env.RUN_ID);
+            const manifestPath = path.join(dir, 'manifest.json');
+            if (!existsSync(manifestPath)) {
+              lines.push(`- ${variant}: no manifest published`);
+              continue;
+            }
+            const manifest = JSON.parse(readFileSync(manifestPath, 'utf8'));
+            lines.push(`- ${variant}: **${manifest.status}**; completed steps ${manifest.completedStepCount}/${manifest.plannedStepCount}; guard aborts ${manifest.guardAbortCount}`);
+          }
+          lines.push('', 'A D guard abort is a recorded diagnostic outcome, not a complete O/D trajectory comparison.');
+          appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.join('\n') + '\n');
+          NODE
+
+      - name: Upload CAL-01 campaign evidence
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: at002-cal01-${{ inputs.run_id }}
+          path: |
+            artifacts/AT-002-CALIBRATION/
+            ci-evidence/
+          if-no-files-found: warn
+          retention-days: 90
