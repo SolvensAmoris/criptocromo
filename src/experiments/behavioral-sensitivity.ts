@@ -45,7 +45,7 @@ function compareState(a: NetworkState, b: NetworkState) {
     maxWeight: maxAbs(a.weights.flatMap((row, i) => row.map((value, j) => value - b.weights[i][j])))
   };
 }
-type TickState = { tick: number; raw: number[]; state: NetworkState | null; clippedNodes: number[]; status: 'completed' | 'guard_aborted' };
+type TickState = { tick: number; raw: number[]; state: NetworkState | null; clippedNodes: number[]; rawOutOfRangeNodes: number[]; status: 'completed' | 'guard_aborted' };
 function simulate(seed: number, variant: Variant, variable: Variable, delta: number, seedIndex: number) {
   const simConfig: SimulationConfig = { ...defaultConfig, seed, switches: { ...config.cal01.switches } };
   const initial = engines[variant].createNetwork(simConfig);
@@ -60,20 +60,20 @@ function simulate(seed: number, variant: Variant, variable: Variable, delta: num
     const rawOutOfRangeNodes = raw.map((value, i) => value < 0 || value > 1 ? i : -1).filter(i => i >= 0);
     try {
       const next = engines[variant].stepNetwork(state, stimulus, simConfig);
-      ticks.push({ tick, raw, state: next, clippedNodes: variant === 'O' ? rawOutOfRangeNodes : [], status: 'completed' });
+      ticks.push({ tick, raw, state: next, clippedNodes: variant === 'O' ? rawOutOfRangeNodes : [], rawOutOfRangeNodes, status: 'completed' });
       state = next;
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
       if (variant !== 'D' || !message.includes('overflow guard')) throw error;
       abortTick = tick; abortReason = message;
-      ticks.push({ tick, raw, state: null, clippedNodes: [], status: 'guard_aborted' });
+      ticks.push({ tick, raw, state: null, clippedNodes: [], rawOutOfRangeNodes, status: 'guard_aborted' });
       break;
     }
   }
   const completed = ticks.filter(item => item.status === 'completed');
   const y16 = completed.length >= 16 ? completed.slice(0, 16).reduce((sum, item) => sum + item.state!.nodes.reduce((s, node) => s + node.activation, 0) / item.state!.nodes.length, 0) / 16 : null;
   const last = completed.at(-1);
-  return { seed, variant, variable, delta, status: abortTick === null && completed.length === 42 ? 'COMPLETE' : 'ABORTED_GUARD', abortTick, abortReason, firstClippingTick: ticks.find(item => item.clippedNodes.length > 0)?.tick ?? null, firstClippingNodes: ticks.find(item => item.clippedNodes.length > 0)?.clippedNodes ?? [], totalRawOutOfRange: ticks.reduce((sum, item) => sum + item.clippedNodes.length, 0), y16, lastCompletedTick: last?.tick ?? 0, lastCompletedMeanActivation: last ? last.state!.nodes.reduce((sum, node) => sum + node.activation, 0) / last.state!.nodes.length : null, ticks };
+  return { seed, variant, variable, delta, status: abortTick === null && completed.length === 42 ? 'COMPLETE' : 'ABORTED_GUARD', abortTick, abortReason, firstClippingTick: ticks.find(item => item.clippedNodes.length > 0)?.tick ?? null, firstClippingNodes: ticks.find(item => item.clippedNodes.length > 0)?.clippedNodes ?? [], totalRawOutOfRange: ticks.reduce((sum, item) => sum + item.rawOutOfRangeNodes.length, 0), y16, lastCompletedTick: last?.tick ?? 0, lastCompletedMeanActivation: last ? last.state!.nodes.reduce((sum, node) => sum + node.activation, 0) / last.state!.nodes.length : null, ticks };
 }
 function run() {
   if (process.env.SENSITIVITY_AUTHORIZED !== 'YES') throw new Error('Explicit SENSITIVITY_AUTHORIZED=YES required');
