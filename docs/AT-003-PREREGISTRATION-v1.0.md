@@ -200,7 +200,7 @@ Potencia objetivo 90%, \(\Delta=0.05\), planificación conservadora Bonferroni p
 t_{1-0.05/(2\cdot7),n-1}\frac{\sigma_U}{\sqrt n}\le\frac{\Delta}{2}
 \]
 
-Tamaño por potencia:
+Tamaño por potencia: esta fórmula dimensiona para 90% de potencia cuando el efecto verdadero está al menos a 2Δ (0.10) de cero, es decir, a una distancia de Δ respecto del umbral práctico de decisión ±Δ:
 
 \[
 n_{power}=\left\lceil
