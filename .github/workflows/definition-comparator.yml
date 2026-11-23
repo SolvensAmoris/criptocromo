@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - 'scripts/**'
+      - 'docs/BEHAVIORAL-EQUIVALENCE-EVALUATOR-v0.1.md'
       - 'docs/DEFINITION-COMPARATOR-CONTRACT-*.json'
       - 'src/core/engine.ts'
       - 'src/experiments/at002-calibration/engines/**'
@@ -30,6 +31,7 @@ jobs:
           cache: npm
       - run: npm ci
       - run: npm run test:definitions
+      - run: npm run test:behavioral-equivalence
       - name: Download pinned historical sensitivity artifact
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
