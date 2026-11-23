@@ -22,7 +22,6 @@ const artifactPath = path.resolve(process.cwd(), args[artifactIndex + 1]);
 const unzip = (member) => execFileSync('unzip', ['-p', artifactPath, member], { encoding: 'buffer', stdio: ['ignore', 'pipe', 'pipe'] });
 const checks = [];
 const add = (id, status, detail) => checks.push({ id, status, detail });
-const fail = (message) => { throw new Error(message); };
 
 function sourceAudit() {
   for (const [file, expectedBlob] of Object.entries(contract.sourceFiles)) {
@@ -117,6 +116,7 @@ function artifactAudit() {
     manifest.sourceCommit === contract.historicalReferences.PR13SensitivitySourceCommit &&
     manifest.trajectoryCount === contract.artifact.expectedTrajectoryCount &&
     manifest.expectedTrajectoryCount === contract.artifact.expectedTrajectoryCount &&
+    summaries.length === contract.artifact.expectedTrajectoryCount &&
     manifest.configSha256 === pinnedConfigSha256 &&
     manifest.pulseTicks === 18 && manifest.recoveryTicks === 24 &&
     JSON.stringify(manifest.levels) === JSON.stringify([1e-6, 1e-8, 1e-10]);
@@ -163,4 +163,4 @@ const report = {
 const output = JSON.stringify(report, null, 2) + '\n';
 if (outIndex >= 0 && args[outIndex + 1]) writeFileSync(path.resolve(process.cwd(), args[outIndex + 1]), output, { flag: 'w' });
 process.stdout.write(output);
-if (hasMismatch) process.exitCode = 1;
+if (overall !== 'DEFINITION_MATCH') process.exitCode = 1;
