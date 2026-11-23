@@ -12,7 +12,9 @@
     "factorial": "tsx src/experiments/at001/factorial.ts",
     "at002:plan": "tsx src/experiments/at002-calibration/plan.ts",
     "at002:cal01": "tsx src/experiments/at002-calibration/cal01.ts",
-    "at002:cal02": "tsx src/experiments/at002-calibration/cal02.ts"
+    "at002:cal02": "tsx src/experiments/at002-calibration/cal02.ts",
+    "netlogo:export": "tsx src/experiments/netlogo-interop.ts export",
+    "netlogo:compare": "tsx src/experiments/netlogo-interop.ts compare"
   },
   "dependencies": {
     "react": "^18.3.1",
