@@ -7,7 +7,7 @@ import { defaultConfig } from '../at001/config';
 import * as O from './engines/engine-v0.1.0-O';
 import * as D from './engines/engine-v0.2.0-D';
 import { calculateRawActivations } from './diagnostics';
-import type { At002Configuration, EngineVariantId } from './runner';
+import { buildCalibrationPlan, type At002Configuration } from './runner';
 
 type Variant = 'O' | 'D';
 type EngineApi = {
@@ -33,6 +33,10 @@ function verifyEngineIdentity(config: At002Configuration, repoRoot: string): voi
         throw new Error(`Source identity mismatch for engine ${variant}: dependency ${relativePath} differs from configuration`);
       }
     }
+  }
+  for (const [relativePath, expectedHash] of Object.entries(config.cal01.instrumentation)) {
+    const bytes = readFileSync(path.join(repoRoot, relativePath));
+    if (GIT_BLOB_SHA1(bytes) !== expectedHash) throw new Error(`CAL-01 instrumentation identity mismatch: ${relativePath}`);
   }
   if (config.engineVariants.D.sharedKernelBlobSha1 !== config.engineVariants.D.dependencyBlobSha1['src/experiments/at002-calibration/engines/variant-engine.ts']) {
     throw new Error('D shared kernel identity is inconsistent with dependency identity');
@@ -203,7 +207,7 @@ export function runCal01(
   configRaw: string
 ): { runId: string; configSha256: string; outputs: Record<Variant, string>; recordCountPerVariant: number } {
   if (!/^[a-zA-Z0-9._-]+$/.test(runId)) throw new Error('runId contains unsafe path characters');
-  if (config.cal01.variants.length !== 2 || config.cal01.variants[0] !== 'O' || config.cal01.variants[1] !== 'D') {
+  buildCalibrationPlan(config);\n  if (config.cal01.variants.length !== 2 || config.cal01.variants[0] !== 'O' || config.cal01.variants[1] !== 'D') {
     throw new Error('CAL-01 execution is restricted to paired O then D');
   }
   verifyEngineIdentity(config, repoRoot);
@@ -235,7 +239,7 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const configRaw = readFileSync(configPath, 'utf8');
   const config = JSON.parse(configRaw) as At002Configuration;
   const runId = process.env.AT002_RUN_ID;
-  if (!runId) throw new Error('Set AT002_RUN_ID explicitly; implicit run IDs are not permitted');
+  if (process.env.AT002_CAL01_AUTHORIZED !== 'YES') throw new Error('CAL-01 campaign is not authorized. Set AT002_CAL01_AUTHORIZED=YES only after protocol review.');\n  if (!runId) throw new Error('Set AT002_RUN_ID explicitly; implicit run IDs are not permitted');
   const outputRoot = path.join(repoRoot, config.artifactPolicy.root);
   const result = runCal01(config, runId, repoRoot, outputRoot, configRaw);
   process.stdout.write(JSON.stringify({ mode: 'CAL-01_EXECUTED', ...result }, null, 2) + '\n');
