@@ -118,7 +118,7 @@ Antes de la ejecución, el protocolo debe enumerar los fallos cualitativos que i
 
 La lista debe derivarse de la tarea. No se debe inventar ni ampliar después de observar qué ejecución falló. Un fallo cualitativo predefinido implica rechazo de equivalencia para la comparación evaluable.
 
-## 4.4 Ejemplo operativo: emisión de señales
+### 4.3 Ejemplo operativo: emisión de señales
 
 Supóngase que la tarea consiste en emitir una señal al detectar un evento. El protocolo específico define como observable conductual primario la secuencia de señales emitidas y sus tiempos. Las variables internas del detector se registran por separado como diagnóstico, salvo que la tarea justifique incluir alguna de ellas en el conjunto primario.
 
@@ -139,7 +139,7 @@ Una diferencia de 2 ticks no demuestra por sí sola un fallo general del sistema
 
 Si una ejecución termina antes del tick 100 por guard, no se declara equivalente hasta 100 ticks. Para preservar la distinción entre conducta y observación incompleta, el resultado se registra como `INDETERMINATE/CENSORED` cuando la terminación impide observar el horizonte completo y no existe otra regla de rechazo predefinida que ya se haya violado. El guard y su tick quedan registrados como diagnóstico. Si la tarea define expresamente la terminación anticipada como fallo cualitativo, se registra además ese rechazo por la regla de tarea, sin atribuirlo automáticamente a divergencia de señales no observadas.
 
-### 4.3 Guard y terminación anticipada
+### 4.4 Guard y terminación anticipada
 
 Un guard es, ante todo, un mecanismo de control o protección de la ejecución. Si una ejecución termina por guard antes de completar (T):
 - la ejecución se marca como `INDETERMINATE/CENSORED` para la equivalencia sobre el horizonte completo;
