@@ -80,11 +80,11 @@ function sourceSemantics() {
     variant.includes('state.weights[i][j] * neighbor.activation') &&
     variant.includes('nextNodes[i].activation * nextNodes[j].activation');
   const topologyRows = auditSeedTopologies(
-    contract.topology.seeds,
+    contract.artifact.expectedSeeds,
     contract.topology.nodeCount,
     contract.topology.perturbationLevels
   );
-  const topologyOk = graphSourcePinned && topologyRows.length === contract.topology.seeds.length &&
+  const topologyOk = graphSourcePinned && topologyRows.length === contract.artifact.expectedSeeds.length &&
     topologyRows.every((row) =>
       row.baseline.edgeCount === contract.topology.expectedEdgeCount &&
       row.baseline.isDag === false &&
