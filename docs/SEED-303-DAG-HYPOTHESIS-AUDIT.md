@@ -12,7 +12,7 @@ El motor construye una matriz de pesos dirigida con una entrada para cada par or
 
 `weights[i][j] = random() * 0.12` para `i != j`, y cero en la diagonal.
 
-Con 24 nodos existen 24 × 23 = 552 posiciones dirigidas fuera de la diagonal. El término de vecinos de cada transición se calcula como:
+Con 24 nodos existen 24 × 23 = 552 posiciones dirigidas fuera de la diagonal. Se reprodujo el generador LCG del motor para las diez semillas del artefacto y las 552/552 posiciones fuera de diagonal resultaron estrictamente positivas en cada semilla. Por tanto, en estas diez redes no solo hay posibilidad estructural de ciclos: están presentes las conexiones recíprocas necesarias para ciclos de longitud 2. El término de vecinos de cada transición se calcula como:
 
 `sum_j state.weights[i][j] * neighbor.activation`
 
