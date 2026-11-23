@@ -20,8 +20,10 @@ export function calculateRawActivations(state: NetworkState, stimulus: Stimulus,
     const resonance = config.switches.resonance ? Math.exp(-config.resonanceWidth * distance * distance) : 1;
     const neighborSignal = state.nodes.reduce((sum, neighbor, j) => sum + state.weights[i][j] * neighbor.activation, 0);
     const retainedMemory = config.switches.memory ? node.memory : 0;
-    return config.alpha * node.activation + config.beta * resonance * input +
+    const raw = config.alpha * node.activation + config.beta * resonance * input +
       config.gamma * neighborSignal + config.eta * retainedMemory;
+    if (!Number.isFinite(raw)) throw new Error('Non-finite raw activation during calibration instrumentation');
+    return raw;
   });
 }
 
