@@ -2,9 +2,11 @@
 
 ## Provenance
 
-Captured from the five source texts and the preregistration supplied by the project owner in the conversation on 2026-11-23. The source files are preserved as a historical snapshot. No behavior, parameter, criterion, or implementation has been corrected in this directory.
+Captured from the four Python source texts and the preregistration supplied by the project owner in the conversation on 2026-11-23. No behavior, parameter, criterion, or implementation has been corrected in this directory.
 
-**Integrity boundary:** SHA-256 values in this receipt identify the UTF-8/LF files materialized from the supplied text. They are not hashes of separately uploaded original filesystem objects. A byte-for-byte identity claim against an external local copy therefore remains pending.
+**Completeness:** the current capture contains four Python modules and one preregistration JSON. The previously referenced `experiment.py` was not included in this submission and remains pending. This PR therefore preserves the supplied subset, not a claim that the entire historical project source set is complete.
+
+**Integrity boundary:** SHA-256 values identify the UTF-8/LF files materialized from the supplied text. They are not hashes of separately uploaded original filesystem objects. Byte-for-byte identity against an external local copy remains pending.
 
 ## SHA-256
 
@@ -31,3 +33,7 @@ Captured from the five source texts and the preregistration supplied by the proj
 - `antikythera_drives.py`
 - `metrics.py`
 - `at004_prereg.json`
+
+## Pending input
+
+- `experiment.py`, previously referenced as part of the original AT-004 source set.
