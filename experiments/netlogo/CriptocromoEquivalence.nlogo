@@ -200,7 +200,6 @@ NetLogo 7.0.4
   <experiment name="Criptocromo CAL01 shared-state equivalence" repetitions="1" runMetricsEveryStep="false">
     <setup>setup</setup>
     <go>go</go>
-    <timeLimit steps="1"/>
     <metric>ticks</metric>
   </experiment>
 </experiments>@#$#@#$#@
