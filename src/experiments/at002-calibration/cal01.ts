@@ -239,9 +239,9 @@ export function runCal01(
   }
   for (const directory of finalDirectories) mkdirSync(path.dirname(directory), { recursive: true });
 
+  const publishedDirectories: string[] = [];
   try {
     const published: Record<Variant, string> = { O: '', D: '' };
-    const publishedDirectories: string[] = [];
     outputs.forEach((output, index) => {
       const directory = writeVariantOutput(output, config, runId, configSha256, temporaryDirectories[index]);
       published[output.variant] = directory;
