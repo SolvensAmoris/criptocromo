@@ -12,6 +12,19 @@ export function transformActivation(value: number, variant: ActivationVariant): 
   }
 }
 
+export function calculateRawActivations(state: NetworkState, stimulus: Stimulus, config: SimulationConfig): number[] {
+  if (!Number.isFinite(stimulus.frequency) || !Number.isFinite(stimulus.intensity)) throw new Error('Stimulus values must be finite');
+  const input = Math.min(1, Math.max(0, stimulus.intensity));
+  return state.nodes.map((node, i) => {
+    const distance = stimulus.frequency - node.preferredFrequency;
+    const resonance = config.switches.resonance ? Math.exp(-config.resonanceWidth * distance * distance) : 1;
+    const neighborSignal = state.nodes.reduce((sum, neighbor, j) => sum + state.weights[i][j] * neighbor.activation, 0);
+    const retainedMemory = config.switches.memory ? node.memory : 0;
+    return config.alpha * node.activation + config.beta * resonance * input +
+      config.gamma * neighborSignal + config.eta * retainedMemory;
+  });
+}
+
 export interface CalibrationTracePoint {
   tick: number;
   meanActivation: number;
