@@ -209,7 +209,6 @@ function writeVariantOutput(
     seedMetrics: output.metrics
   }, null, 2) + '\n', { flag: 'wx' });
 
-  const finalDirectory = path.join(path.dirname(path.dirname(temporaryDirectory)), output.variant, 'CAL-01', runId);
   // temporaryDirectory already lives under <root>/<variant>/CAL-01.
   const resolvedFinal = path.join(path.dirname(temporaryDirectory), runId);
   renameSync(temporaryDirectory, resolvedFinal);
