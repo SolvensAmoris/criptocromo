@@ -10,7 +10,7 @@ Criptocromo es el entorno experimental de ATANOR Ω para estudiar qué ocurre cu
 
 **Fase:** fundación experimental  
 **Primer experimento:** AT-001, Memoria resonante autoorganizada  
-**Plataforma inicial:** aplicación web local-first, ejecutable en navegadores de escritorio y móviles.
+**Plataforma inicial:** aplicación web adaptable, ejecutable en navegadores de escritorio y móviles.
 
 Esta primera versión es un prototipo de investigación. Sus ecuaciones son hipótesis de diseño computacional, no leyes físicas ni afirmaciones de equivalencia biológica.
 
