@@ -3,11 +3,11 @@ import { execFileSync } from 'node:child_process';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { defaultConfig } from '../at001/config';
-import * as O from '../at002-calibration/engines/engine-v0.1.0-O';
-import * as D from '../at002-calibration/engines/engine-v0.2.0-D';
-import { calculateRawActivations } from '../at002-calibration/diagnostics';
-import type { NetworkState, SimulationConfig, Stimulus } from '../../core/types';
+import { defaultConfig } from './at001/config';
+import * as O from './at002-calibration/engines/engine-v0.1.0-O';
+import * as D from './at002-calibration/engines/engine-v0.2.0-D';
+import { calculateRawActivations } from './at002-calibration/diagnostics';
+import type { NetworkState, SimulationConfig, Stimulus } from '../core/types';
 import configJson from '../../experiments/AT-002-CALIBRATION/configuration.json';
 
 type Variant = 'O' | 'D';
