@@ -19,7 +19,7 @@ describe('AT-002 versioned engines', () => {
   expect(D.stepNetwork(D.createNetwork(cfg),stimulus,cfg)).toEqual(O.stepNetwork(O.createNetwork(cfg),stimulus,cfg));
  });
  it('allows D to retain activation above one where O clips', () => {
-  const cfg={...defaultConfig,seed:101,alpha:1,beta:2,gamma:0,eta:0,switches:{memory:false,resonance:false,plasticity:false}};
+  const cfg={...defaultConfig,seed:101,alpha:1,beta:4,gamma:0,eta:0,switches:{memory:false,resonance:false,plasticity:false}};
   const input={frequency:0.5,intensity:1};
   const o=O.stepNetwork(O.createNetwork(cfg),input,cfg),d=D.stepNetwork(D.createNetwork(cfg),input,cfg);
   expect(o.nodes.every(node=>node.activation<=1)).toBe(true);expect(d.nodes.some(node=>node.activation>1)).toBe(true);
@@ -30,7 +30,7 @@ describe('AT-002 versioned engines', () => {
   expect(S.smoothSigmoid(0)).toBe(0.5);
  });
  it('fails fast when D exceeds overflow guard', () => {
-  const cfg={...defaultConfig,seed:101,alpha:1,beta:2000000,gamma:0,eta:0,switches:{memory:false,resonance:false,plasticity:false}};
+  const cfg={...defaultConfig,seed:101,alpha:1,beta:3000000,gamma:0,eta:0,switches:{memory:false,resonance:false,plasticity:false}};
   expect(()=>D.stepNetwork(D.createNetwork(cfg),{frequency:0.5,intensity:1},cfg)).toThrow(/overflow guard/);
  });
 });
