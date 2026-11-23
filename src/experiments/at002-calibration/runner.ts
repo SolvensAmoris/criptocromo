@@ -4,6 +4,7 @@ export type EngineVariantId = 'O' | 'D' | 'S';
 export type CalibrationStage = 'CAL-01' | 'CAL-02' | 'CAL-03' | 'CAL-04';
 
 export interface EngineIdentity {
+  module: string;
   version: string;
   sourceBlobSha1: string;
   dependencyBlobSha1: Record<string, string>;
