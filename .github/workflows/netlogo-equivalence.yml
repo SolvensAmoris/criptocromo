@@ -1,0 +1,88 @@
+name: NetLogo cross-platform equivalence
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/experiments/netlogo-interop.ts"
+      - "experiments/netlogo/**"
+      - "docs/NETLOGO-CROSS-PLATFORM-EQUIVALENCE-v0.1.md"
+      - ".github/workflows/netlogo-equivalence.yml"
+      - "package.json"
+      - "package-lock.json"
+  push:
+    branches: [main]
+    paths:
+      - "src/experiments/netlogo-interop.ts"
+      - "experiments/netlogo/**"
+      - "docs/NETLOGO-CROSS-PLATFORM-EQUIVALENCE-v0.1.md"
+      - ".github/workflows/netlogo-equivalence.yml"
+      - "package.json"
+      - "package-lock.json"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reproduce-cal01:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v7.0.1
+
+      - name: Set up Node.js 24.22.3
+        uses: actions/setup-node@v7.1.0
+        with:
+          node-version: 24.22.3
+          package-manager-cache: false
+
+      - name: Install locked dependencies
+        run: npm ci
+
+      - name: Run repository tests
+        run: npm test
+
+      - name: Export canonical initial states and Criptocromo reference traces
+        run: npm run netlogo:export
+
+      - name: Install pinned NetLogo 7.0.4
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p "$RUNNER_TEMP/netlogo"
+          curl --fail --location --retry 3 \
+            https://ccl.northwestern.edu/netlogo/7.0.4/NetLogo-7.0.4-64.tgz \
+            --output "$RUNNER_TEMP/netlogo-7.0.4.tgz"
+          tar -xzf "$RUNNER_TEMP/netlogo-7.0.4.tgz" -C "$RUNNER_TEMP/netlogo"
+          console="$(find "$RUNNER_TEMP/netlogo" -type f -name NetLogo_Console | head -n 1)"
+          test -n "$console"
+          chmod +x "$console"
+          echo "NETLOGO_CONSOLE=$console" >> "$GITHUB_ENV"
+          echo "netlogo_console=$console" >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Execute NetLogo BehaviorSpace experiment
+        working-directory: experiments/netlogo
+        shell: bash
+        run: |
+          set -euo pipefail
+          "$NETLOGO_CONSOLE" --headless \
+            --model "CriptocromoEquivalence.nlogo" \
+            --setup-file "behaviorspace.xml" \
+            --experiment "Criptocromo CAL01 shared-state equivalence" \
+            --threads 1 \
+            --table /dev/null
+
+      - name: Compare complete traces
+        run: npm run netlogo:compare
+
+      - name: Upload reproducibility package
+        if: always()
+        uses: actions/upload-artifact@v7.0.2
+        with:
+          name: netlogo-cal01-equivalence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            experiments/netlogo/interop-data/
+          if-no-files-found: error
+          retention-days: 90
