@@ -16,10 +16,8 @@ SEEDS = (0, 1, 2, 3, 4, 7, 13, 21, 42, 99)
 K_VALUES = (0.2, 0.5, 0.85)
 DT_VALUES = (0.1, 0.05, 0.025)
 WINDOW = (490.1, 500.0)
-PROTOCOL_RELATIVE = Path(
-    "experiments/ATANOR-AT004-001/protocol/"
-    "AT-004-PROTOCOL-AMENDMENT-01-v1.0.0.json"
-)
+REPOSITORY_ROOT = Path(__file__).resolve().parents[3]
+PROTOCOL_PATH = REPOSITORY_ROOT / "experiments/ATANOR-AT004-001/protocol/AT-004-PROTOCOL-AMENDMENT-01-v1.0.0.json"
 MODEL_PATH = Path(__file__).with_name("model.py")
 LOCK_PATH = Path(__file__).with_name("requirements.txt")
 CAMPAIGN_PATH = Path(__file__).resolve()
@@ -55,7 +53,7 @@ def _write_json(path: Path, value: object) -> bytes:
 
 
 def run_campaign(source_revision: str, output_dir: Path, attempt: int = 1) -> dict:
-    protocol_path = Path.cwd() / PROTOCOL_RELATIVE
+    protocol_path = PROTOCOL_PATH
     if not protocol_path.is_file():
         raise FileNotFoundError(protocol_path)
     output_dir.mkdir(parents=True, exist_ok=False)
