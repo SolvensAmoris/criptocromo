@@ -216,19 +216,16 @@ def simulate(theta0: Sequence[float], omega0: Sequence[float], coupling_k: float
     theta = list(theta0)
     times: list[float] = []
     r_history: list[float] = []
-    omega_history: list[list[float]] = []
     for step_index in range(steps):
         t = step_index * dt
         omega_t = modulated_frequencies(t, omega0, scaling, drives)
         theta = euler_step(theta, omega_t, coupling_k, matrix, dt)
         times.append((step_index + 1) * dt)
         r_history.append(order_parameter(theta))
-        omega_history.append(omega_t)
     return {
         "K": coupling_k,
         "times": times,
         "r_history": r_history,
-        "omega_history": omega_history,
         "theta_initial": list(theta0),
         "omega_initial": list(omega0),
         "theta_final": theta,
