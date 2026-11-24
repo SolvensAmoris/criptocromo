@@ -40,6 +40,17 @@ jobs:
           } | tee ci-evidence/environment.txt
           sha256sum package-lock.json | tee ci-evidence/package-lock.sha256
 
+      - name: Set up Python for AT-004 model tests
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install pinned AT-004 test dependency
+        run: python -m pip install -r experiments/ATANOR-AT004-001/revised/requirements.txt
+
+      - name: Run AT-004 model contract tests
+        run: python -m unittest discover -s experiments/ATANOR-AT004-001/revised -p 'test_*.py' -v
+
       - name: Install locked dependencies
         run: npm ci
 
