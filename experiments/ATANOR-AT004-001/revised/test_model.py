@@ -73,10 +73,10 @@ class AT004ModelTests(unittest.TestCase):
         self.assertAlmostEqual(result[0], 0.15, places=12)
         self.assertAlmostEqual(result[1], math.pi / 2 + 0.15, places=12)
 
-    def test_non_finite_initial_conditions_are_rejected(self):
+    def test_non_finite_and_non_numeric_initial_conditions_are_rejected(self):
         theta = [0.0] * 24
         omega = [1.0] * 24
-        for invalid in (math.nan, math.inf, -math.inf):
+        for invalid in (math.nan, math.inf, -math.inf, "0.5", True):
             with self.subTest(invalid=invalid):
                 bad_theta = theta.copy()
                 bad_theta[3] = invalid
