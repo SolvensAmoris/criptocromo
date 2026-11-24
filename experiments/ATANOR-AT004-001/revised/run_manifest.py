@@ -6,6 +6,7 @@ import hashlib
 import json
 from pathlib import Path
 import platform
+import re
 import sys
 
 import numpy as np
@@ -18,49 +19,65 @@ def _canonical_json_bytes(value: object) -> bytes:
     ).encode("utf-8")
 
 
+def _sha256(path: Path) -> str:
+    return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
 def write_run_bundle(result: dict, output_dir: str | Path, *,
                      source_revision: str,
-                     model_source_path: str | Path | None = None) -> dict:
-    """Write results.json and manifest.json, returning the manifest.
+                     model_source_path: str | Path,
+                     dependency_lock_path: str | Path) -> dict:
+    """Write canonical results and a manifest bound to exact source inputs.
 
-    source_revision must be the exact Git commit SHA used for the execution.
-    A model-source hash is included when the source file is supplied.
+    The caller must supply a full 40-character Git commit SHA and paths to
+    the exact model source and dependency lock used for the run.
     """
-    if not isinstance(source_revision, str) or not source_revision.strip():
-        raise ValueError("source_revision must be a non-empty Git revision")
-    if "seed" not in result or "K" not in result or "config" not in result:
+    if not isinstance(source_revision, str) or not re.fullmatch(r"[0-9a-f]{40}", source_revision):
+        raise ValueError("source_revision must be a full 40-character lowercase Git SHA")
+    if not isinstance(result, dict) or not {"seed", "K", "config"}.issubset(result):
         raise ValueError("result must include seed, K, and config")
+    seed = result["seed"]
+    if isinstance(seed, bool) or not isinstance(seed, int) or seed < 0:
+        raise ValueError("seed must be a non-negative integer")
+    coupling_k = result["K"]
+    if isinstance(coupling_k, bool) or not isinstance(coupling_k, (int, float)):
+        raise ValueError("K must be numeric")
+    if not np.isfinite(coupling_k):
+        raise ValueError("K must be finite")
+    if not isinstance(result["config"], dict):
+        raise ValueError("config must be a dictionary")
 
-    destination = Path(output_dir)
-    destination.mkdir(parents=True, exist_ok=True)
+    source_path = Path(model_source_path)
+    lock_path = Path(dependency_lock_path)
+    if not source_path.is_file():
+        raise FileNotFoundError(source_path)
+    if not lock_path.is_file():
+        raise FileNotFoundError(lock_path)
+
+    # Serialize and validate all inputs before creating or changing output files.
     result_bytes = _canonical_json_bytes(result)
-    result_path = destination / "results.json"
-    result_path.write_bytes(result_bytes)
-
-    model_hash = None
-    if model_source_path is not None:
-        source_path = Path(model_source_path)
-        if not source_path.is_file():
-            raise FileNotFoundError(source_path)
-        model_hash = hashlib.sha256(source_path.read_bytes()).hexdigest()
+    model_hash = _sha256(source_path)
+    lock_hash = _sha256(lock_path)
+    results_hash = hashlib.sha256(result_bytes).hexdigest()
 
     identity = {
         "source_revision": source_revision,
-        "seed": result["seed"],
-        "K": result["K"],
+        "seed": seed,
+        "K": coupling_k,
         "config": result["config"],
-        "results_sha256": hashlib.sha256(result_bytes).hexdigest(),
+        "model_source_sha256": model_hash,
+        "dependency_lock_sha256": lock_hash,
+        "results_sha256": results_hash,
     }
     run_id = hashlib.sha256(_canonical_json_bytes(identity)).hexdigest()
 
     manifest = {
-        "schema": "AT-004-run-manifest-v0.1",
+        "schema": "AT-004-run-manifest-v0.2",
         "run_id": run_id,
         "created_at_utc": datetime.now(timezone.utc).isoformat(),
         "source_revision": source_revision,
-        "model_source_sha256": model_hash,
-        "seed": result["seed"],
-        "K": result["K"],
+        "seed": seed,
+        "K": coupling_k,
         "config": result["config"],
         "environment": {
             "python": sys.version,
@@ -68,13 +85,21 @@ def write_run_bundle(result: dict, output_dir: str | Path, *,
             "platform": platform.platform(),
             "numpy": np.__version__,
         },
+        "inputs": {
+            "model_source_sha256": model_hash,
+            "dependency_lock_sha256": lock_hash,
+        },
         "artifacts": {
             "results.json": {
-                "sha256": hashlib.sha256(result_bytes).hexdigest(),
+                "sha256": results_hash,
                 "bytes": len(result_bytes),
             }
         },
     }
-    manifest_path = destination / "manifest.json"
-    manifest_path.write_bytes(_canonical_json_bytes(manifest) + b"\n")
+    manifest_bytes = _canonical_json_bytes(manifest) + b"\n"
+
+    destination = Path(output_dir)
+    destination.mkdir(parents=True, exist_ok=True)
+    (destination / "results.json").write_bytes(result_bytes)
+    (destination / "manifest.json").write_bytes(manifest_bytes)
     return manifest
