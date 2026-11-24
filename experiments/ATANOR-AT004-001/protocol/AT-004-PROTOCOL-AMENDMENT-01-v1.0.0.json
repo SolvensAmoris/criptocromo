@@ -1,0 +1,74 @@
+{
+  "protocol_id": "ATANOR-AT004-001-AMENDMENT-01",
+  "version": "1.0.0",
+  "status": "FROZEN_ON_MERGE",
+  "amends": "experiments/ATANOR-AT004-001/original/at004_prereg.json",
+  "does_not_modify_original": true,
+  "purpose": "Reproducibility campaign for the prospective 24-node candidate model. This amendment fixes implementation choices and the interpretation of the historical metric without changing the original preregistration file.",
+  "model": {
+    "node_count": 24,
+    "topology": {
+      "groups": [
+        {"nodes_inclusive": [0, 5], "period": "metonic", "period_years": 19.0, "drive_amplitude": 0.1},
+        {"nodes_inclusive": [6, 11], "period": "callippic", "period_years": 76.0, "drive_amplitude": 0.1},
+        {"nodes_inclusive": [12, 17], "period": "saros", "period_years": 18.03, "drive_amplitude": 0.1},
+        {"nodes_inclusive": [18, 23], "period": "lunar", "period_years": 0.0748, "drive_amplitude": 0.1}
+      ],
+      "within_group_weight": 0.8,
+      "between_group_weight": 0.2,
+      "hub_node": 0,
+      "hub_weight": 1.0,
+      "diagonal": 0.0,
+      "normalization": "divide all matrix entries by the global mean weighted degree sum(A_ij)/N; preserve symmetry"
+    },
+    "scaling_simulated_units_per_reference_year": 6.5,
+    "integrator": "forward_euler",
+    "dt_primary": 0.1,
+    "forcing_evaluated_at": "t_n before state update",
+    "observations_recorded_at": "t_(n+1) after state update",
+    "added_noise_sigma": 0.0,
+    "initial_phases": "numpy.random.default_rng(seed).uniform(0, 2*pi, 24)",
+    "natural_frequencies": "numpy.random.default_rng(seed).normal(1.0, 0.1, 24), using a separate Generator initialized with the same seed",
+    "duration": 500.0
+  },
+  "primary_campaign": {
+    "K_values": [0.2, 0.5, 0.85],
+    "seeds_in_fixed_order": [0, 1, 2, 3, 4, 7, 13, 21, 42, 99],
+    "runs": 30,
+    "primary_metric": "arithmetic mean of the final 100 post-update r samples; at dt=0.1 these are timestamps 490.1 through 500.0 inclusive",
+    "criteria": {
+      "0.2": {"operator": "<", "threshold": 0.4},
+      "0.5": {"operator": "between_inclusive", "lower": 0.4, "upper": 0.8},
+      "0.85": {"operator": ">", "threshold": 0.7}
+    },
+    "criterion_interpretation": "Use r_mean_last_100 for all three K values, matching the executable historical metrics.py implementation. The original JSON's shorthand r for K=0.5 and K=0.85 is explicitly resolved by this amendment.",
+    "aggregation": "Report every seed-level value and pass/fail; for each K report pass count, proportion, Wilson 95% interval, mean, sample standard deviation, median, minimum, and maximum. Do not pool K values. No all-seeds pass threshold or single campaign-wide binary success label is defined."
+  },
+  "numerical_robustness": {
+    "dt_values": [0.1, 0.05, 0.025],
+    "same_seed_and_K_pairs": true,
+    "comparison_metric": "trapezoidal time average of r over [490.1, 500.0], using linear interpolation at window boundaries",
+    "report": "For each seed and K, report values at all three dt and absolute differences from dt=0.1. Summarize differences by K.",
+    "tolerance": null,
+    "interpretation": "Descriptive numerical sensitivity only. No numerical convergence claim or pass/fail tolerance is asserted by this campaign."
+  },
+  "failure_policy": {
+    "non_finite_state_or_metric": "invalid run; stop campaign; preserve partial artifacts; do not replace seed",
+    "model_exception": "invalid run; stop campaign; preserve partial artifacts; do not replace seed",
+    "infrastructure_failure": "retry only the same frozen commit, seed, K, dt and parameters; retain attempt records",
+    "post_freeze_code_or_parameter_change": "prohibited for this campaign; requires a new amendment and new campaign identifier"
+  },
+  "environment": {
+    "python": "3.13.18",
+    "numpy": "2.3.5",
+    "dependency_lock": "experiments/ATANOR-AT004-001/revised/requirements.txt",
+    "source_identity": "full Git commit SHA plus SHA-256 of model, campaign runner, protocol JSON and dependency lock"
+  },
+  "claims_boundary": [
+    "This tests reproducibility and behavior of the specified computational model only.",
+    "It does not establish that the historical Antikythera mechanism operated as a Kuramoto network.",
+    "It does not establish emergence, synergy, physical causation or external validity.",
+    "The synthetic group-to-cycle mapping, equal amplitudes and global normalization are prospective modeling decisions, not archaeological findings.",
+    "The campaign is not evidence of numerical convergence."
+  ]
+}
