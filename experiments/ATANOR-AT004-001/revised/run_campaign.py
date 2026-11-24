@@ -59,10 +59,12 @@ def run_campaign(source_revision: str, output_dir: Path, attempt: int = 1) -> di
     output_dir.mkdir(parents=True, exist_ok=False)
 
     records = []
+    current_run = None
     try:
         for dt in DT_VALUES:
             for K in K_VALUES:
                 for seed in SEEDS:
+                    current_run = {"dt": dt, "K": K, "seed": seed}
                     result = run_experiment(K, T=500.0, seed=seed, dt=dt, scaling=6.5)
                     window_mean = window_mean_order_parameter(
                         result["times"], result["r_history"], *WINDOW
@@ -104,6 +106,8 @@ def run_campaign(source_revision: str, output_dir: Path, attempt: int = 1) -> di
                         "results_sha256": manifest["artifacts"]["results.json"]["sha256"],
                     })
 
+        if len(records) != len(SEEDS) * len(K_VALUES) * len(DT_VALUES):
+            raise RuntimeError("campaign did not complete the frozen 90-run matrix")
         primary = [row for row in records if row["dt"] == 0.1]
         per_k = {}
         for K in K_VALUES:
@@ -175,6 +179,7 @@ def run_campaign(source_revision: str, output_dir: Path, attempt: int = 1) -> di
             "source_revision": source_revision,
             "attempt": attempt,
             "completed_runs": len(records),
+            "failed_run": current_run,
             "failure_type": type(error).__name__,
             "failure_message": str(error),
             "failed_at_utc": datetime.now(timezone.utc).isoformat(),
