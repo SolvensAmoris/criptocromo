@@ -76,5 +76,5 @@ def write_run_bundle(result: dict, output_dir: str | Path, *,
         },
     }
     manifest_path = destination / "manifest.json"
-    manifest_path.write_bytes(_canonical_json_bytes(manifest) + b"\\n")
+    manifest_path.write_bytes(_canonical_json_bytes(manifest) + b"\n")
     return manifest
