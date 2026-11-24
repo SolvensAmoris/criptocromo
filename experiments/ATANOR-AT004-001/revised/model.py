@@ -53,17 +53,26 @@ def _finite_positive(value: float, name: str) -> None:
 def scaled_periods(scaling: float = DEFAULT_SCALING) -> dict[str, float]:
     """Return simulated-time periods; scaling is units per reference year."""
     _finite_positive(scaling, "scaling")
-    return {name: years * scaling for name, years in REFERENCE_PERIODS_YEARS.items()}
+    periods = {name: years * scaling for name, years in REFERENCE_PERIODS_YEARS.items()}
+    if not all(math.isfinite(period) and period > 0 for period in periods.values()):
+        raise ValueError("scaled periods must remain finite and positive")
+    return periods
 
 def validate_drive_specs(drives: Sequence[DriveSpec]) -> None:
     if len(drives) != 4:
         raise ValueError("exactly four group drive assignments are required")
+    if not all(isinstance(drive, DriveSpec) for drive in drives):
+        raise ValueError("every assignment must be a DriveSpec")
     groups = [drive.group for drive in drives]
+    if any(isinstance(group, bool) or not isinstance(group, int) for group in groups):
+        raise ValueError("drive groups must be integer indices")
     if sorted(groups) != [0, 1, 2, 3]:
         raise ValueError("each synthetic group 0..3 must have exactly one drive")
     for drive in drives:
         if drive.period not in REFERENCE_PERIODS_YEARS:
             raise ValueError(f"unknown reference period: {drive.period}")
+        if isinstance(drive.amplitude, bool) or not isinstance(drive.amplitude, (int, float)):
+            raise ValueError("drive amplitude must be numeric")
         if not math.isfinite(drive.amplitude) or drive.amplitude < 0:
             raise ValueError("drive amplitude must be finite and non-negative")
 
@@ -94,17 +103,48 @@ def order_parameter(theta: Sequence[float]) -> float:
 
 def window_mean_order_parameter(times: Sequence[float], values: Sequence[float],
                                 start: float, end: float) -> float:
-    """Mean r over an inclusive physical-time interval, independent of dt."""
-    if not math.isfinite(start) or not math.isfinite(end) or start > end:
-        raise ValueError("window bounds must be finite and start <= end")
-    if len(times) != len(values) or len(times) == 0:
-        raise ValueError("times and values must have equal non-zero lengths")
+    """Trapezoidal time average on an inclusive physical-time interval.
+
+    Boundary values are linearly interpolated. This is a quadrature estimate,
+    not exactly invariant to dt for nonlinear trajectories.
+    """
+    if not math.isfinite(start) or not math.isfinite(end) or start >= end:
+        raise ValueError("window bounds must be finite and start < end")
+    if len(times) != len(values) or len(times) < 2:
+        raise ValueError("times and values must have equal lengths >= 2")
     _finite_sequence(times, "times")
     _finite_sequence(values, "values")
-    selected = [value for time, value in zip(times, values) if start <= time <= end]
-    if not selected:
-        raise ValueError("time window contains no recorded samples")
-    return math.fsum(selected) / len(selected)
+    numeric_times = [float(value) for value in times]
+    numeric_values = [float(value) for value in values]
+    if any(right <= left for left, right in zip(numeric_times, numeric_times[1:])):
+        raise ValueError("times must be strictly increasing")
+    if start < numeric_times[0] or end > numeric_times[-1]:
+        raise ValueError("time window must be covered by the recorded interval")
+
+    def interpolate(target: float) -> float:
+        for index, time in enumerate(numeric_times):
+            if time == target:
+                return numeric_values[index]
+            if time > target:
+                left_time, right_time = numeric_times[index - 1], time
+                left_value, right_value = numeric_values[index - 1], numeric_values[index]
+                fraction = (target - left_time) / (right_time - left_time)
+                return left_value + fraction * (right_value - left_value)
+        return numeric_values[-1]
+
+    points = [(start, interpolate(start))]
+    points.extend(
+        (time, value)
+        for time, value in zip(numeric_times, numeric_values)
+        if start < time < end
+    )
+    points.append((end, interpolate(end)))
+    area = math.fsum(
+        0.5 * (left_value + right_value) * (right_time - left_time)
+        for (left_time, left_value), (right_time, right_value)
+        in zip(points, points[1:])
+    )
+    return area / (end - start)
 
 def euler_step(theta: Sequence[float], omega: Sequence[float], coupling_k: float,
                matrix: Sequence[Sequence[float]], dt: float) -> list[float]:
@@ -148,6 +188,7 @@ def modulated_frequencies(t: float, omega0: Sequence[float],
             2.0 * math.pi * t / periods[drive.period]
         )
         output.append(base_frequency * factor)
+    _finite_sequence(output, "modulated frequencies")
     return output
 
 def simulate(theta0: Sequence[float], omega0: Sequence[float], coupling_k: float,
