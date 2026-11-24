@@ -1,39 +1,41 @@
-# ATANOR-AT004-001 | Original source receipt v0.1
+# ATANOR-AT004-001 | Original source receipt v0.2
 
 ## Provenance
 
-Captured from the four Python source texts and the preregistration supplied by the project owner in the conversation on 2026-11-23. No behavior, parameter, criterion, or implementation has been corrected in this directory.
+This receipt inventories the historical source snapshot currently preserved in this repository. The files under `original/` are immutable audit inputs; no behavior, parameter, criterion, or implementation in that directory is corrected by this receipt.
 
-**Completeness:** the current capture contains four Python modules and one preregistration JSON. The previously referenced `experiment.py` was not included in this submission and remains pending. This PR therefore preserves the supplied subset, not a claim that the entire historical project source set is complete.
+**Completeness:** the capture contains five Python modules and the preregistration JSON: `experiment.py`, `network_24.py`, `kuramoto.py`, `antikythera_drives.py`, `metrics.py`, and `at004_prereg.json`. In particular, `experiment.py` is present in the repository and is no longer pending.
 
-**Integrity boundary:** SHA-256 values identify the UTF-8/LF files materialized from the supplied text. They are not hashes of separately uploaded original filesystem objects. Byte-for-byte identity against an external local copy remains pending.
+**Integrity boundary:** the identifiers below are Git blob object IDs returned by GitHub for the exact repository objects. They are not SHA-256 hashes of external local files. Byte-for-byte identity against any separate local copy remains unverified.
 
-## SHA-256
+## Git blob object IDs
 
-| File | SHA-256 |
+| File | Git blob object ID |
 |---|---|
-| antikythera_drives.py | 0aa80076d27da67f68e9e339a5eebf63b89a09ad479768487eee908138c4b40e |
-| at004_prereg.json | fc9610d9a06e75766a758ae898020f9aecd2c0c3a78650d3c81ab61d0a296c8f |
-| kuramoto.py | f422e45f60ab84a061f761c27403c3126adeb6ca7a79510196c2c5ea45e83fbe |
-| metrics.py | 6ef1125d248dc0e002ab59f80638952105763d69c902ff79c3fef8fd43c9a1eb |
-| network_24.py | 90af945f84930b6837cc64dcbcfcb98f79d1e2488d3164868e47c54a1daedf64 |
+| `antikythera_drives.py` | `5cad791fab04626cdd020f3502626808b4e9457d` |
+| `at004_prereg.json` | `a9912e2c16246b32df7a4786d6afdd09b2b6b56f` |
+| `experiment.py` | `55d5dd90a4ac4c51a578bdf2a68cc5786b6b1be0` |
+| `kuramoto.py` | `20d1ed7241b0c3b306884df8a5ce71414837ba9c` |
+| `metrics.py` | `1f4b58ada5f9cde1918bd452fd3039f9db61a67a` |
+| `network_24.py` | `cfe5aa3aea5f65950eecb9d6c27cc46418634606` |
 
 ## Handling rules
 
 - This directory is immutable historical input for the audit.
-- Characterization tests must describe the behavior of this snapshot, including undesirable behavior.
-- Corrections belong in a separately versioned implementation.
+- Characterization tests describe the behavior of this snapshot, including undesirable behavior.
+- Corrections belong in a separately versioned implementation under `revised/`.
 - The preregistered criteria and seed list are not amended by this receipt.
-- No confirmatory campaign is authorized by source preservation or unit tests.
+- No confirmatory campaign is authorized by source preservation, unit tests, or CI.
 
 ## Files
 
-- `kuramoto.py`
-- `network_24.py`
 - `antikythera_drives.py`
-- `metrics.py`
 - `at004_prereg.json`
+- `experiment.py`
+- `kuramoto.py`
+- `metrics.py`
+- `network_24.py`
 
-## Pending input
+## Remaining provenance limitation
 
-- `experiment.py`, previously referenced as part of the original AT-004 source set.
+The Git objects establish the identity of the captured repository texts. They do not establish byte-for-byte identity against an external filesystem copy or prove that the captured files were the exact bytes used in any historical execution. That requires an independently supplied original artifact or execution manifest.
