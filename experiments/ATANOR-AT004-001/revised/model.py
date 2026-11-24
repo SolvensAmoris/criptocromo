@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 import math
+from numbers import Real
 import numpy as np
 from typing import Sequence
 
@@ -40,13 +41,20 @@ PROPOSED_DRIVES = (
 
 def _finite_sequence(values: Sequence[float], name: str) -> None:
     try:
-        valid = all(math.isfinite(float(value)) for value in values)
+        valid = all(
+            not isinstance(value, bool)
+            and isinstance(value, Real)
+            and math.isfinite(float(value))
+            for value in values
+        )
     except (TypeError, ValueError, OverflowError):
         valid = False
     if not valid:
         raise ValueError(f"{name} must contain only finite numeric values")
 
 def _finite_positive(value: float, name: str) -> None:
+    if isinstance(value, bool) or not isinstance(value, Real):
+        raise ValueError(f"{name} must be a real numeric value")
     if not math.isfinite(value) or value <= 0:
         raise ValueError(f"{name} must be finite and positive")
 
@@ -71,7 +79,7 @@ def validate_drive_specs(drives: Sequence[DriveSpec]) -> None:
     for drive in drives:
         if drive.period not in REFERENCE_PERIODS_YEARS:
             raise ValueError(f"unknown reference period: {drive.period}")
-        if isinstance(drive.amplitude, bool) or not isinstance(drive.amplitude, (int, float)):
+        if isinstance(drive.amplitude, bool) or not isinstance(drive.amplitude, Real):
             raise ValueError("drive amplitude must be numeric")
         if not math.isfinite(drive.amplitude) or drive.amplitude < 0:
             raise ValueError("drive amplitude must be finite and non-negative")
@@ -108,7 +116,9 @@ def window_mean_order_parameter(times: Sequence[float], values: Sequence[float],
     Boundary values are linearly interpolated. This is a quadrature estimate,
     not exactly invariant to dt for nonlinear trajectories.
     """
-    if not math.isfinite(start) or not math.isfinite(end) or start >= end:
+    if (isinstance(start, bool) or isinstance(end, bool)
+            or not isinstance(start, Real) or not isinstance(end, Real)
+            or not math.isfinite(start) or not math.isfinite(end) or start >= end):
         raise ValueError("window bounds must be finite and start < end")
     if len(times) != len(values) or len(times) < 2:
         raise ValueError("times and values must have equal lengths >= 2")
@@ -158,8 +168,8 @@ def euler_step(theta: Sequence[float], omega: Sequence[float], coupling_k: float
     _finite_sequence([value for row in matrix for value in row], "matrix")
     if any(len(row) != n for row in matrix):
         raise ValueError("coupling matrix must be square")
-    if not math.isfinite(coupling_k):
-        raise ValueError("coupling_k must be finite")
+    if isinstance(coupling_k, bool) or not isinstance(coupling_k, Real) or not math.isfinite(coupling_k):
+        raise ValueError("coupling_k must be a finite real number")
     updated = []
     for i in range(n):
         coupling = math.fsum(
@@ -173,8 +183,8 @@ def modulated_frequencies(t: float, omega0: Sequence[float],
                           scaling: float = DEFAULT_SCALING,
                           drives: Sequence[DriveSpec] = PROPOSED_DRIVES) -> list[float]:
     """Apply the explicitly assigned cycle to each synthetic six-node group."""
-    if not math.isfinite(t):
-        raise ValueError("t must be finite")
+    if isinstance(t, bool) or not isinstance(t, Real) or not math.isfinite(t):
+        raise ValueError("t must be a finite real number")
     if len(omega0) != NODE_COUNT:
         raise ValueError(f"omega0 must contain exactly {NODE_COUNT} values")
     _finite_sequence(omega0, "base frequencies")
