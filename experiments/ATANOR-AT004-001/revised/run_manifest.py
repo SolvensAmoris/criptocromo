@@ -26,7 +26,9 @@ def _sha256(path: Path) -> str:
 def write_run_bundle(result: dict, output_dir: str | Path, *,
                      source_revision: str,
                      model_source_path: str | Path,
-                     dependency_lock_path: str | Path) -> dict:
+                     dependency_lock_path: str | Path,
+                     campaign_source_path: str | Path,
+                     protocol_path: str | Path) -> dict:
     """Write canonical results and a manifest bound to exact source inputs.
 
     The caller must supply a full 40-character Git commit SHA and paths to
@@ -49,15 +51,18 @@ def write_run_bundle(result: dict, output_dir: str | Path, *,
 
     source_path = Path(model_source_path)
     lock_path = Path(dependency_lock_path)
-    if not source_path.is_file():
-        raise FileNotFoundError(source_path)
-    if not lock_path.is_file():
-        raise FileNotFoundError(lock_path)
+    campaign_path = Path(campaign_source_path)
+    protocol_file = Path(protocol_path)
+    for required_path in (source_path, lock_path, campaign_path, protocol_file):
+        if not required_path.is_file():
+            raise FileNotFoundError(required_path)
 
     # Serialize and validate all inputs before creating or changing output files.
     result_bytes = _canonical_json_bytes(result)
     model_hash = _sha256(source_path)
     lock_hash = _sha256(lock_path)
+    campaign_hash = _sha256(campaign_path)
+    protocol_hash = _sha256(protocol_file)
     results_hash = hashlib.sha256(result_bytes).hexdigest()
 
     identity = {
@@ -67,6 +72,8 @@ def write_run_bundle(result: dict, output_dir: str | Path, *,
         "config": result["config"],
         "model_source_sha256": model_hash,
         "dependency_lock_sha256": lock_hash,
+        "campaign_source_sha256": campaign_hash,
+        "protocol_sha256": protocol_hash,
         "results_sha256": results_hash,
     }
     run_id = hashlib.sha256(_canonical_json_bytes(identity)).hexdigest()
@@ -88,6 +95,8 @@ def write_run_bundle(result: dict, output_dir: str | Path, *,
         "inputs": {
             "model_source_sha256": model_hash,
             "dependency_lock_sha256": lock_hash,
+            "campaign_source_sha256": campaign_hash,
+            "protocol_sha256": protocol_hash,
         },
         "artifacts": {
             "results.json": {
