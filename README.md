@@ -27,7 +27,7 @@ El objetivo no es asumir que una combinación produce emergencia. Es diseñar ex
 - **Topología y comparador:** [PR #15](https://github.com/SolvensAmoris/criptocromo/pull/15) y [PR #16](https://github.com/SolvensAmoris/criptocromo/pull/16) integraron la auditoría de red recurrente y el comparador de definición v0.2. La salida esperada es DEFINITION_PARTIAL_MATCH: el comparador detecta una diferencia conocida en el dominio de guardas TypeScript/NetLogo. No es una prueba formal de equivalencia semántica ni conductual.
 - **Análisis de semilla 303:** en la campaña BEHAVIORAL-SENSITIVITY-001 (run `BSENS-45198131816`), y únicamente entre las diez semillas preregistradas de esa campaña, 303 fue la única semilla D que completó 16 ticks. En el prefijo común 1–14 no presentó la mayor amplificación; tuvo el menor máximo de diferencia de estado de las diez en las tres variables comparadas a 1e-6. Esto no la convierte en una semilla excepcional fuera de ese conjunto ni permite inferir ticks censurados. Ver [Análisis de sensibilidad D: semilla 303](docs/BEHAVIORAL-EQUIVALENCE-SEED-303-ANALYSIS-v0.1.md).
 - **BEHAVIORAL-SENSITIVITY-002:** protocolo v0.1 en borrador para intervenir por separado la activación bruta y la contribución vecinal. La primitiva tiene pruebas unitarias; no existe ejecutor de campaña y no se ha ejecutado ni autorizado el estudio. Ver [Protocolo de sensibilidad por términos](docs/BEHAVIORAL-SENSITIVITY-002-PROTOCOL-v0.1.md).
-- **AT-004 / Anticítera:** la captura histórica conserva `experiment.py` y los demás módulos originales sin modificación. El candidato prospectivo v0.1 corrigió la ruta de integración, normalización y asignación sintética de ciclos. La revisión v0.2 añade validación de entradas finitas, pruebas de aislamiento para los cuatro grupos, resumen por ventana de tiempo físico y escritura de manifiestos con hashes de resultados y entorno. El candidato sigue sin congelarse; no se ha ejecutado ningún barrido confirmatorio. Ver [auditoría AT-004](docs/AT-004-AUDIT-02-IMPLEMENTATION-REVIEW-v0.2.md) y [especificación candidata](docs/AT-004-REVISED-MODEL-SPEC-v0.2.md).
+- **AT-004 / Anticítera:** el snapshot histórico y el preregistro original permanecen intactos. El candidato v0.3 corrige el promedio temporal mediante cuadratura trapezoidal, exige hashes de los cuatro insumos de ejecución y añade un runner de 90 ejecuciones (30 primarias y 60 de sensibilidad descriptiva). La enmienda de protocolo 01 v1.0.0 fija los parámetros y criterios sin afirmar convergencia ni correspondencia histórica. Está pendiente de CI y revisión antes de congelarse por merge; no se ha ejecutado la campaña. Ver [auditoría de preparación](docs/AT-004-AUDIT-03-CAMPAIGN-READINESS-v0.3.md), [especificación v0.3](docs/AT-004-REVISED-MODEL-SPEC-v0.3.md) y [protocolo 01](experiments/ATANOR-AT004-001/protocol/AT-004-PROTOCOL-AMENDMENT-01-v1.0.0.md).
 
 ### Siguiente secuencia
 
@@ -102,8 +102,10 @@ El comando anterior no ejecuta una campaña. Las campañas oficiales se despacha
 - [Contrato del comparador de definición v0.2](docs/DEFINITION-COMPARATOR-CONTRACT-v0.2.json)
 - [Auditoría topológica y de ciclo v0.2](docs/SEED-303-DAG-HYPOTHESIS-AUDIT-v0.2.md)
 - [Workflow del comparador](.github/workflows/definition-comparator.yml)
-- [Auditoría de implementación AT-004](docs/AT-004-AUDIT-02-IMPLEMENTATION-REVIEW-v0.2.md)
-- [Especificación candidata AT-004](docs/AT-004-REVISED-MODEL-SPEC-v0.2.md)
+- [Auditoría de preparación de campaña AT-004 v0.3](docs/AT-004-AUDIT-03-CAMPAIGN-READINESS-v0.3.md)
+- [Especificación candidata AT-004 v0.3](docs/AT-004-REVISED-MODEL-SPEC-v0.3.md)
+- [Enmienda de protocolo AT-004 v1.0.0](experiments/ATANOR-AT004-001/protocol/AT-004-PROTOCOL-AMENDMENT-01-v1.0.0.md)
+- [Workflow de campaña AT-004](.github/workflows/at004-campaign.yml)
 
 ## Procedencia y timestamps verificables
 
