@@ -1,94 +1,90 @@
-# AT-004-AUDIT-02 — Corrected implementation review
+# AT-004 — Implementation review and validation audit
 
-**Version:** 0.1  
+**Version:** 0.2  
 **Date:** 2026-11-24  
 **Status:** IMPLEMENTATION_CANDIDATE / NOT_FROZEN  
-**Baseline:** `main` at `d817bb9e1283c944408900533ba549e87f76aee0`  
+**Baseline:** merged candidate v0.1 on `main`; v0.2 review branch is prospective  
 **Historical source:** `experiments/ATANOR-AT004-001/original/`  
 **Prospective implementation:** `experiments/ATANOR-AT004-001/revised/`
 
 ## 1. Audit boundary
 
-This review distinguishes the immutable historical implementation from a prospective candidate. The historical files and preregistration remain unchanged. The revised implementation is not a retroactive correction of earlier runs and does not authorize a new sweep.
+The historical source snapshot and preregistration remain immutable. The v0.2 work strengthens implementation validation and execution provenance. It does not amend the historical preregistration and does not authorize a sweep or confirmatory run.
 
-The source receipt now confirms that `experiment.py` is present in the repository capture. Its earlier description as missing was stale. The capture contains five Python modules and the preregistration JSON. Git blob identities are recorded in `original/SOURCE-RECEIPT.md`; identity against a separate external filesystem copy remains unverified.
+## 2. v0.1 findings retained
 
-## 2. F-01 — Duplicate integration paths
+- F-01: one forward-Euler integration path in the candidate, with forcing at pre-update time and observables at post-update time.
+- F-02: global mean weighted-degree normalization preserves matrix symmetry; it does not normalize every row independently.
+- F-03: four synthetic six-node groups receive explicit cycle assignments. Mapping and equal amplitude 0.1 remain scientific review decisions.
 
-**Historical defect confirmed.** `original/kuramoto.py::simulate` and `original/network_24.py::run_experiment` each implement Euler updates but differ in:
-- step size (`0.05` default versus `0.1` in the experiment runner);
-- whether phase noise is added;
-- whether the order parameter is sampled before or after the update;
-- whether time-varying frequencies are applied.
+The v0.1 candidate's diagnostic values are not treated as confirmatory evidence. The single-seed results and one-K step-size comparison do not establish a transition or general numerical convergence.
 
-**Prospective disposition:** `revised/model.py` defines one `euler_step`; the simulation loop calls only that function. The candidate fixes `dt=0.1` as its default, uses zero added noise, evaluates forcing at the pre-update time `t_n`, and records observables at post-update times `t_{n+1}`. The last 100 samples at `T=500`, `dt=0.1` therefore correspond to 490.1 through 500.0 inclusive.
+## 3. v0.2 defects addressed
 
-**Status:** CLOSED IN CANDIDATE; requires review and CI confirmation.
+### D-01 — Non-finite initial conditions
 
-## 3. F-02 — Row normalization destroys symmetry
+**Finding:** v0.1 checked vector lengths but did not reject NaN or infinity in initial phases and frequencies. Such values could contaminate the trajectory and summary.
 
-**Historical defect confirmed, with an arithmetic correction to Audit-01 v0.1.** Before normalization, the 24-node matrix is symmetric. Its actual unnormalized row sums are:
-- node 0: 23.0;
-- nodes 1–5: 7.8 each;
-- nodes 6–23: 8.4 each.
+**Change:** finite numeric validation is applied to initial phase/frequency vectors, Euler inputs, generated phases, and order-parameter inputs.
 
-The earlier value 7.6 for every non-hub row was incorrect. The difference arises because node 0's edge is overwritten to weight 1.0 after the within-community weights are assigned.
+**Tests:** NaN, positive infinity, and negative infinity are rejected in both initial vectors.
 
-Row normalization divides by unequal row sums and makes the effective matrix asymmetric. In particular, `A[0,1]=1/23` while `A[1,0]=1/7.8`.
+**Status:** ADDRESSED IN CANDIDATE; CI review pending.
 
-**Prospective disposition:** the candidate divides the entire symmetric matrix by its global mean weighted degree, `sum_ij(A_ij)/N`. This preserves `A_ij=A_ji` and makes the mean row sum equal to 1. Individual row sums are not forced to 1; preserving the relative strength of the hub and community nodes is intentional.
+### D-02 — Incomplete drive-isolation coverage
 
-**Status:** CLOSED IN CANDIDATE; covered by symmetry and global-normalization tests.
+**Finding:** the earlier test activated only the Saros group.
 
-## 4. F-03 — Common-mode modulation and group assignment
+**Change:** the test suite independently activates each of the four assigned drives and verifies that exactly the corresponding six-node group is modulated.
 
-**Historical defect confirmed.** The historical function multiplies every oscillator's natural frequency by one shared scalar. The cycle signals are not assigned to the four six-node groups.
+**Status:** ADDRESSED IN CANDIDATE; CI review pending.
 
-**Prospective disposition:** the candidate uses an explicit synthetic partition:
-- nodes 0–5: Metonic;
-- nodes 6–11: Callippic;
-- nodes 12–17: Saros;
-- nodes 18–23: Lunar.
+### D-03 — Fixed sample count changes physical window with dt
 
-Each group receives only its assigned cycle. All four amplitudes are set to 0.1 in this candidate so that period is the varying drive property rather than amplitude. This is a prospective modeling choice, not an archaeological claim and not a parameter found in the original preregistration. It must be reviewed and frozen in a versioned amendment before any confirmatory run.
+**Finding:** the final 100 samples cover different physical durations when dt changes.
 
-The groups are synthetic partitions of a 24-node model. They are not asserted to correspond one-to-one to four physically isolated subsystems in the historical mechanism.
+**Change:** the historical `r_mean_last_100` is retained for historical-grid compatibility. A separate `window_mean_order_parameter(times, values, start, end)` computes an inclusive fixed physical-time window and rejects invalid or empty intervals.
 
-**Status:** IMPLEMENTED AS AN EXPLICIT PROPOSAL; SCIENTIFIC FREEZE PENDING REVIEW.
+**Tests:** equivalent linear traces sampled at different resolutions yield the same mean over the same physical interval.
 
-## 5. Additional defects handled or bounded
+**Status:** ADDRESSED IN CANDIDATE; CI review pending.
 
-- **Scaling propagation:** the explicit `scaling` argument is used for every period. Tests verify the four scaled periods and verify that changing the factor changes the result.
-- **Fixed topology size:** the candidate rejects `N != 24` rather than implying unsupported generality.
-- **Output completeness:** the candidate returns time stamps, per-node frequency traces, order-parameter history, final phases, coupling matrix, seed, and configuration. A durable run manifest, source revision and artifact checksums are still required before campaign execution.
-- **Overlapping historical thresholds:** the original Boolean criteria are not changed. Their overlap on `0.7 < r <= 0.8` remains a reporting limitation; no mutually exclusive labels are introduced.
-- **Aggregation:** the historical aggregate still pools K values. The candidate does not introduce a pooled aggregate. Any campaign report must summarize each K and topology separately.
-- **Fast lunar drive:** with scaling 6.5, the lunar period is 0.4862 simulated time units. At `dt=0.1`, this is approximately 4.862 steps per cycle. The candidate does not claim numerical convergence; the planned step-size study remains mandatory.
+### D-04 — Documentation/test-count mismatch
 
-## 6. Tests
+**Finding:** v0.1 documentation listed nine covered properties while the suite contained eight test methods.
 
-The prospective test suite covers:
-1. symmetric coupling matrix;
-2. global mean weighted-degree normalization;
-3. rejection of unsupported node counts;
-4. scaling propagation;
-5. complete, one-to-one group-drive assignment;
-6. isolation of a drive to its assigned group;
-7. one-step Euler arithmetic;
-8. deterministic seeded execution and post-update sampling;
-9. rejection of invalid time grids and insufficient summary windows.
+**Change:** v0.2 expands the suite and documents executable tests and covered properties separately. Test method count must be taken from the CI log, not inferred from a prose checklist.
 
-The local test run executed 8 tests successfully. CI must independently reproduce this result after the PR is opened. Unit tests validate implementation contracts; they are not experimental results.
+**Status:** ADDRESSED IN CANDIDATE; CI review pending.
 
-## 7. Execution gate
+### D-05 — Missing durable run manifest
 
-No AT-004 sweep or confirmatory execution has been run as part of this audit. The historical preregistration remains untouched. Before execution, reviewers must approve:
-- the synthetic group-to-cycle mapping;
-- the equal amplitude 0.1 choice or a justified alternative;
-- whether the changed coupling normalization is the intended prospective model;
-- the time-step convergence plan and numerical tolerances;
-- a versioned amendment to the historical protocol;
-- the run manifest, environment capture and artifact schema;
-- the original overlapping success-criterion interpretation.
+**Finding:** v0.1 returned in-memory results but did not write a durable manifest or checksums.
 
-**Current decision:** the candidate is ready for code review, not for confirmatory execution. MODEL != EVIDENCE.
+**Change:** `run_manifest.py` writes canonical `results.json` and `manifest.json`, recording the supplied Git revision, seed, K, configuration, runtime environment, result SHA-256, byte length, and optional model-source SHA-256. A deterministic run ID is derived from source revision, seed, K, configuration, and result digest.
+
+**Tests:** manifest identity, environment fields, result digest, required inputs, and optional source digest are tested.
+
+**Boundary:** a self-generated manifest is not an independent attestation, trusted timestamp, or proof of execution provenance. It is a reproducible record whose claims must be checked against retained files and repository history.
+
+**Status:** IMPLEMENTED IN CANDIDATE; CI review pending.
+
+## 4. Remaining scientific and numerical gates
+
+The following are not implementation defects and are intentionally not silently changed:
+
+- synthetic group-to-cycle mapping;
+- equal drive amplitude 0.1;
+- global coupling normalization as the prospective model definition;
+- overlapping historical thresholds for `0.7 < r <= 0.8`;
+- campaign aggregation and reporting by K/topology;
+- convergence tolerances and the required step-size design;
+- seed set and versioned protocol amendment.
+
+The lunar period remains 0.4862 simulated-time units at scaling 6.5. The previous one-K, one-seed diagnostic is preliminary only. A full convergence design must be preregistered before a confirmatory campaign.
+
+## 5. Execution status
+
+No multi-seed sweep or confirmatory campaign is included in this change. Unit tests validate implementation contracts only. No claim of physical correspondence, emergence, synergy, or causal effect is supported by these tests.
+
+**Decision:** v0.2 is prepared for code review and CI. It is not frozen and is not authorization to execute a confirmatory campaign.
