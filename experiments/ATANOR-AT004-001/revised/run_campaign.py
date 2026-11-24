@@ -48,7 +48,7 @@ def wilson_interval(successes: int, trials: int, z: float = 1.959963984540054):
 def _write_json(path: Path, value: object) -> bytes:
     payload = json.dumps(
         value, sort_keys=True, indent=2, ensure_ascii=False, allow_nan=False
-    ).encode("utf-8") + b"\\n"
+    ).encode("utf-8") + b"\n"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_bytes(payload)
     return payload
