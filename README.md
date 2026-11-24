@@ -1,9 +1,9 @@
 # Criptocromo | ATANOR Ω
 
 **Autor e investigador principal:** Luis Alberto Burciaga Miker  
-**Afiliación / ubicación:** Sonora, México  
+**Ubicación del autor (sin afiliación institucional declarada):** Ensenada, Baja California, México  
 **Proyecto:** ATANOR Ω · Criptocromo  
-© 2026 Luis Alberto Burciaga Miker · Sonora, México
+© 2026 Luis Alberto Burciaga Miker · Ensenada, Baja California, México
 
 **Laboratorio computacional de principios y comportamientos emergentes.**
 
@@ -25,8 +25,9 @@ El objetivo no es asumir que una combinación produce emergencia. Es diseñar ex
 - **Criterio conductual v0.2:** [PR #14](https://github.com/SolvensAmoris/criptocromo/pull/14) dejó un borrador metodológico no congelado. 1e-8 y 1e-10 permanecen sin aceptación; el margen general está sin resolver.
 - **Contrato de equivalencia conductual v0.3:** borrador prospectivo común para futuras pruebas de margen. Separa observables conductuales Yₜ de variables diagnósticas Zₜ, define tolerancias por observable, eventos categóricos, fallos cualitativos y censura por guard. No selecciona ACT por defecto ni modifica campañas anteriores. Ver [Contrato metodológico v0.3](docs/BEHAVIORAL-EQUIVALENCE-CONTRACT-v0.3.md).
 - **Topología y comparador:** [PR #15](https://github.com/SolvensAmoris/criptocromo/pull/15) y [PR #16](https://github.com/SolvensAmoris/criptocromo/pull/16) integraron la auditoría de red recurrente y el comparador de definición v0.2. La salida esperada es DEFINITION_PARTIAL_MATCH: el comparador detecta una diferencia conocida en el dominio de guardas TypeScript/NetLogo. No es una prueba formal de equivalencia semántica ni conductual.
-- **Análisis de semilla 303:** la evidencia original muestra que 303 es la única semilla D con 16 ticks completos, pero no la de mayor amplificación en el prefijo común 1–14. El informe específico está en [Análisis de sensibilidad D: semilla 303](docs/BEHAVIORAL-EQUIVALENCE-SEED-303-ANALYSIS-v0.1.md).
+- **Análisis de semilla 303:** en la campaña BEHAVIORAL-SENSITIVITY-001 (run `BSENS-45198131816`), y únicamente entre las diez semillas preregistradas de esa campaña, 303 fue la única semilla D que completó 16 ticks. En el prefijo común 1–14 no presentó la mayor amplificación; tuvo el menor máximo de diferencia de estado de las diez en las tres variables comparadas a 1e-6. Esto no la convierte en una semilla excepcional fuera de ese conjunto ni permite inferir ticks censurados. Ver [Análisis de sensibilidad D: semilla 303](docs/BEHAVIORAL-EQUIVALENCE-SEED-303-ANALYSIS-v0.1.md).
 - **BEHAVIORAL-SENSITIVITY-002:** protocolo v0.1 en borrador para intervenir por separado la activación bruta y la contribución vecinal. La primitiva tiene pruebas unitarias; no existe ejecutor de campaña y no se ha ejecutado ni autorizado el estudio. Ver [Protocolo de sensibilidad por términos](docs/BEHAVIORAL-SENSITIVITY-002-PROTOCOL-v0.1.md).
+- **AT-004 / Anticítera:** la captura histórica conserva `experiment.py` y los demás módulos originales sin modificación. La auditoría encontró dos rutas de integración, asimetría inducida por normalización por fila y modulación de frecuencias en modo común. La rama de revisión incorpora un candidato prospectivo con un integrador único, normalización global simétrica y asignación sintética explícita de ciclos a cuatro grupos. El candidato no está congelado, no se ha ejecutado ningún barrido y no constituye evidencia confirmatoria. Ver [auditoría AT-004](docs/AT-004-AUDIT-02-IMPLEMENTATION-REVIEW-v0.1.md) y [especificación candidata](docs/AT-004-REVISED-MODEL-SPEC-v0.1.md).
 
 ### Siguiente secuencia
 
@@ -81,6 +82,7 @@ El comando anterior no ejecuta una campaña. Las campañas oficiales se despacha
 - src/core/: tipos y motor histórico.
 - src/experiments/at001/: modelo, configuración y métricas AT-001.
 - src/experiments/at002-calibration/: variantes O/D/S, instrumentación, diagnósticos y ejecutores CAL-01/CAL-02.
+- experiments/ATANOR-AT004-001/revised/: candidato independiente de modelo y pruebas de regresión AT-004.
 - experiments/AT-002-CALIBRATION/: configuración versionada del protocolo.
 - experiments/netlogo/: implementación de comparación NetLogo.
 - scripts/: comparador de definición y auditoría topológica.
@@ -100,6 +102,8 @@ El comando anterior no ejecuta una campaña. Las campañas oficiales se despacha
 - [Contrato del comparador de definición v0.2](docs/DEFINITION-COMPARATOR-CONTRACT-v0.2.json)
 - [Auditoría topológica y de ciclo v0.2](docs/SEED-303-DAG-HYPOTHESIS-AUDIT-v0.2.md)
 - [Workflow del comparador](.github/workflows/definition-comparator.yml)
+- [Auditoría de implementación AT-004](docs/AT-004-AUDIT-02-IMPLEMENTATION-REVIEW-v0.1.md)
+- [Especificación candidata AT-004](docs/AT-004-REVISED-MODEL-SPEC-v0.1.md)
 
 ## Procedencia y timestamps verificables
 
