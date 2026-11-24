@@ -31,15 +31,20 @@ class DriveSpec:
     period: str
     amplitude: float
 
-# Synthetic partition only; group order follows the model's declared labels.
-# Equal amplitudes isolate period as the varying drive property. This is a
-# prospective modeling choice, not a claim about historical gear amplitudes.
 PROPOSED_DRIVES = (
     DriveSpec(0, "metonic", DEFAULT_DRIVE_AMPLITUDE),
     DriveSpec(1, "callippic", DEFAULT_DRIVE_AMPLITUDE),
     DriveSpec(2, "saros", DEFAULT_DRIVE_AMPLITUDE),
     DriveSpec(3, "lunar", DEFAULT_DRIVE_AMPLITUDE),
 )
+
+def _finite_sequence(values: Sequence[float], name: str) -> None:
+    try:
+        valid = all(math.isfinite(float(value)) for value in values)
+    except (TypeError, ValueError, OverflowError):
+        valid = False
+    if not valid:
+        raise ValueError(f"{name} must contain only finite numeric values")
 
 def _finite_positive(value: float, name: str) -> None:
     if not math.isfinite(value) or value <= 0:
@@ -63,12 +68,7 @@ def validate_drive_specs(drives: Sequence[DriveSpec]) -> None:
             raise ValueError("drive amplitude must be finite and non-negative")
 
 def build_coupling_matrix(n: int = NODE_COUNT) -> list[list[float]]:
-    """Build the symmetric 24-node matrix with global mean-strength normalization.
-
-    The unnormalized graph has within-group weight 0.8, between-group weight
-    0.2, and node 0 connected to every other node with weight 1.0.
-    Dividing by the global mean weighted degree preserves symmetry.
-    """
+    """Build the symmetric 24-node matrix with global mean-strength normalization."""
     if n != NODE_COUNT:
         raise ValueError(f"AT-004 topology is fixed at N={NODE_COUNT}")
     matrix = [[0.0] * n for _ in range(n)]
@@ -85,11 +85,26 @@ def build_coupling_matrix(n: int = NODE_COUNT) -> list[list[float]]:
     return [[weight / mean_weighted_degree for weight in row] for row in matrix]
 
 def order_parameter(theta: Sequence[float]) -> float:
-    if not theta:
+    if len(theta) == 0:
         raise ValueError("theta must not be empty")
+    _finite_sequence(theta, "theta")
     real = math.fsum(math.cos(value) for value in theta) / len(theta)
     imag = math.fsum(math.sin(value) for value in theta) / len(theta)
     return math.hypot(real, imag)
+
+def window_mean_order_parameter(times: Sequence[float], values: Sequence[float],
+                                start: float, end: float) -> float:
+    """Mean r over an inclusive physical-time interval, independent of dt."""
+    if not math.isfinite(start) or not math.isfinite(end) or start > end:
+        raise ValueError("window bounds must be finite and start <= end")
+    if len(times) != len(values) or len(times) == 0:
+        raise ValueError("times and values must have equal non-zero lengths")
+    _finite_sequence(times, "times")
+    _finite_sequence(values, "values")
+    selected = [value for time, value in zip(times, values) if start <= time <= end]
+    if not selected:
+        raise ValueError("time window contains no recorded samples")
+    return math.fsum(selected) / len(selected)
 
 def euler_step(theta: Sequence[float], omega: Sequence[float], coupling_k: float,
                matrix: Sequence[Sequence[float]], dt: float) -> list[float]:
@@ -98,6 +113,9 @@ def euler_step(theta: Sequence[float], omega: Sequence[float], coupling_k: float
     n = len(theta)
     if n == 0 or len(omega) != n or len(matrix) != n:
         raise ValueError("theta, omega and matrix dimensions must agree")
+    _finite_sequence(theta, "theta")
+    _finite_sequence(omega, "omega")
+    _finite_sequence([value for row in matrix for value in row], "matrix")
     if any(len(row) != n for row in matrix):
         raise ValueError("coupling matrix must be square")
     if not math.isfinite(coupling_k):
@@ -108,6 +126,7 @@ def euler_step(theta: Sequence[float], omega: Sequence[float], coupling_k: float
             matrix[i][j] * math.sin(theta[j] - theta[i]) for j in range(n)
         )
         updated.append(theta[i] + (omega[i] + coupling_k * coupling) * dt)
+    _finite_sequence(updated, "updated phases")
     return updated
 
 def modulated_frequencies(t: float, omega0: Sequence[float],
@@ -118,13 +137,12 @@ def modulated_frequencies(t: float, omega0: Sequence[float],
         raise ValueError("t must be finite")
     if len(omega0) != NODE_COUNT:
         raise ValueError(f"omega0 must contain exactly {NODE_COUNT} values")
+    _finite_sequence(omega0, "base frequencies")
     validate_drive_specs(drives)
     periods = scaled_periods(scaling)
     by_group = {drive.group: drive for drive in drives}
     output = []
     for node, base_frequency in enumerate(omega0):
-        if not math.isfinite(base_frequency):
-            raise ValueError("base frequencies must be finite")
         drive = by_group[node // GROUP_SIZE]
         factor = 1.0 + drive.amplitude * math.sin(
             2.0 * math.pi * t / periods[drive.period]
@@ -139,8 +157,13 @@ def simulate(theta0: Sequence[float], omega0: Sequence[float], coupling_k: float
     """Run deterministic, zero-noise Euler simulation; record post-update samples."""
     if len(theta0) != NODE_COUNT or len(omega0) != NODE_COUNT:
         raise ValueError(f"AT-004 requires {NODE_COUNT} initial phases and frequencies")
+    _finite_sequence(theta0, "initial phases")
+    _finite_sequence(omega0, "initial frequencies")
+    if not math.isfinite(coupling_k):
+        raise ValueError("coupling_k must be finite")
     _finite_positive(T, "T")
     _finite_positive(dt, "dt")
+    _finite_positive(scaling, "scaling")
     ratio = T / dt
     steps = round(ratio)
     if not math.isclose(ratio, steps, rel_tol=0.0, abs_tol=1e-9):
@@ -165,6 +188,8 @@ def simulate(theta0: Sequence[float], omega0: Sequence[float], coupling_k: float
         "times": times,
         "r_history": r_history,
         "omega_history": omega_history,
+        "theta_initial": list(theta0),
+        "omega_initial": list(omega0),
         "theta_final": theta,
         "A": matrix,
         "r_final": r_history[-1],
