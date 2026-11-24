@@ -65,11 +65,18 @@ def write_run_bundle(result: dict, output_dir: str | Path, *,
     protocol_hash = _sha256(protocol_file)
     results_hash = hashlib.sha256(result_bytes).hexdigest()
 
+    environment = {
+        "python": sys.version,
+        "python_implementation": platform.python_implementation(),
+        "platform": platform.platform(),
+        "numpy": np.__version__,
+    }
     identity = {
         "source_revision": source_revision,
         "seed": seed,
         "K": coupling_k,
         "config": result["config"],
+        "environment": environment,
         "model_source_sha256": model_hash,
         "dependency_lock_sha256": lock_hash,
         "campaign_source_sha256": campaign_hash,
@@ -86,12 +93,7 @@ def write_run_bundle(result: dict, output_dir: str | Path, *,
         "seed": seed,
         "K": coupling_k,
         "config": result["config"],
-        "environment": {
-            "python": sys.version,
-            "python_implementation": platform.python_implementation(),
-            "platform": platform.platform(),
-            "numpy": np.__version__,
-        },
+        "environment": environment,
         "inputs": {
             "model_source_sha256": model_hash,
             "dependency_lock_sha256": lock_hash,
