@@ -96,8 +96,7 @@ class AT004ModelTests(unittest.TestCase):
         self.assertAlmostEqual(first["times"][0], 0.1)
         self.assertAlmostEqual(first["times"][-1], 10.0)
         self.assertEqual(first["config"]["noise_sigma"], 0.0)
-        self.assertEqual(len(first["omega_history"]), 100)
-        self.assertEqual(len(first["omega_history"][0]), 24)
+        self.assertNotIn("omega_history", first)
         self.assertEqual(len(first["theta_initial"]), 24)
         self.assertEqual(len(first["omega_initial"]), 24)
 
