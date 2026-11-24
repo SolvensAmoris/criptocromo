@@ -210,8 +210,8 @@ def simulate(theta0: Sequence[float], omega0: Sequence[float], coupling_k: float
         raise ValueError(f"AT-004 requires {NODE_COUNT} initial phases and frequencies")
     _finite_sequence(theta0, "initial phases")
     _finite_sequence(omega0, "initial frequencies")
-    if not math.isfinite(coupling_k):
-        raise ValueError("coupling_k must be finite")
+    if isinstance(coupling_k, bool) or not isinstance(coupling_k, Real) or not math.isfinite(coupling_k):
+        raise ValueError("coupling_k must be a finite real number")
     _finite_positive(T, "T")
     _finite_positive(dt, "dt")
     _finite_positive(scaling, "scaling")
