@@ -1,0 +1,15 @@
+{
+  "campaign_id": "ATANOR-AT004-001",
+  "protocol": "ATANOR-AT004-001-AMENDMENT-01-v1.0.0",
+  "authorized": true,
+  "authorized_scope": {
+    "primary_runs": 30,
+    "numerical_sensitivity_runs": 60,
+    "total_runs": 90,
+    "K_values": [0.2, 0.5, 0.85],
+    "seeds": [0, 1, 2, 3, 4, 7, 13, 21, 42, 99],
+    "dt_values": [0.1, 0.05, 0.025]
+  },
+  "frozen_source_revision": "9d9898709d508f55f7edf778a24b88dd8c9b02d2",
+  "authorization_note": "Execution authorized by the project owner after code review and protocol amendment merge. This file triggers the isolated GitHub Actions campaign workflow; it does not modify the frozen model or protocol."
+}
